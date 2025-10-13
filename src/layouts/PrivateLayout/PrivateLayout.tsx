@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { Outlet } from "react-router-dom";
 
-const PublicLayout = () => {
+const PrivateLayout = () => {
 	return (
 		<>
 			<Toaster
@@ -19,4 +19,4 @@ const PublicLayout = () => {
 	);
 };
 
-export default PublicLayout;
+export default PrivateLayout;

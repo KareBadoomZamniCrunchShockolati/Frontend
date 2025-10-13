@@ -4,6 +4,7 @@ import Landing from "@/pages/Landing";
 import Temp from "@/pages/Temp";
 import PrivateLayout from "@/layouts/PrivateLayout/PrivateLayout";
 import DashBoard from "@/components/Custom/Profile/DashBoard";
+import FollowBar from "@/components/Custom/Profile/FollowBar";
 
 export const router = createBrowserRouter([
 	{
@@ -36,7 +37,7 @@ export const router = createBrowserRouter([
 			// 	element: <EditProfile />,
 			// },
 			{
-				path: "/DashBoard",
+				path: "/DashBoard", //  /:username
 				element: <DashBoard />,
 			},
 		],

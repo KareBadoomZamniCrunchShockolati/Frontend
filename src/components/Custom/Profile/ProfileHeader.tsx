@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import "../Profile/ProfileHeader.css";
 import { Button } from "@/components/ui/button";
 import { EllipsisIcon } from "@/components/ui/icons/lucide-ellipsis";
-function getUserInitials(fullName: string) {
+function getUserInitials(fullName: string):string {
   if (!fullName) {
     return "";
   }
@@ -23,37 +23,46 @@ function getUserInitials(fullName: string) {
 
   return initials;
 }
-
-const ProfileHeader = () => {
-  const fullName = "Saman Khajeamiri";
+interface Props {
+  fullName: string;
+  personalColor?: string;
+  followersCount?: number;
+  followingCount?: number;
+  doneChallengesCount?: number;
+}
+const ProfileHeader = ({
+  fullName,
+  personalColor = "bg-blue-500 text-white",
+}: Props) => {
   const initials = getUserInitials(fullName);
-  const personalColor = "bg-blue-500 text-white"; //costumizable
-
   return (
     <>
-    <Button variant="ghost">
+      <Button variant="ghost">
         <EllipsisIcon className="absolute top-5 right-5 w-6 h-6 rotate-90"></EllipsisIcon>
-    </Button>
-    <div className="flex justify-center mt-2.5">
-      <div className="relative">
-        <Avatar className="w-24 h-24 shadow-lg">
-          <AvatarImage
-            alt={fullName}
-            src="https://samanskh.github.io/assets/images/bio-photo.jpg"
-          />
-          <AvatarFallback className={`text-2xl font-semibold ${personalColor}`}>
-            {initials}
-          </AvatarFallback>
-        </Avatar>
+      </Button>
+      <div className="flex justify-center mt-2.5">
+        <div className="relative">
+          <Avatar className="w-24 h-24 shadow-lg">
+            <AvatarImage
+              alt={fullName}
+              src="https://samanskh.github.io/assets/images/bio-photo.jpg"
+            />
+            <AvatarFallback
+              className={`text-2xl font-semibold ${personalColor}`}
+            >
+              {initials}
+            </AvatarFallback>
+          </Avatar>
 
-        <img src="/badge.png" alt="badge" className="badge badge-center"></img>
-        <img src="/badge.png" alt="badge" className="badge badge-right"></img>
-        <img src="/badge.png" alt="badge" className="badge badge-left"></img>
-
+          <img
+            src="/badge.png"
+            alt="badge"
+            className="badge badge-center"
+          ></img>
+          <img src="/badge.png" alt="badge" className="badge badge-right"></img>
+          <img src="/badge.png" alt="badge" className="badge badge-left"></img>
+        </div>
       </div>
-    </div>
-
-    
     </>
   );
 };

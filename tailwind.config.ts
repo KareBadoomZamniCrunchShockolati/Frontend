@@ -12,6 +12,7 @@ const config: Config = {
 		extend: {
 			fontFamily: {
 				vazirmatn: ["Vazirmatn", "Roboto"],
+				peyda: ["Peyda", "sans-serif"], // added
 			},
 
 			colors: {

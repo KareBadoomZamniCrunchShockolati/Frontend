@@ -1,9 +1,14 @@
 import React from 'react'
 import ProfileHeader from './ProfileHeader'
+import FollowBar from './FollowBar'
 
 const DashBoard = () => {
   return (
-    <ProfileHeader />
+    <>
+    <ProfileHeader fullName='saman khajeamiri' />
+    <FollowBar/>
+    
+    </>
   )
 }
 
