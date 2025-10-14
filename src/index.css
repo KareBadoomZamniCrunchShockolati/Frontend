@@ -45,6 +45,8 @@
 	--borderDefault : oklch(0% 0 0);
 	--borderFoucus : oklch(0.6378 0.1961 257.1);
 	--borderFoucusShadow : oklch(0.3637 0.244 267.42);
+	--borderInvalidShadow : oklch(0.3788 0.1554 29.23);
+	--borderInvalid : oklch(0.5347 0.2194 29.23);
 	--input: oklch(0.922 0 0);
 	--ring: oklch(0.708 0 0);
 	--chart-1: oklch(0.646 0.222 41.116);
