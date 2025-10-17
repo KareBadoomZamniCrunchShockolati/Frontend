@@ -225,3 +225,70 @@
 	font-family: 'Peyda';
  }
 
+
+
+/* animation for the side sheet */
+
+@keyframes enter-from-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes enter-from-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes exit-to-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes exit-to-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes overlay-show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+[data-state="open"] .sheet-overlay {
+  animation: overlay-show 200ms ease-out;
+}
+
+[data-state="open"][data-side="right"] .sheet-content {
+  animation: enter-from-right 250ms ease-out;
+}
+[data-state="closed"][data-side="right"] .sheet-content {
+  animation: exit-to-right 200ms ease-in;
+}
+
+/* @import "@/styles/animations.css"; if you extracted it separately */
+
+
+/* @keyframes slide-in-from-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+[data-state="open"][data-side="right"] .sheet-content {
+  animation: slide-in-from-right 250ms ease-out;
+} */

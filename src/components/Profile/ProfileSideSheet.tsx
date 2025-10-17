@@ -33,10 +33,7 @@ const ProfileSideSheet = () => {
             ></EllipsisIcon>
           </Button>
         </SheetTrigger>
-        <SheetContent
-          side="right"
-          className="animate-slideIn shadow-xl bg-white"
-        >
+        <SheetContent side={"right"}>
           <SheetHeader>
             <SheetTitle>تنظیمات</SheetTitle>
             {/* <SheetDescription>
@@ -45,17 +42,35 @@ const ProfileSideSheet = () => {
               </SheetDescription> */}
           </SheetHeader>
           <div className="grid flex-1 auto-rows-min gap-6 px-1 mt-6">
+            <CustomButton
+              pageAddress="/temp"
+              backgroundColor="bg-[var(--color-gray-main)]"
+            >
+              شخصی‌سازی
+            </CustomButton>
 
-                <CustomButton pageAddress="/temp" backgroundColor="bg-[var(--color-gray-main)]" >شخصی‌سازی</CustomButton>
-
-                <CustomButton pageAddress="/temp" backgroundColor="bg-[var(--color-gray-main)]" >ذخیره شده‌ها</CustomButton>
+            <CustomButton
+              pageAddress="/temp"
+              backgroundColor="bg-[var(--color-gray-main)]"
+            >
+              ذخیره شده‌ها
+            </CustomButton>
 
             <div className="border-t"></div>
-              
-                <CustomButton pageAddress="/temp" backgroundColor="bg-[var(--color-red-main)]" >خروج از حساب</CustomButton>
 
-                <CustomButton pageAddress="/temp" backgroundColor="bg-[var(--color-red-main)]" >حذف حساب کاربری</CustomButton>
+            <CustomButton
+              pageAddress="/temp"
+              backgroundColor="bg-[var(--color-red-main)]"
+            >
+              خروج از حساب
+            </CustomButton>
 
+            <CustomButton
+              pageAddress="/temp"
+              backgroundColor="bg-[var(--color-red-main)]"
+            >
+              حذف حساب کاربری
+            </CustomButton>
           </div>
           {/* <SheetFooter>
               <Button type="submit">Save changes</Button>
