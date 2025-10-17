@@ -11,10 +11,5 @@ export const basicSchema = yup.object().shape({
   password: yup
     .string()
     .min(5, "رمز عبور باید حداقل 5 کلمه باشد")
-    // .matches(passwordRules, { message: "Please create a stronger password" })
     .required("رمز عبور ضروری است"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password"), null], "Passwords must match")
-    .required("Required"),
 });
