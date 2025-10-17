@@ -1,5 +1,6 @@
 import CustomInput from "@/components/Custom/CustomInput";
 import { Button } from "@/components/ui/button";
+import CustomCheckbox from '@/components/Custom/CustomCheckbox';
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { Eye, EyeClosed } from "lucide-react";
@@ -59,6 +60,8 @@ function SignUp() {
           </Form>
         )}
       </Formik>
+      <CustomCheckbox checked = {false} labelText="چک باکس اول" textTransparentOnChecked = {true} />
+			<CustomCheckbox checked = {false} labelText="چک باکس دوم" textTransparentOnChecked = {false}/>
     </div>
   );
 }
