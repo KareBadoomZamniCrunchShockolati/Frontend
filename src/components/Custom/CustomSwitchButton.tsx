@@ -34,14 +34,15 @@ const CustomSwitchButton: React.FC<CustomSwitchButtonProps> = ({
         checked={checked}
         onCheckedChange={handleChange}
         className={`
-            ${classNames?.switch || ''}
+            ${classNames?.switch || ''} 
             border-[2px] 
-            ${checked ? 'bg-orange-500 border-orange-500' : 'bg-white border-black'} 
-            data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500
+            ${checked ? 'bg-[var(--orange-primary-color)] border-[var(--orange-primary-color)]' : 'bg-white border-black'} 
+            data-[state=checked]:bg-[var(--orange-primary-color)] data-[state=checked]:border-[var(--orange-primary-color)]
             data-[state=unchecked]:bg-white data-[state=unchecked]:border-black
             relative inline-flex items-center rounded-full transition-colors duration-300
             shadow-none
         `}
+
       >
       </Switch>
     </div>
