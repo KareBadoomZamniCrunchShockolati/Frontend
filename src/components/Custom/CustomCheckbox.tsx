@@ -1,48 +1,66 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Field, type FieldProps } from "formik";
 
 interface CustomCheckboxProps {
-  checked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
+  name: string;
   labelText?: string;
-  textTransparentOnChecked?: boolean;  
+  textTransparentOnChecked?: boolean; 
+  classNames?: {
+    label?: string;
+    checkbox?: string;
+  }; 
 }
 
 const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
-  checked = false,
-  onCheckedChange,
+  name,
   labelText = 'متن',
   textTransparentOnChecked = false,  
+  classNames = {},
 }) => {
-  const [isChecked, setIsChecked] = useState<boolean>(checked);
-
-  const handleChange = (checked: boolean) => {
-    setIsChecked(checked);
-    if (onCheckedChange) {
-      onCheckedChange(checked);
-    }
-  };
-
   return (
-    <label className="flex items-center cursor-pointer">
-      <span
-        className={`text-lg text-black mr-2 ${textTransparentOnChecked && isChecked ? 'opacity-30' : ''}`}
-      >
-        {labelText}
-      </span>
-
-      <Checkbox
-        checked={isChecked}
-        onCheckedChange={handleChange}
-        className="
-          rounded-[4px] 
-          border-[2px] 
-          bg-white
-          data-[state=checked]:text-black
-          data-[state=checked]:bg-[var(--orange-primary-color)]
-        "
-      />
-    </label>
+    <Field name={name}>
+      {({ field, form, meta }: FieldProps) => {
+        const hasError = meta.touched && meta.error;
+        const isChecked = field.value || false;
+        
+        const handleChange = (checked: boolean) => {
+          form.setFieldValue(name, checked);
+        };
+        
+        
+        return (
+          <div className="w-full">
+            <label className="flex items-center cursor-pointer">
+              <span
+                className={`text-lg text-black mr-2 
+                          ${textTransparentOnChecked && isChecked ? 'opacity-30' : ''}
+                           ${classNames.label || ''}`}
+              >
+                {labelText}
+              </span>
+              <Checkbox
+                name={field.name}
+                checked={isChecked}
+                onCheckedChange={handleChange}
+                onBlur={field.onBlur}
+                className={`
+                  rounded-[4px] 
+                  border-[2px] 
+                  bg-white
+                  data-[state=checked]:text-black
+                  data-[state=checked]:bg-[var(--orange-primary-color)]
+                  ${classNames.checkbox || ''}
+                `}
+              />
+            </label>
+            {hasError && (
+              <div className="text-red-500 text-sm mt-1">{meta.error}</div>
+            )}
+          </div>
+        );
+      }}
+    </Field>
   );
 };
 
