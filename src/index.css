@@ -1,4 +1,82 @@
 @import "tailwindcss";
+/* src/index.css */
+/* === Peyda Font Faces === */
+@font-face {
+  font-family: 'Peyda';
+  src: url('/fonts/Peyda-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('/fonts/peyda-extralight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('/fonts/Peyda-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('/fonts/Peyda-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('/fonts/Peyda-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('/fonts/Peyda-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('/fonts/Peyda-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('/fonts/Peyda-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('/fonts/Peyda-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* === Tailwind base imports === */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer utilities {
 	.rtl {
@@ -18,7 +96,7 @@
 	font-weight: 400;
 
 	color-scheme: light dark;
-	background-color: rgba(255, 255, 255, 0.87);
+	background-color: rgb(255, 255, 255);
 	color: #242424;
 
 	font-synthesis: none;
@@ -26,7 +104,7 @@
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	--radius: 0.625rem;
-	--background: oklch(1 0 0);
+	--background: oklch(100% 0.00011 271.152);
 	--foreground: oklch(0.145 0 0);
 	--card: oklch(1 0 0);
 	--card-foreground: oklch(0.145 0 0);
@@ -70,6 +148,11 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: 15px;
+	--color-blue-main: #3B71DD;
+	--color-blue-side: #A0BBEF;
+	--color-red-main: #EF4444;
+	--color-orange-main: #FF7700;
+	--color-gray-main : #B1B1B1;
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
 	--color-card: var(--card);
@@ -143,3 +226,74 @@
 		@apply border-border outline-ring/50;
 	}
 }
+ *{
+	font-family: 'Peyda';
+ }
+
+
+
+/* animation for the side sheet */
+
+@keyframes enter-from-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes enter-from-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes exit-to-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes exit-to-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes overlay-show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+[data-state="open"] .sheet-overlay {
+  animation: overlay-show 200ms ease-out;
+}
+
+[data-state="open"][data-side="right"] .sheet-content {
+  animation: enter-from-right 250ms ease-out;
+}
+[data-state="closed"][data-side="right"] .sheet-content {
+  animation: exit-to-right 200ms ease-in;
+}
+
+/* @import "@/styles/animations.css"; if you extracted it separately */
+
+
+/* @keyframes slide-in-from-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+[data-state="open"][data-side="right"] .sheet-content {
+  animation: slide-in-from-right 250ms ease-out;
+} */

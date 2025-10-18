@@ -2,6 +2,9 @@ import { createBrowserRouter } from "react-router-dom";
 import PublicLayout from "@/layouts/PublicLayout/PublicLayout";
 import Landing from "@/pages/Landing";
 import Temp from "@/pages/Temp";
+import PrivateLayout from "@/layouts/PrivateLayout/PrivateLayout";
+import DashBoard from "@/components/Profile/DashBoard";
+import FollowBar from "@/components/Profile/FollowBar";
 import SignUp from "@/pages/SignUp";
 
 export const router = createBrowserRouter([
@@ -27,19 +30,19 @@ export const router = createBrowserRouter([
 			
 		],
 	},
-	// {
-	// 	element: <PrivateLayout />,
-	// 	children: [
-	// 		{
-	// 			path: "/EditProfile",
-	// 			element: <EditProfile />,
-	// 		},
-	// 		{
-	// 			path: "/DashBoard",
-	// 			element: <DashBoard />,
-	// 		},
-	// 	],
-	// },
+	{
+		element: <PrivateLayout />,
+		children: [
+			// {
+			// 	path: "/EditProfile",
+			// 	element: <EditProfile />,
+			// },
+			{
+				path: "/DashBoard", //  /:username
+				element: <DashBoard />,
+			},
+		],
+	},
 	// {
 	// 	element: <AnotherLayout />,
 	// 	children: [
