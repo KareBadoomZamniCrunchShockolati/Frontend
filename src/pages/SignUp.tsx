@@ -1,6 +1,7 @@
 import CustomInput from "@/components/Custom/CustomInput";
 import { Button } from "@/components/ui/button";
 import CustomCheckbox from '@/components/Custom/CustomCheckbox';
+import CustomSwitchButton from '@/components/Custom/CustomSwitchButton';
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { Eye, EyeClosed } from "lucide-react";
@@ -74,6 +75,10 @@ function SignUp() {
                 textTransparentOnChecked={false}
               />
             </div>
+            <CustomSwitchButton
+              name = "switch 1"
+              labelText="سوییچ"
+            />
 
             <Button type="submit" disabled={isSubmitting} className="mt-4">
               submit
@@ -81,6 +86,7 @@ function SignUp() {
           </Form>
         )}
       </Formik>
+      
     </div>
   );
 }
