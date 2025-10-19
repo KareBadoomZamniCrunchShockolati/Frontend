@@ -24,7 +24,7 @@ const CustomSwitchButton: React.FC<CustomSwitchButtonProps> = ({
   return (
     <div className="flex items-center">
       {labelText && (
-        <label className={`${classNames?.label || ""} mr-2`}>
+        <label className={`${classNames?.label} mr-2`}>
           {labelText}
         </label> 
       )}
@@ -34,10 +34,10 @@ const CustomSwitchButton: React.FC<CustomSwitchButtonProps> = ({
         checked={checked}
         onCheckedChange={handleChange}
         className={`
-            ${classNames?.switch || ''} 
+            ${classNames?.switch} 
             border-[2px] 
-            ${checked ? 'bg-[var(--orange-primary-color)] border-[var(--orange-primary-color)]' : 'bg-white border-black'} 
-            data-[state=checked]:bg-[var(--orange-primary-color)] data-[state=checked]:border-[var(--orange-primary-color)]
+            ${checked ? 'bg-orange-primary border-orange-primary' : 'bg-white border-black'} 
+            data-[state=checked]:bg-orange-primary data-[state=checked]:border-orange-primary
             data-[state=unchecked]:bg-white data-[state=unchecked]:border-black
             relative inline-flex items-center rounded-full transition-colors duration-300
             shadow-none
