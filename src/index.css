@@ -84,6 +84,8 @@
   --walking-man-width: 233px;
   --walking-man-height: 320px;
   --title-size: 30px;
+  --login-from-h: 410px;
+  --login-from-w: 420px;
 }
 
 @theme inline {

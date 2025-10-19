@@ -29,7 +29,7 @@ export default function Login() {
             alt=""
           />
         </div>
-        <div className="flex flex-col-reverse justify-around sm:w-[420px] h-[410px] p-[6px] py-[20px]">
+        <div className="flex flex-col-reverse justify-around sm:w-(--login-from-w) h-(--login-form-h) p-[6px] py-[20px]">
           <Formik {...loginFormSchemaConfig} onSubmit={onSubmit}>
             {({ isSubmitting }) => (
               <Form>
