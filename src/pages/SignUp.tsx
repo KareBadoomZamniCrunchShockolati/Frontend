@@ -1,15 +1,15 @@
 import CustomInput from "@/components/Custom/CustomInput";
-import { Button } from "@/components/ui/button";
+import CustomCheckbox from "@/components/Custom/CustomCheckbox";
+import CustomBtn from "@/components/Custom/CustomBtn";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { Eye, EyeClosed, ArrowLeft, Loader2 } from "lucide-react";
+import { Eye, EyeClosed, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import telegramLogo from "../assets/telegram.svg";
 import Stepper, { Step } from "../components/ui/Stepper";
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 
@@ -25,6 +25,29 @@ function SignUp() {
   const [OTPvalue, setOTPValue] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(10);
+  const [emailConfirmDisabled, setDisabled] = useState(true);
+
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const handleClick = () => {
+    setTimeLeft(10);
+    setDisabled(true);
+  };
+
+  useEffect(() => {
+    if (timeLeft === 0) {
+      setDisabled(false);
+    }
+  }, [timeLeft]);
 
   const step1ValidationSchema = Yup.object({
     username: Yup.string()
@@ -35,9 +58,9 @@ function SignUp() {
       .required("وارد کردن پست الکترونیک الزامی است")
       .email("ایمیل وارد شده معتبر نیست"),
 
-    // acceptTerms: Yup.boolean()
-    //   .oneOf([true], "باید قوانین و مقررات را بپذیرید")
-    //   .required("پذیرفتن قوانین الزامی است"),
+    acceptTerms: Yup.boolean()
+      .oneOf([true], "باید قوانین و مقررات را بپذیرید")
+      .required("پذیرفتن قوانین الزامی است"),
   });
 
   const step2ValidationSchema = Yup.object({
@@ -48,10 +71,6 @@ function SignUp() {
     email: Yup.string()
       .required("وارد کردن پست الکترونیک الزامی است")
       .email("ایمیل وارد شده معتبر نیست"),
-
-    // acceptTerms: Yup.boolean()
-    //   .oneOf([true], "باید قوانین و مقررات را بپذیرید")
-    //   .required("پذیرفتن قوانین الزامی است"),
   });
 
   const step3ValidationSchema = Yup.object({
@@ -119,22 +138,24 @@ function SignUp() {
 
               <CustomInput name="email" label="پست الکترونیک" />
 
-              <div className="flex items-center gap-2 self-start">
-                <input
-                  type="checkbox"
+              <div className="flex items-center gap-2 self-start" dir="ltr">
+                <CustomCheckbox
                   name="acceptTerms"
-                  id="acceptTerms"
-                  className="accent-orange-500 bg-white w-5 h-5 rounded-md border-gray-300 cursor-pointer"
+                  labelText=".قوانین و مقررات را خوانده و می‌پذیرم"
+                  classNames={{
+                    label: "text-sm text-gray-600 font-extrabold",
+                    checkbox: `
+                    rounded-[4px]
+                    border-[2px] border-[#111]
+                    bg-white
+                    data-[state=checked]:bg-orange-500
+                    data-[state=checked]:text-black
+                  `,
+                  }}
                 />
-                <label
-                  htmlFor="acceptTerms"
-                  className="text-sm text-gray-600 font-extrabold"
-                >
-                  قوانین و مقررات را خوانده و می‌پذیرم.
-                </label>
               </div>
-
-              <Button
+              <CustomBtn
+                children="ثبت نام"
                 type="submit"
                 disabled={isSubmitting || !isValid || !dirty}
                 className="
@@ -147,21 +168,14 @@ function SignUp() {
                   transition-all duration-300
                 "
                 onClick={() => setIsPressedNext((prev) => !prev)}
-              >
-                ثبت‌نام
-              </Button>
+              />
             </Form>
           )}
         </Formik>
       </Step>
       <Step>
-        <div
-          // className="min-h-screen flex items-center justify-center bg-gray-50"
-          dir="rtl"
-        >
-          <div
-          // className="w-full max-w-sm bg-white rounded-2xl shadow-lg p-8"
-          >
+        <div dir="rtl">
+          <div>
             <div className="flex items-center justify-end mb-12">
               <button
                 className="p-2 border-2 border-orange-400 rounded-xl hover:bg-orange-50 transition-colors"
@@ -188,14 +202,6 @@ function SignUp() {
             >
               {({ isSubmitting }) => (
                 <Form className="flex flex-col items-center gap-4 w-full">
-                  {/* <div className="flex items-center justify-center mb-12">
-                    <CustomInput name="e_1" label="" />
-                    <CustomInput name="e_2" label="" />
-                    <CustomInput name="e_3" label="" />
-                    <CustomInput name="e_4" label="" />
-                    <CustomInput name="e_5" label="" />
-                    <CustomInput name="e_6" label="" />
-                  </div> */}
                   <div dir="ltr">
                     <InputOTP
                       maxLength={6}
@@ -218,9 +224,14 @@ function SignUp() {
                     </InputOTP>
                   </div>
 
-                  <Button
+                  <CustomBtn
+                    children={
+                      emailConfirmDisabled
+                        ? `  ارسال مجدد کد ${timeLeft}s`
+                        : "ارسال مجدد کد"
+                    }
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || emailConfirmDisabled}
                     className="
                   w-full mt-2 
                   bg-[#3871DD] hover:bg-[#265bb5] 
@@ -230,10 +241,8 @@ function SignUp() {
                   shadow-[0px_1px_0px_var(--borderDefault)]
                   transition-all duration-300
                 "
-                    // onClick={() => setIsPressedNext((prev) => !prev)}
-                  >
-                    ارسال مجدد کد تایید(120)
-                  </Button>
+                    onClick={handleClick}
+                  />
                 </Form>
               )}
             </Formik>
@@ -265,7 +274,7 @@ function SignUp() {
           validationSchema={step3ValidationSchema}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, isValid, dirty }) => (
             <Form className="flex flex-col items-center gap-4 w-full h-full">
               <CustomInput
                 name="password"
@@ -283,9 +292,10 @@ function SignUp() {
                 onIconClick={() => setShowConfirmPassword((prev) => !prev)}
               />
 
-              <Button
+              <CustomBtn
+                children="ثبت نام"
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isValid || !dirty}
                 className="
                   w-full mt-2 
                   bg-[#3871DD] hover:bg-[#265bb5] 
@@ -296,9 +306,7 @@ function SignUp() {
                   transition-all duration-300
                 "
                 onClick={() => setIsPressedNext((prev) => !prev)}
-              >
-                ثبت‌نام
-              </Button>
+              />
             </Form>
           )}
         </Formik>
