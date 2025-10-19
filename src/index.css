@@ -110,7 +110,13 @@
 	--card-foreground: oklch(0.145 0 0);
 	--popover: oklch(1 0 0);
 	--popover-foreground: oklch(0.145 0 0);
-	--primary: oklch(0.205 0 0);
+	--primary:  #ff7700;
+	--primary-hover: #ff983d;
+	--secondry:  #3871dd;
+	--secondry-hover: #6c96e6;
+	--error : #c30025;
+	--success:  #009262;
+	--disable: #b1b1b1;
 	--primary-foreground: oklch(0.985 0 0);
 	--secondary: oklch(0.97 0 0);
 	--secondary-foreground: oklch(0.205 0 0);
@@ -140,7 +146,12 @@
 	--sidebar-accent-foreground: oklch(0.205 0 0);
 	--sidebar-border: oklch(0.922 0 0);
 	--sidebar-ring: oklch(0.708 0 0);
-	--orange-primary-color: #ff7700
+
+
+
+
+
+	
 }
 
 @theme inline {
@@ -148,11 +159,6 @@
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: 15px;
-	--color-blue-main: #3B71DD;
-	--color-blue-side: #A0BBEF;
-	--color-red-main: #EF4444;
-	--color-orange-main: #FF7700;
-	--color-gray-main : #B1B1B1;
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
 	--color-card: var(--card);
@@ -184,6 +190,16 @@
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
+	--color-primary : var(--primary);
+	--color-primary-hover : var(--primary-hover);
+	--color-secondry : var(--secondry);
+	--color-secondry-hover : var(--secondry-hover);
+	--color-error : var(--error);
+	--color-success : var(--success);
+	--color--disable : var(--disable);
+
+
+
 
 }
 
