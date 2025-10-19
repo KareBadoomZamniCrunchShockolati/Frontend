@@ -36,8 +36,8 @@ const CustomSwitchButton: React.FC<CustomSwitchButtonProps> = ({
         className={`
             ${classNames?.switch} 
             border-[2px] 
-            ${checked ? 'bg-orange-primary-1 border-orange-primary-1' : 'bg-white border-black'} 
-            data-[state=checked]:bg-orange-primary-1 data-[state=checked]:border-orange-primary-1
+            ${checked ? 'bg-primary border-primary' : 'bg-white border-black'} 
+            data-[state=checked]:bg-primary data-[state=checked]:border-primary
             data-[state=unchecked]:bg-white data-[state=unchecked]:border-black
             relative inline-flex items-center rounded-full transition-colors duration-300
             shadow-none

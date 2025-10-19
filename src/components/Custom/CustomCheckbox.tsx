@@ -34,8 +34,8 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
             <label className="flex items-center cursor-pointer">
               <span
                 className={`text-lg text-black mr-2 
-                          ${textTransparentOnChecked && isChecked ? 'opacity-30' : ''}
-                           ${classNames.label || ''}`}
+                          ${textTransparentOnChecked && isChecked && 'opacity-30'}
+                           ${classNames?.label}`}
               >
                 {labelText}
               </span>
@@ -46,11 +46,12 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
                 onBlur={field.onBlur}
                 className={`
                   rounded-[4px] 
-                  border-[2px] 
+                  border-[2px]
+                  border-[#000] 
                   bg-white
                   data-[state=checked]:text-black
-                  data-[state=checked]:bg-orange-primary-1
-                  ${classNames.checkbox || ''}
+                  data-[state=checked]:bg-primary
+                  ${classNames?.checkbox}
                 `}
               />
             </label>
