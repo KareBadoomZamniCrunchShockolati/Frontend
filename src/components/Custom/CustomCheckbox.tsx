@@ -49,7 +49,7 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
                   border-[2px] 
                   bg-white
                   data-[state=checked]:text-black
-                  data-[state=checked]:bg-[var(--orange-primary-color)]
+                  data-[state=checked]:bg-orange-primary-1
                   ${classNames.checkbox || ''}
                 `}
               />
