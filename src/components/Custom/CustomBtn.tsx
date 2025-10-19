@@ -21,13 +21,8 @@ export default function CustomBtn({
         style={{ color }}
         disabled={loading || props.disabled}
       >
-        {loading ? (
-          <Spinner className="opacity-100" />
-        ) : (
-          <Spinner className="opacity-0" />
-        )}
+        {loading && <Spinner />}
         {children}
-        {<Spinner className="opacity-0" />}
       </Button>
     </div>
   );
