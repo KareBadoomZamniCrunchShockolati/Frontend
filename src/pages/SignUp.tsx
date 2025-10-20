@@ -2,6 +2,7 @@ import CustomInput from "@/components/Custom/CustomInput";
 import { Button } from "@/components/ui/button";
 import CustomCheckbox from '@/components/Custom/CustomCheckbox';
 import CustomSwitchButton from '@/components/Custom/CustomSwitchButton';
+import UserCard from "@/components/Follower_Following/UserCard";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { Eye, EyeClosed } from "lucide-react";
@@ -32,6 +33,8 @@ function SignUp() {
       .required("این فیلد الزامی است"),
   });
 
+  
+  
   const handleSubmit = (values: typeof initialValues) => {
     console.log("Form values:", values);
     alert(`Welcome ${values.username}!`);
@@ -83,6 +86,8 @@ function SignUp() {
             <Button type="submit" disabled={isSubmitting} className="mt-4">
               submit
             </Button>
+
+            <UserCard id = "1" name = "mahditd0010" image = "testURL" />
           </Form>
         )}
       </Formik>

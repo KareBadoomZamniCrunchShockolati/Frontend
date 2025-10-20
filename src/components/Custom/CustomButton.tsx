@@ -10,6 +10,7 @@ interface Props {
   pageAddress?: string;
   width?: string;
   onClick?: () => void;
+  className?: string;
 }
 
 const CustomButton = ({
@@ -17,6 +18,7 @@ const CustomButton = ({
   backgroundColor,
   pageAddress,
   width = "w-40",
+  className = "",
   onClick,
 }: Props) => {
   const navigate = useNavigate();
@@ -33,7 +35,7 @@ const CustomButton = ({
   return (
     <Button
       onClick={handleClick}
-      className={`${width} h-8.5 rounded-[12.5px] text-white font-bold ${backgroundColor} active:shadow-none active:translate-y-[3px] shadow-[0_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-50 border-2 border-black `}
+      className={`${width} h-8.5 rounded-[12.5px] text-white font-bold ${backgroundColor} active:shadow-none active:translate-y-[3px] shadow-[0_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-50 border-2 border-black ${className}`}
     >
       {children}
     </Button>
