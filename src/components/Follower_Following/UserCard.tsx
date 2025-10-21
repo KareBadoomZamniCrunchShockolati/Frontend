@@ -10,7 +10,7 @@ interface UserCardProps {
 
 const UserCard: React.FC<UserCardProps> = ({ id, username, imagePath }) => {
     return (
-      <div className="flex items-center justify-between p-2 w-88 border border-black rounded-lg">
+      <div className="flex items-center justify-between p-2 w-88 h-24 border border-black rounded-lg">
         <div className="flex items-center space-x-4">
           <img
             className="w-16 h-16 rounded-full border-1 border-black"

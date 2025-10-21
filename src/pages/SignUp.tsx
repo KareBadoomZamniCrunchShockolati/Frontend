@@ -87,7 +87,7 @@ function SignUp() {
               submit
             </Button>
 
-            <UserCard id = "1" name = "mahditd0010" image = "testURL" />
+            <UserCard id = "1" username = "mahditd0010" imagePath = "testURL" />
           </Form>
         )}
       </Formik>
