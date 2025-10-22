@@ -19,56 +19,83 @@ import DropdownButton from "./DropdownButton";
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
 interface Props {
-  items?: { id: number; name: string }[];
+  items: { id: number; name: string }[];
+  checkedCategories: { [key: number]: boolean };
+  setCheckedCategories: React.Dispatch<
+    React.SetStateAction<{ [key: number]: boolean }>
+  >;
 }
 
 const DropdownMenuCheckboxes = ({
-  items = [
-    { id: 1, name: "ورزشی" },
-    { id: 2, name: "هنری" },
-    { id: 3, name: "علمی" },
-    { id: 4, name: "تفریحی" },
-  ]
+  items,
+  checkedCategories,
+  setCheckedCategories,
 }: Props) => {
-  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
-  const [open , setOpen] = useState(false);
-
+  // const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
+  const [open, setOpen] = useState(false);
   const toggleChecked = (id: number) => {
-    setCheckedItems((prev) => ({
+    setCheckedCategories((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
   };
 
-return (
+  return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <DropdownButton className={open ? "shadow-none translate-y-[3px]" : ""} backgroundColor="bg-[var(--color-blue-main)]">
-            فیلتر{" "}
-            <svg
-              className="w-2.5 h-2.5 ms-3"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 10 6"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="m1 1 4 4 4-4"
-              />
-            </svg>
-            </DropdownButton>
-          {/* </button> */}
+        <DropdownButton
+          className={open ? "shadow-none translate-y-[3px]" : ""}
+          backgroundColor="bg-[var(--color-blue-main)]"
+        >
+          فیلتر{" "}
+          <svg
+            className="w-2.5 h-2.5 ms-3"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 10 6"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 4 4 4-4"
+            />
+          </svg>
+        </DropdownButton>
+        {/* </button> */}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end">
-        <DropdownMenuLabel className="text-[var(--color-orange-main)]" dir="rtl">دسته‌بندی</DropdownMenuLabel>
+        <DropdownMenuLabel
+          className="text-[var(--color-orange-main)]"
+          dir="rtl"
+        >
+          دسته‌بندی
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {items.map((item) => (
-          <DropdownMenuCheckboxItem dir="rtl" key={item.id} checked={!!checkedItems[item.id]} onCheckedChange={() => toggleChecked(item.id)}>{item.name}</DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            dir="rtl"
+            key={item.id}
+            checked={!!checkedCategories[item.id]}
+            onCheckedChange={() => toggleChecked(item.id)}
+          >
+            {item.name}
+          </DropdownMenuCheckboxItem>
         ))}
+        <DropdownMenuCheckboxItem
+        className="felx justify-center text-[var(--color-red-main)]"
+          dir="rtl"
+          checked={false}
+          onCheckedChange={() =>
+            setCheckedCategories(
+              Object.fromEntries(items.map((category) => [category.id, false]))
+            )
+          }
+        >
+          پاک‌سازی فیلتر
+        </DropdownMenuCheckboxItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

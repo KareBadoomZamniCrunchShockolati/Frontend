@@ -26,11 +26,11 @@ const posts = [
 
 const ProfilePosts = () => {
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4">
+    <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 mt-2.5">
       {posts.map((post) => (
         <Card
           key={post.id}
-          className="overflow-hidden cursor-pointer hover:opacity-90 transition rounded-none"
+          className="cursor-pointer overflow-hidden cursor-pointer hover:opacity-90 transition"
           onClick={() => console.log(post.id + " clicked!")}
         >
           <AspectRatio ratio={4 / 5}>

@@ -30,7 +30,7 @@ const FollowBar = ({
       {/* Stats row */}
       <div className="flex justify-around text-center mr-5 ml-5">
         {/* Done challenges */}
-        <div onClick={() => console.log("done challenges")} tabIndex={0} className="active:bg-[var(--color-gray-main)] transition-all duration-200">
+        <div onClick={() => console.log("done challenges")} tabIndex={0} className="cursor-pointer active:bg-[var(--color-gray-main)] transition-all duration-200">
           <p className="text-sm sm:text-base md:text-lg text-black-500">موفقیت‌ها</p>
           <p className="text-sm sm:text-base md:text-lg font-bold text-black-800">
             {convertToPersianDigits(formatFollowBarNumber(doneChallengesCount))}
@@ -41,7 +41,7 @@ const FollowBar = ({
         <div className="w-px bg-gray-500"></div>
 
         {/* Followers */}
-        <div onClick={() => console.log("followers")} tabIndex={0} className="active:bg-[var(--color-gray-main)] transition-all duration-200" >
+        <div onClick={() => console.log("followers")} tabIndex={0} className="cursor-pointer active:bg-[var(--color-gray-main)] transition-all duration-200" >
           <p className="text-sm sm:text-base md:text-lg text-black-500">دنبال‌کنیا</p>
           <p className="text-sm sm:text-base md:text-lg font-bold text-black-800">
             {convertToPersianDigits(formatFollowBarNumber(followersCount))}
@@ -52,7 +52,7 @@ const FollowBar = ({
         <div className="w-px bg-gray-500"></div>
 
         {/* Following */}
-        <div onClick={() => console.log("following")} tabIndex={0} className="active:bg-[var(--color-gray-main)] transition-all duration-200">
+        <div onClick={() => console.log("following")} tabIndex={0} className="cursor-pointer active:bg-[var(--color-gray-main)] transition-all duration-200">
           <p className="text-sm sm:text-base md:text-lg text-black-500">من‌دنبالشونم</p>
           <p className="text-sm sm:text-base md:text-lg font-bold text-black-800">
             {convertToPersianDigits(formatFollowBarNumber(followingCount))}
