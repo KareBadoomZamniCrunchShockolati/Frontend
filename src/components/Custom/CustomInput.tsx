@@ -8,7 +8,6 @@ type CustomInputProps = InputHTMLAttributes<HTMLInputElement> & {
   name: string;
   icon?: ReactNode;
   onIconClick?: () => void;
-  width?: string | number;
 };
 
 export default function CustomInput({
@@ -17,7 +16,6 @@ export default function CustomInput({
   icon = null,
   onIconClick,
   type = "text",
-  width,
   ...props
 }: CustomInputProps) {
   const [isFocused, setIsFocused] = useState(false);
@@ -54,7 +52,7 @@ export default function CustomInput({
         return (
           <div
             className="flex flex-col w-full"
-            style={{ width: width ?? "100%" }}
+            style={{ width: "100%" }}
           >
             <div className="relative">
               <Input

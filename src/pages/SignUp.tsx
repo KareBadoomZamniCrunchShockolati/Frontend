@@ -7,6 +7,11 @@ import { Eye, EyeClosed, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import telegramLogo from "../assets/telegram.svg";
 import Stepper, { Step } from "../components/ui/Stepper";
+import SignUpFormSchemaStep1Config from "@/schemas/SignUpFormSchemaStep1";
+import SignUpFormSchemaStep2Config from "@/schemas/SignUpFormSchemaStep2";
+import SignUpFormSchemaStep3Config from "@/schemas/SignUpFormSchemaStep3";
+
+
 import {
   InputOTP,
   InputOTPGroup,
@@ -49,36 +54,6 @@ function SignUp() {
     }
   }, [timeLeft]);
 
-  const step1ValidationSchema = Yup.object({
-    username: Yup.string()
-      .required("وارد کردن نام کاربری الزامی است")
-      .min(3, "حداقل ۳ کاراکتر وارد کنید"),
-
-    email: Yup.string()
-      .required("وارد کردن پست الکترونیک الزامی است")
-      .email("ایمیل وارد شده معتبر نیست"),
-
-    acceptTerms: Yup.boolean()
-      .oneOf([true], "باید قوانین و مقررات را بپذیرید")
-      .required("پذیرفتن قوانین الزامی است"),
-  });
-
-  const step2ValidationSchema = Yup.object({
-    username: Yup.string()
-      .required("وارد کردن نام کاربری الزامی است")
-      .min(3, "حداقل ۳ کاراکتر وارد کنید"),
-
-    email: Yup.string()
-      .required("وارد کردن پست الکترونیک الزامی است")
-      .email("ایمیل وارد شده معتبر نیست"),
-  });
-
-  const step3ValidationSchema = Yup.object({
-    confirmPassword: Yup.string()
-      .required("تکرار رمز عبور الزامی است")
-      .oneOf([Yup.ref("password")], "رمز عبور و تکرارش باید یکسان باشند"),
-  });
-
   const handleSubmit = (values) => {
     console.log("Form values:", values);
   };
@@ -111,17 +86,18 @@ function SignUp() {
         <div className="flex items-center justify-between mb-12 ">
           <img src={telegramLogo} alt="لوگو" className="w-18 h-18 rounded-xl" />
           <button
-            className="p-2 border-2 border-orange-400 rounded-xl hover:bg-orange-50 transition-colors"
+            className="p-2 border-2 border-[var(--primary)] rounded-xl hover:bg-orange-50 transition-colors"
             onClick={() => setIsPressedBack((prev) => !prev)}
           >
-            <ArrowLeft className="w-8 h-8 text-orange-400" />
+            <ArrowLeft className="w-8 h-8 text-[var(--primary)]" />
           </button>
         </div>
 
         <div className="text-right mb-8">
-          <h1 className="text-4xl font-extrabold text-[#FF7700] mb-2">
+          <div className="text-4xl font-extrabold text-[var(--primary)] mb-2">
             ثبت نام
-          </h1>
+          </div>
+
           <p className="text-[#666666] text-sm font-extrabold">
             لطفا ایمیل و نام کاربری خود را وارد کنید
           </p>
@@ -129,7 +105,7 @@ function SignUp() {
 
         <Formik
           initialValues={initialValues}
-          validationSchema={step1ValidationSchema}
+          validationSchema={SignUpFormSchemaStep1Config}
           onSubmit={handleSubmit}
         >
           {({ isSubmitting, isValid, dirty }) => (
@@ -148,7 +124,7 @@ function SignUp() {
                     rounded-[4px]
                     border-[2px] border-[#111]
                     bg-white
-                    data-[state=checked]:bg-orange-500
+                    data-[state=checked]:bg-[var(--primary)]
                     data-[state=checked]:text-black
                   `,
                   }}
@@ -160,7 +136,69 @@ function SignUp() {
                 disabled={isSubmitting || !isValid || !dirty}
                 className="
                   w-full mt-2 
-                  bg-[#3871DD] hover:bg-[#265bb5] 
+                  bg-[var(--secondry)] hover:bg-white 
+                  text-white py-3 rounded-xl 
+                  font-semibold 
+                  border-1 border-black 
+                  shadow-[0px_1px_0px_var(--borderDefault)]
+                  transition-all duration-300
+                "
+                onClick={() => setIsPressedNext((prev) => !prev)}
+              />
+            </Form>
+          )}
+        </Formik>
+      </Step>
+      <Step>
+        <div className="flex items-center justify-end mb-12">
+          <button
+            className="p-2 border-2 border-[var(--primary)] rounded-xl hover:bg-orange-50 transition-colors"
+            onClick={() => setIsPressedBack((prev) => !prev)}
+          >
+            <ArrowLeft className="w-8 h-8 text-[var(--primary)]" />
+          </button>
+        </div>
+
+        <div className="text-right mb-8">
+          <div className="text-4xl font-extrabold text-[var(--primary)] mb-2">
+            ! رمز عبورت رو بساز
+          </div>
+          <p className="text-[#666666] text-sm font-extrabold">
+            رمز عبورت باید حداقل ۸ کاراکتر و شامل عدد و علامت خاص باشد تا امنیت
+            حسابت حفظ شود
+          </p>
+        </div>
+
+        <Formik
+          initialValues={initialValues}
+          validationSchema={SignUpFormSchemaStep2Config}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting, isValid, dirty }) => (
+            <Form className="flex flex-col items-center gap-4 w-full h-full">
+              <CustomInput
+                name="password"
+                type={showPassword ? "text" : "password"}
+                label="رمزعبور"
+                icon={showPassword ? <EyeClosed /> : <Eye />}
+                onIconClick={() => setShowPassword((prev) => !prev)}
+              />
+
+              <CustomInput
+                name="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                label="تکرار رمزعبور"
+                icon={showConfirmPassword ? <EyeClosed /> : <Eye />}
+                onIconClick={() => setShowConfirmPassword((prev) => !prev)}
+              />
+
+              <CustomBtn
+                children="ثبت نام"
+                type="submit"
+                disabled={isSubmitting || !isValid || !dirty}
+                className="
+                  w-full mt-2 
+                  bg-[var(--secondry)] hover:bg-[var(--secondry-hover)]
                   text-white py-3 rounded-xl 
                   font-semibold 
                   border-1 border-black 
@@ -178,17 +216,17 @@ function SignUp() {
           <div>
             <div className="flex items-center justify-end mb-12">
               <button
-                className="p-2 border-2 border-orange-400 rounded-xl hover:bg-orange-50 transition-colors"
+                className="p-2 border-2 border-[var(--primary)] rounded-xl hover:bg-orange-50 transition-colors"
                 onClick={() => setIsPressedBack((prev) => !prev)}
               >
-                <ArrowLeft className="w-8 h-8 text-orange-400" />
+                <ArrowLeft className="w-8 h-8 text-[var(--primary)]" />
               </button>
             </div>
 
             <div className="text-right mb-8">
-              <h1 className="text-4xl font-extrabold text-[#FF7700] mb-2">
-                تایید پست الکترونیک
-              </h1>
+              <div className="text-4xl font-extrabold text-[var(--primary)] mb-2">
+                 تقریبا تمومه! تایید پست الکترونیک 
+              </div>
               <p className="text-[#666666] text-sm font-extrabold">
                 لطفا کد ارسال شده به پست الکترونیک karebadoomzamini@gamil.com را
                 وارد کنید
@@ -197,7 +235,7 @@ function SignUp() {
 
             <Formik
               initialValues={initialValues}
-              validationSchema={step2ValidationSchema}
+              validationSchema={SignUpFormSchemaStep3Config}
               onSubmit={handleSubmit}
             >
               {({ isSubmitting }) => (
@@ -234,7 +272,7 @@ function SignUp() {
                     disabled={isSubmitting || emailConfirmDisabled}
                     className="
                   w-full mt-2 
-                  bg-[#3871DD] hover:bg-[#265bb5] 
+                  bg-[var(--secondry)] hover:bg-[var(--secondry-hover)] 
                   text-white py-3 rounded-xl 
                   font-semibold 
                   border-1 border-black 
@@ -248,68 +286,6 @@ function SignUp() {
             </Formik>
           </div>
         </div>
-      </Step>
-      <Step>
-        <div className="flex items-center justify-end mb-12">
-          <button
-            className="p-2 border-2 border-orange-400 rounded-xl hover:bg-orange-50 transition-colors"
-            onClick={() => setIsPressedBack((prev) => !prev)}
-          >
-            <ArrowLeft className="w-8 h-8 text-orange-400" />
-          </button>
-        </div>
-
-        <div className="text-right mb-8">
-          <h1 className="text-4xl font-extrabold text-[#FF7700] mb-2">
-            تقریبا تمومه! رمز عبورت رو بساز
-          </h1>
-          <p className="text-[#666666] text-sm font-extrabold">
-            رمز عبورت باید حداقل ۸ کاراکتر و شامل عدد و علامت خاص باشد تا امنیت
-            حسابت حفظ شود
-          </p>
-        </div>
-
-        <Formik
-          initialValues={initialValues}
-          validationSchema={step3ValidationSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ isSubmitting, isValid, dirty }) => (
-            <Form className="flex flex-col items-center gap-4 w-full h-full">
-              <CustomInput
-                name="password"
-                type={showPassword ? "text" : "password"}
-                label="رمزعبور"
-                icon={showPassword ? <EyeClosed /> : <Eye />}
-                onIconClick={() => setShowPassword((prev) => !prev)}
-              />
-
-              <CustomInput
-                name="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                label="تکرار رمزعبور"
-                icon={showConfirmPassword ? <EyeClosed /> : <Eye />}
-                onIconClick={() => setShowConfirmPassword((prev) => !prev)}
-              />
-
-              <CustomBtn
-                children="ثبت نام"
-                type="submit"
-                disabled={isSubmitting || !isValid || !dirty}
-                className="
-                  w-full mt-2 
-                  bg-[#3871DD] hover:bg-[#265bb5] 
-                  text-white py-3 rounded-xl 
-                  font-semibold 
-                  border-1 border-black 
-                  shadow-[0px_1px_0px_var(--borderDefault)]
-                  transition-all duration-300
-                "
-                onClick={() => setIsPressedNext((prev) => !prev)}
-              />
-            </Form>
-          )}
-        </Formik>
       </Step>
     </Stepper>
   );
