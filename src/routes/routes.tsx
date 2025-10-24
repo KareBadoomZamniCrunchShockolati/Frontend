@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import PublicLayout from "@/layouts/PublicLayout/PublicLayout";
 import Landing from "@/pages/Landing";
 import Temp from "@/pages/Temp";
-import FollowerFollowing from "@/pages/Follower_Following";
+import FollowerFollowing from "@/components/Follower_Following/Follower_Following";
 import PrivateLayout from "@/layouts/PrivateLayout/PrivateLayout";
 import DashBoard from "@/components/Profile/DashBoard";
 import FollowBar from "@/components/Profile/FollowBar";
