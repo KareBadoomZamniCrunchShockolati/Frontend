@@ -1,18 +1,24 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { X } from "lucide-react";
 
 interface UserCardProps {
   id: string;
   username: string;
   imagePath: string;
+  onDelete: (id: string, username: string) => void;  // Add onDelete prop
 }
 
-const UserCard: React.FC<UserCardProps> = ({ id, username, imagePath }) => {
+const UserCard: React.FC<UserCardProps> = ({ id, username, imagePath, onDelete }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    // Navigate to the user's dashboard
     navigate(`/dashboard/${id}`);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the card click event
+    onDelete(id, username); // Call the onDelete function passed via props
   };
 
   return (
@@ -28,19 +34,8 @@ const UserCard: React.FC<UserCardProps> = ({ id, username, imagePath }) => {
         />
         <span className="font-bold">{username}</span>
       </div>
-      <button className="text-primary">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="w-6 h-6 mr-2 border-2 border-primary rounded-[11px]"
-        >
-          <path d="M6 18L18 6M6 6l12 12" className="transform scale-70 origin-center" />
-        </svg>
+      <button className="text-primary" onClick={handleDeleteClick}>
+        <X className='w-6 h-6 mr-2 border-2 border-primary rounded-[11px]' />
       </button>
     </div>
   );
