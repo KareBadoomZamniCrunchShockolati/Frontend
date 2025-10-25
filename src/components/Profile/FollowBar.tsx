@@ -1,5 +1,7 @@
-import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import React from "react";
+import { useNavigate } from "react-router-dom"; // Use useNavigate instead of useHistory
+import convertToPersianDigits from "@/utils/convertToPersianDigits";
+
 interface Props {
   fullName?: string;
   bio?: string;
@@ -7,6 +9,7 @@ interface Props {
   followingCount?: number;
   doneChallengesCount?: number;
 }
+
 function formatNumber(num: number): string {
   if (num >= 1_000_000) {
     return (num / 1_000_000).toFixed(1).replace(/\,0$/, "") + "M";
@@ -21,6 +24,7 @@ function formatNumber(num: number): string {
     );
   }
 }
+
 const FollowBar = ({
   fullName = "saman khajeamiri",
   bio = "سلااام صبحت بخیررر",
@@ -28,6 +32,12 @@ const FollowBar = ({
   followingCount = 12_300,
   doneChallengesCount = 1200,
 }: Props) => {
+  const navigate = useNavigate(); // Use useNavigate hook
+
+  const handleNavigateToFollowerFollowingPage = (tab: "followers" | "followings") => {
+    navigate(`/follow?tab=${tab}`);
+  };
+
   return (
     <div className="w-full max-w-md mx-auto mt-5">
       {/* full name */}
@@ -53,7 +63,11 @@ const FollowBar = ({
         <div className="w-px bg-gray-500"></div>
 
         {/* Followers */}
-        <div onClick={() => console.log("followers")} tabIndex={0} className="active:bg-[var(--color-gray-main)] transition-all duration-200" >
+        <div
+          onClick={() => handleNavigateToFollowerFollowingPage("followers")}
+          tabIndex={0}
+          className="active:bg-[var(--color-gray-main)] transition-all duration-200"
+        >
           <p className="text-sm text-black-500">دنبال‌کنیا</p>
           <p className="text-sm font-bold text-black-800">
             {convertToPersianDigits(formatNumber(followersCount))}
@@ -64,7 +78,11 @@ const FollowBar = ({
         <div className="w-px bg-gray-500"></div>
 
         {/* Following */}
-        <div onClick={() => console.log("following")} tabIndex={0} className="active:bg-[var(--color-gray-main)] transition-all duration-200">
+        <div
+          onClick={() => handleNavigateToFollowerFollowingPage("followings")}
+          tabIndex={0}
+          className="active:bg-[var(--color-gray-main)] transition-all duration-200"
+        >
           <p className="text-sm text-black-500">من‌دنبالشونم</p>
           <p className="text-sm font-bold text-black-800">
             {convertToPersianDigits(formatNumber(followingCount))}
