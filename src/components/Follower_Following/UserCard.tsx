@@ -6,10 +6,11 @@ interface UserCardProps {
   id: string;
   username: string;
   imagePath: string;
-  onDelete: (id: string, username: string) => void;  // Add onDelete prop
+  onDelete: (id: string, username: string) => void;
+  isOwner: boolean; // Add isOwner here
 }
 
-const UserCard: React.FC<UserCardProps> = ({ id, username, imagePath, onDelete }) => {
+const UserCard: React.FC<UserCardProps> = ({ id, username, imagePath, onDelete, isOwner }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
@@ -34,9 +35,11 @@ const UserCard: React.FC<UserCardProps> = ({ id, username, imagePath, onDelete }
         />
         <span className="font-bold">{username}</span>
       </div>
-      <button className="text-primary" onClick={handleDeleteClick}>
-        <X className='w-6 h-6 mr-2 border-2 border-primary rounded-[11px]' />
-      </button>
+      {isOwner && ( // Only show delete button if the user is the profile owner
+        <button className="text-primary" onClick={handleDeleteClick}>
+          <X className='w-6 h-6 mr-2 border-2 border-primary rounded-[11px] hover:bg-orange-100' />
+        </button>
+      )}
     </div>
   );
 };

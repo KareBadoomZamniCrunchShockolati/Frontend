@@ -4,11 +4,12 @@ import UserCard from '@/components/Follower_Following/UserCard';
 interface UserCardListProps {
   users: { id: string; username: string; imagePath: string }[];
   onDelete: (id: string, username: string) => void;
+  isOwner: boolean; // Add isOwner here
 }
 
-const UserCardList: React.FC<UserCardListProps> = ({ users, onDelete }) => {
+const UserCardList: React.FC<UserCardListProps> = ({ users, onDelete, isOwner }) => {
   return (
-    <div className="w-full max-w-md flex justify-center overflow-y-auto max-h-96 scrollbar-custom">
+    <div className="w-full max-w-md flex justify-center">
       {users.length > 0 ? (
         <div className="space-y-2">
           {users.map((user) => (
@@ -18,6 +19,7 @@ const UserCardList: React.FC<UserCardListProps> = ({ users, onDelete }) => {
               username={user.username}
               imagePath={user.imagePath}
               onDelete={onDelete}
+              isOwner={isOwner} // Pass isOwner to UserCard
             />
           ))}
         </div>

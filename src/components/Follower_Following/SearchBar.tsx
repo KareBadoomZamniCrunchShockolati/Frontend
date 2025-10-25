@@ -1,5 +1,6 @@
 import React from 'react';
 import CustomInput from '@/components/Custom/CustomInput';
+import {Search} from 'lucide-react';
 
 interface SearchBarProps {
   searchTerm: string;
@@ -14,6 +15,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, onSearchTermChange, o
         className="w-88 h-8 rounded-[12.5px]"
         name="searchTerm"
         label=""
+        icon= {<Search/>}
         value={searchTerm}
         onChange={onSearchTermChange}
         onBlur={onBlur}

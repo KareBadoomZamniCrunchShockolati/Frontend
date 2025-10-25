@@ -29,6 +29,11 @@ const FollowerFollowingPage: React.FC = () => {
   // Retrieve fullName from the navigation state
   const fullName = location.state?.fullName || "Unknown User"; 
 
+  // Assume the logged-in user ID is stored somewhere
+  const loggedInUserId = '1'; // You can replace this with actual logic
+
+  const isOwner = loggedInUserId === '1'; // Determine if the current user is the profile owner
+
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tab = params.get("tab") as 'followers' | 'followings' | null;
@@ -67,34 +72,29 @@ const FollowerFollowingPage: React.FC = () => {
     setUserToDelete(null);
   };
 
-  const validationSchema = Yup.object({
-    searchTerm: Yup.string().min(3, 'Search term must be at least 3 characters').required('')
-  });
-
-  const handleSubmit = (values: { searchTerm: string }) => {
-    console.log("Search term:", values.searchTerm);
-  };
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-start p-4">
       <BackButtonWithUsername username={fullName} onBackClick={() => navigate('/dashboard')} />
-
       <ToggleButtons activeTab={activeTab} onTabSwitch={handleTabSwitch} />
-
+      
       <Formik
         initialValues={{ searchTerm: '' }}
-        validationSchema={validationSchema}
-        onSubmit={handleSubmit}
-        validateOnChange={true}
-        validateOnBlur={true}
+        validationSchema={Yup.object({
+          searchTerm: Yup.string(),
+        })}
+        onSubmit={(values) => console.log(values.searchTerm)}
       >
         {({ values, handleChange, handleBlur }) => {
           const ChosenList = activeTab === 'followers' ? followers : followings;
-
+          
           return (
             <Form className="w-full max-w-md mb-6 flex flex-col items-center justify-center">
               <SearchBar searchTerm={values.searchTerm} onSearchTermChange={handleChange} onBlur={handleBlur} />
-              <UserCardList users={ChosenList} onDelete={handleDeleteClick} />
+              <UserCardList
+                users={ChosenList}
+                onDelete={handleDeleteClick}
+                isOwner={isOwner} // Pass isOwner here
+              />
             </Form>
           );
         }}
@@ -103,6 +103,7 @@ const FollowerFollowingPage: React.FC = () => {
       {showDeleteModal && userToDelete && (
         <DeleteConfirmationModal
           username={userToDelete.username}
+          listType={activeTab} // Pass activeTab to DeleteConfirmationModal as listType
           onDeleteConfirm={handleDeleteConfirmation}
           onDeleteCancel={handleDeleteCancel}
         />
