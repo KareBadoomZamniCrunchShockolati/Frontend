@@ -30,7 +30,7 @@ const CustomButton = ({
       if (pageAddress){
       navigate(pageAddress);
       }
-    }, 350);
+    }, 0);
   };
   return (
     <Button
