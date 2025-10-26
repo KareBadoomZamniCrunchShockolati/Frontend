@@ -16,6 +16,8 @@ const FollowerFollowingPage: React.FC = () => {
   const [userToDelete, setUserToDelete] = useState<{ id: string; username: string } | null>(null);
   const [followers, setFollowers] = useState([
     { id: '1', username: 'mahditd0010', imagePath: 'path_to_image1' },
+    { id: '8', username: 'mahditd0010', imagePath: 'path_to_image1' },
+    { id: '9', username: 'mahditd0010', imagePath: 'path_to_image1' },
     { id: '2', username: 'samiskh', imagePath: 'path_to_image2' },
     { id: '3', username: 'CNumb6004', imagePath: 'path_to_image3' },
     { id: '7', username: 'Soroush1384ak', imagePath: 'path_to_image4' },

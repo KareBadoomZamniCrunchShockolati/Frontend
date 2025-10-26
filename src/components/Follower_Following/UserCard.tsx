@@ -24,7 +24,7 @@ const UserCard: React.FC<UserCardProps> = ({ id, username, imagePath, onDelete, 
 
   return (
     <div
-      className="flex items-center justify-between p-2 w-88 h-24 border border-black rounded-[7px] cursor-pointer"
+      className="flex items-center justify-between mb-2 p-2 w-88 h-24 border border-black rounded-[7px] cursor-pointer"
       onClick={handleCardClick}
     >
       <div className="flex items-center space-x-4">
