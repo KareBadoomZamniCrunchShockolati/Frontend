@@ -16,7 +16,7 @@ const ProfileChallenges = () => {
         <input
           type="text"
           placeholder="جستجو..."
-          className="border-2 mt-2 mb-2 border-[var(--color-blue-main)] rounded-md w-full pr-10 pl-3 py-2 focus:outline-none"
+          className="border-2 mt-2 mb-2 border-secondary rounded-md w-full pr-10 pl-3 py-2 focus:outline-none"
         />
         <button
           type="button"

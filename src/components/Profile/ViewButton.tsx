@@ -42,7 +42,7 @@ const ViewButton = ({ isFollowing = false, username }: Props) => {
     <div className="flex justify-center mt-5">
       {isUserFollowing ? (
         <CustomButton
-          backgroundColor="bg-[var(--color-red-main)]"
+          backgroundColor="bg-red-500"
           width="w-60"
           onClick={handleUnfollowClick}
         >
@@ -50,7 +50,7 @@ const ViewButton = ({ isFollowing = false, username }: Props) => {
         </CustomButton>
       ) : (
         <CustomButton
-          backgroundColor="bg-[var(--color-blue-main)]"
+          backgroundColor="bg-secondry"
           width="w-60"
           onClick={handleFollowClick}
         >

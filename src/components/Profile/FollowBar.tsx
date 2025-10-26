@@ -52,7 +52,7 @@ const FollowBar = ({
       {/* Stats row */}
       <div className="flex justify-around text-center mr-5 ml-5">
         {/* Done challenges */}
-        <div onClick={() => console.log("done challenges")} tabIndex={0} className="active:bg-[var(--color-gray-main)] transition-all duration-200">
+        <div onClick={() => console.log("done challenges")} tabIndex={0} className="active:bg-gray-500 transition-all duration-200">
           <p className="text-sm text-black-500">موفقیت‌ها</p>
           <p className="text-sm font-bold text-black-800">
             {convertToPersianDigits(formatNumber(doneChallengesCount))}
@@ -66,7 +66,7 @@ const FollowBar = ({
         <div
           onClick={() => handleNavigateToFollowerFollowingPage("followers")}
           tabIndex={0}
-          className="active:bg-[var(--color-gray-main)] transition-all duration-200"
+          className="active:bg-gray-500 transition-all duration-200"
         >
           <p className="text-sm text-black-500">دنبال‌کنیا</p>
           <p className="text-sm font-bold text-black-800">
@@ -81,7 +81,7 @@ const FollowBar = ({
         <div
           onClick={() => handleNavigateToFollowerFollowingPage("followings")}
           tabIndex={0}
-          className="active:bg-[var(--color-gray-main)] transition-all duration-200"
+          className="active:bg-gray-500 transition-all duration-200"
         >
           <p className="text-sm text-black-500">من‌دنبالشونم</p>
           <p className="text-sm font-bold text-black-800">

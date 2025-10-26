@@ -13,7 +13,7 @@ const DashBoard = () => {
 
   return (
     <>
-    <ProfileHeader fullName='saman khajeamiri' isOwner = {false}/>
+    <ProfileHeader fullName='saman khajeamiri' isOwner = {true}/>
     <ProfileBody></ProfileBody>
     </>
   )
