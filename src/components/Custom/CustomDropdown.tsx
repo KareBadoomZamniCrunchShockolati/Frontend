@@ -15,6 +15,7 @@ import {
 import { useState } from "react";
 import CustomButton from "./CustomButton";
 import DropdownButton from "./DropdownButton";
+import CustomCheckbox from "./CustomCheckbox";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -85,7 +86,7 @@ const CustomDropdown = ({
             className="flex items-center justify-between cursor-pointer hover:outline-none hover:bg-[var(--color-gray-side)]"
           >
             <span>{item.name}</span>
-            {/* <CustomCheckbox checked={!!checkedCategories[item.id]} /> */}
+            <CustomCheckbox name={item.id.toString()} viewOnly={{ isViewOnly: true, checked: !!checkedCategories[item.id] }} />
           </DropdownMenuItem>
         ))}
         <DropdownMenuItem
