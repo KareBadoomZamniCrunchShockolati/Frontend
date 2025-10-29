@@ -106,7 +106,7 @@ const posts = [
     id: 17,
     imageUrl: "https://picsum.photos/400/225?random=17",
     text: "پست آزمایشی دیگر برای تست چند خطی بودن توضیح",
-    ratio: 9 / 16,
+    ratio: 9 / 16, //these too long
   },
   {
     id: 18,

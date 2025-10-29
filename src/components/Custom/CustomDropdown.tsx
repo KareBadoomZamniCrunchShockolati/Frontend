@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import type { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenuItem, type DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +26,7 @@ interface Props {
   >;
 }
 
-const DropdownMenuCheckboxes = ({
+const CustomDropdown = ({
   items,
   checkedCategories,
   setCheckedCategories,
@@ -49,7 +49,7 @@ const DropdownMenuCheckboxes = ({
         >
           فیلتر{" "}
           <svg
-            className="w-2.5 h-2.5 ms-3"
+            className={`w-2.5 h-2.5 ms-3 transform transition-transform duration-200 ease-in-out ${open ? "rotate-180" : ""}`}
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -75,30 +75,34 @@ const DropdownMenuCheckboxes = ({
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {items.map((item) => (
-          <DropdownMenuCheckboxItem
+          <DropdownMenuItem
             dir="rtl"
             key={item.id}
-            checked={!!checkedCategories[item.id]}
-            onCheckedChange={() => toggleChecked(item.id)}
+            onSelect={(event) => {
+              event.preventDefault(); // Prevents close on item click
+              toggleChecked(item.id);
+            }}
+            className="flex items-center justify-between cursor-pointer hover:outline-none hover:bg-[var(--color-gray-side)]"
           >
-            {item.name}
-          </DropdownMenuCheckboxItem>
+            <span>{item.name}</span>
+            {/* <CustomCheckbox checked={!!checkedCategories[item.id]} /> */}
+          </DropdownMenuItem>
         ))}
-        <DropdownMenuCheckboxItem
-        className="felx justify-center text-[var(--color-red-main)]"
+        <DropdownMenuItem
+          className="flex justify-center text-[var(--color-red-main)] cursor-pointer hover:outline-none hover:bg-[var(--color-gray-side)]"
           dir="rtl"
-          checked={false}
-          onCheckedChange={() =>
+          onSelect={(event) => {
+            event.preventDefault(); // Prevents close on clear filter click
             setCheckedCategories(
               Object.fromEntries(items.map((category) => [category.id, false]))
-            )
-          }
+            );
+          }}
         >
           پاک‌سازی فیلتر
-        </DropdownMenuCheckboxItem>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 };
 
-export default DropdownMenuCheckboxes;
+export default CustomDropdown;
