@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Lock, ThumbsUp } from "lucide-react";
 
@@ -22,6 +17,7 @@ interface ChallengeCardProps {
   profiles: Profile[];
   initialLikes?: number;
   coverImage?: string;
+  isPrivate?: boolean;
 }
 
 export default function ChallengeCard({
@@ -32,6 +28,7 @@ export default function ChallengeCard({
   profiles,
   initialLikes = 0,
   coverImage = "/images/sample-cover.jpg",
+  isPrivate = false,
 }: ChallengeCardProps) {
   const [likes, setLikes] = useState(initialLikes);
   const [isLiked, setIsLiked] = useState(false);
@@ -40,6 +37,10 @@ export default function ChallengeCard({
     setLikes((prev) => prev + (isLiked ? -1 : 1));
     setIsLiked(!isLiked);
   };
+
+  // ✨ کوتاه کردن توضیحات در صورت طولانی بودن
+  const shortDescription =
+    description.length > 100 ? description.slice(0, 100) + "..." : description;
 
   return (
     <Card className="w-full max-w-lg mx-auto rounded-3xl overflow-hidden shadow-lg border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white">
@@ -50,15 +51,15 @@ export default function ChallengeCard({
           alt="Challenge Cover"
           className="w-full h-full object-cover"
         />
-        {/* فید سفید پایین تصویر */}
         <div className="absolute inset-0 bg-gradient-to-t from-white via-white/0 to-transparent"></div>
 
-        {/* آواتارها روی عکس */}
-        <div className="absolute bottom-3 left-4 flex -space-x-3">
-          {profiles.slice(0, 3).map((profile) => (
+        {/* آواتارها */}
+        <div className="absolute bottom-3 right-4 flex -space-x-3" dir="rtl">
+          {profiles.slice(0, 3).map((profile, index) => (
             <Avatar
               key={profile.id}
-              className="h-10 w-10 border-2 border-white shadow-sm hover:scale-110 transition-transform duration-200"
+              className="relative h-10 w-10 border-2 border-white shadow-sm hover:scale-110 transition-transform duration-200"
+              style={{ zIndex: profiles.length - index }}
             >
               <AvatarImage src={profile.image} />
               <AvatarFallback className="bg-gray-200 text-gray-700 text-sm">
@@ -73,23 +74,25 @@ export default function ChallengeCard({
           )}
         </div>
 
-        {/* آیکون قفل بالا سمت راست */}
-        <div className="absolute top-4 right-4 bg-white/70 backdrop-blur-md rounded-full p-2">
-          <Lock className="h-5 w-5 text-gray-800" />
-        </div>
+        {/* 🔒 فقط اگه isPrivate = true باشه */}
+        {isPrivate && (
+          <div className="absolute top-4 left-4 bg-white/70 backdrop-blur-md rounded-full p-2">
+            <Lock className="h-5 w-5 text-gray-800" />
+          </div>
+        )}
       </div>
 
       {/* محتوای پایین */}
-      <CardHeader className="pt-3 px-6">
+      <CardHeader className="pt-3 px-6" dir="rtl">
         <CardTitle className="text-lg sm:text-xl font-semibold text-gray-900">
           {title}
         </CardTitle>
-        <p className="text-sm text-gray-500 mt-1">{description}</p>
+        <p className="text-sm text-gray-500 mt-1">{shortDescription}</p>
       </CardHeader>
 
       <CardContent className="px-6 pb-5">
         <div className="flex items-center justify-between mt-4 text-gray-700 text-sm sm:text-base">
-          {/* لایک */}
+          {/* دکمه لایک */}
           <button
             onClick={handleLike}
             className={`flex items-center gap-2 transition-transform duration-300 hover:scale-105 ${
