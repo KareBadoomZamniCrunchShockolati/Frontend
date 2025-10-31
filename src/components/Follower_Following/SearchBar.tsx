@@ -12,7 +12,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, onSearchTermChange, o
   return (
     <div className="flex justify-center mb-3">
       <CustomInput
-        className="w-88 h-8 rounded-[12.5px]"
+        className=" w-88 h-8 sm:w-100 sm:h-8 md:w-110 md:h-9 rounded-[12.5px]"
         name="searchTerm"
         label=""
         icon= {<Search/>}
