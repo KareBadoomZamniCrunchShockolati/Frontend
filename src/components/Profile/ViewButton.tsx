@@ -4,7 +4,7 @@ import CustomButton from "../Custom/CustomButton";
 interface Props {
   isFollowing?: boolean;
 }
-const ViewButton = ({ isFollowing = false }: Props) => {
+const ViewButton = ({ isFollowing = true }: Props) => {
   return (
     <div className="flex justify-center mt-5">
       {isFollowing ? (
