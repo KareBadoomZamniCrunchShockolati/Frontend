@@ -10,6 +10,10 @@ interface CustomCheckboxProps {
     label?: string;
     checkbox?: string;
   }; 
+  viewOnly?: {
+    isViewOnly?: boolean;
+    checked?: boolean;
+  };
 }
 
 const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
@@ -17,7 +21,9 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
   labelText = 'متن',
   textTransparentOnChecked = false,  
   classNames = {},
+  viewOnly = { isViewOnly: false, checked: false },
 }) => {
+  if (!viewOnly.isViewOnly) {
   return (
     <Field name={name}>
       {({ field, form, meta }: FieldProps) => {
@@ -63,6 +69,19 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
       }}
     </Field>
   );
+}
+  return (<Checkbox
+                checked={viewOnly.checked}
+                className={`
+                  rounded-[4px] 
+                  border-[2px]
+                  border-[#000] 
+                  bg-white
+                  data-[state=checked]:text-black
+                  data-[state=checked]:bg-primary
+                  ${classNames?.checkbox}
+                `}
+              />);
 };
 
 export default CustomCheckbox;
