@@ -11,12 +11,12 @@ import SignUpFormSchemaStep1Config from "@/schemas/SignUpFormSchemaStep1";
 import SignUpFormSchemaStep2Config from "@/schemas/SignUpFormSchemaStep2";
 import SignUpFormSchemaStep3Config from "@/schemas/SignUpFormSchemaStep3";
 
-
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { signupService } from "@/services/authService";
 
 function SignUp() {
   const initialValues = {
@@ -54,11 +54,21 @@ function SignUp() {
     }
   }, [timeLeft]);
 
-  const handleSubmit = () => {
-    console.log("Form values:");
-  };
-
   
+  const handleSignup = async () => {
+    try {
+      const data = await signupService({
+        username,
+        email,
+        password,
+        bio,
+      });
+      localStorage.setItem("token", data.token); // save JWT
+      console.log("Signed up:", data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     setIsPressedBack(false);
@@ -108,7 +118,7 @@ function SignUp() {
         <Formik
           initialValues={initialValues}
           validationSchema={SignUpFormSchemaStep1Config}
-          onSubmit={handleSubmit}
+          onSubmit={handleSignup}
         >
           {({ isSubmitting, isValid, dirty }) => (
             <Form className="flex flex-col items-center gap-4 w-full h-full">
@@ -174,7 +184,7 @@ function SignUp() {
         <Formik
           initialValues={initialValues}
           validationSchema={SignUpFormSchemaStep2Config}
-          onSubmit={handleSubmit}
+          onSubmit={handleSignup}
         >
           {({ isSubmitting, isValid, dirty }) => (
             <Form className="flex flex-col items-center gap-4 w-full h-full">
@@ -227,7 +237,7 @@ function SignUp() {
 
             <div className="text-right mb-8">
               <div className="text-4xl font-extrabold text-[var(--primary)] mb-2">
-                 تقریبا تمومه! تایید پست الکترونیک 
+                تقریبا تمومه! تایید پست الکترونیک
               </div>
               <p className="text-[#666666] text-sm font-extrabold">
                 لطفا کد ارسال شده به پست الکترونیک karebadoomzamini@gamil.com را
@@ -238,7 +248,7 @@ function SignUp() {
             <Formik
               initialValues={initialValues}
               validationSchema={SignUpFormSchemaStep3Config}
-              onSubmit={handleSubmit}
+              onSubmit={handleSignup}
             >
               {({ isSubmitting }) => (
                 <Form className="flex flex-col items-center gap-4 w-full">

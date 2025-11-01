@@ -13,7 +13,7 @@ import type {
 	PutParams,
 } from "../types/apiTypes";
 
-export const baseURL = "http://1.2.3.4:8000"; // backend URL
+export const baseURL = "http://localhost:8000"; // backend URL
 
 const apiClient: AxiosInstance = axios.create({
 	baseURL,
@@ -24,11 +24,13 @@ const apiClient: AxiosInstance = axios.create({
 });
 
 apiClient.interceptors.request.use(
-	(config: InternalAxiosRequestConfig) => {
-		// const token = getTokenFromStore();
-		// if (token) config.headers.Authorization = `Bearer ${token}`;
-		return config;
-	},
+  (config: InternalAxiosRequestConfig) => {
+    const token = localStorage.getItem("token"); // get JWT from localStorage
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`; // attach token
+    }
+    return config;
+  },
 	(error) => Promise.reject(error)
 );
 
