@@ -54,9 +54,11 @@ function SignUp() {
     }
   }, [timeLeft]);
 
-  const handleSubmit = (values) => {
-    console.log("Form values:", values);
+  const handleSubmit = () => {
+    console.log("Form values:");
   };
+
+  
 
   useEffect(() => {
     setIsPressedBack(false);
