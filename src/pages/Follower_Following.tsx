@@ -7,6 +7,7 @@ import BackButtonWithUsername from "@/components/Follower_Following/BackButtonWi
 import SearchBar from "@/components/Follower_Following/SearchBar";
 import UserCardList from "@/components/Follower_Following/UserCardList";
 import DeleteConfirmationModal from "@/components/Follower_Following/DeleteConfirmationModal";
+import { getData } from "@/services/services";
 
 interface User {
   id: string;
@@ -25,10 +26,13 @@ const FollowerFollowingPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const fullName = location.state?.fullName || "Unknown User"; 
+  const loggedInUserId = '6'; // This should be dynamically set for the logged-in user
+  const isOwner = loggedInUserId === '6'; 
 
-  const loggedInUserId = '1'; // Replace with actual logic for logged-in user ID
+  // Base URL for the backend API, make sure this is correct
+  const backendUrl = 'http://localhost:8080'; // Make sure this matches your backend
 
-  const isOwner = loggedInUserId === '1'; 
+
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -38,31 +42,28 @@ const FollowerFollowingPage: React.FC = () => {
     }
   }, [location.search]);
 
+  const fetchUsers = () => {
+    
+    const endpoint = activeTab === 'followers' 
+    ? `/api/v1/users/${loggedInUserId}/followers` 
+    : `/api/v1/users/${loggedInUserId}/following`;
+    getData({endPoint: endpoint}).then((data) => {
+    console.log("data", data)
+    if (activeTab === 'followers') {
+          setFollowers(data.users);
+    } else {
+          setFollowings(data.users);
+    }
+    }).catch((error) => {
+      
+          console.error('Failed to fetch users:', error);
+    }).finally(()=>     setLoading(false))
+  }
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      try {
-        const endpoint = activeTab === 'followers' ? '/api/followers' : '/api/followings';
-        const response = await fetch(`${endpoint}?userId=${loggedInUserId}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (activeTab === 'followers') {
-            setFollowers(data.users);
-          } else {
-            setFollowings(data.users);
-          }
-        } else {
-          console.error('Error fetching users:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Failed to fetch users:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchUsers();
-  }, [loggedInUserId, activeTab]);
+  }, [loggedInUserId, activeTab, backendUrl]);
 
   const handleTabSwitch = (tab: 'followers' | 'followings') => {
     setActiveTab(tab);
@@ -77,7 +78,7 @@ const FollowerFollowingPage: React.FC = () => {
   const handleDeleteConfirmation = async () => {
     if (userToDelete) {
       try {
-        const response = await fetch(`/api/removeFollower`, {
+        const response = await fetch(`${backendUrl}/api/v1/followers/remove`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: loggedInUserId, followerId: userToDelete.id }),

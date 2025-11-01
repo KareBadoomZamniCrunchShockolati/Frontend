@@ -36,13 +36,13 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
 
           <div className="flex flex-col space-y-4">
             <CustomButton
-              className="bg-primary text-white w-full text-xl font-normal px-4 py-2 mb-3 rounded-lg shadow-primary border-primary hover:bg-primary-dark"
+              className="bg-white text-primary w-full text-xl font-normal px-4 py-2 mb-3 rounded-lg shadow-primary border-primary hover:bg-primary-dark"
               onClick={onDeleteConfirm}
             >
               حذف
             </CustomButton>
             <CustomButton
-              className="bg-secondary text-white w-full text-xl font-normal px-4 py-2 rounded-lg shadow-secondary border-secondary hover:bg-secondary-dark"
+              className="bg-white text-secondary w-full text-xl font-normal px-4 py-2 rounded-lg shadow-secondary border-secondary hover:bg-secondary-dark"
               onClick={onDeleteCancel}
             >
               انصراف
