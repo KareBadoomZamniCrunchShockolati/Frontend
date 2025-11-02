@@ -15,9 +15,9 @@ import { postData } from "./services";
 // };
 const AUTH_BASE = "/api/v1";
 // Login function
-export const loginService = async (credentials: LoginPayload): Promise<LoginResponse> => {
+export const loginService = async (credentials: LoginPayload): Promise<AuthResponse> => {
     return postData({
-        endPoint: `/api/v1/auth/login`,
+        endPoint: `${AUTH_BASE}/auth/login`,
         data: credentials,
     });
 };
@@ -28,7 +28,7 @@ export const signupService = async ({
   email,
   password,
   bio,
-}: SignupPayload) => {
+}: SignupPayload): Promise<AuthResponse> => {
   const data = await postData({
     endPoint: `${AUTH_BASE}/auth/signup`,
     data: { username, email, password, bio },
@@ -39,7 +39,7 @@ export const signupService = async ({
 export const verifyEmailService = async ({
   email,
   code,
-}: VerifyEmailService) => {
+}: VerifyEmailService): Promise<any> => {
   const data = await postData({
     endPoint: `${AUTH_BASE}/verify`,
     data: { email, code },
@@ -47,7 +47,7 @@ export const verifyEmailService = async ({
   return data;
 };
 
-export const resendVerificationCode = async (email: string) => {
+export const resendVerificationCode = async (email: string): Promise<any> => {
   const res = await axios.post(`${AUTH_BASE}/resend-verification`, { email });
   return res.data;
 };
