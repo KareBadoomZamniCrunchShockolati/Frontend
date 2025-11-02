@@ -47,7 +47,11 @@ export const verifyEmailService = async ({
   return data;
 };
 
-export const resendVerificationCode = async (email: string) => {
-  const res = await axios.post(`${AUTH_BASE}/resend-verification`, { email });
-  return res.data;
+export const resendVerificationCode = async (email: string,password:string) => {
+  // const res = await axios.post(`${AUTH_BASE}/resend-verification`, { email });
+  const data = await postData({
+    endPoint: `${AUTH_BASE}/resend-verification`,
+    data: { email,password },
+  });
+  return data;
 };

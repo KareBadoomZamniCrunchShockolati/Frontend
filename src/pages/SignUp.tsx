@@ -58,12 +58,12 @@ function SignUp() {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  const handleClick = async () => {
+  const handleClick = async (email:string, password:string) => {
     setShouldClear(true);
     setTimeLeft(10);
     setDisabled(true);
     try {
-      await resendVerificationCode(email);
+      await resendVerificationCode(email,password);
       alert("کد جدید به ایمیل شما ارسال شد ✅");
     } catch (err) {
       console.error("Failed to resend code:", err);
@@ -94,13 +94,13 @@ function SignUp() {
     }
   };
 
-  const handleVerify = async () => {
+  const handleVerify = async (emailToVerify: string, codeToVerify: string) => {
     try {
       const data = await verifyEmailService({
-        email,
-        code: OTPvalue, // 6-digit entered by user
+        email: emailToVerify,
+        code: codeToVerify,
       });
-
+      console.log("Verification success! Token:", data.token);
       localStorage.setItem("token", data.token); // Save JWT
       console.log("Email verified successfully!");
       alert("ثبت نام شما تکمیل شد ✅");
@@ -108,6 +108,11 @@ function SignUp() {
     } catch (err) {
       console.error("Verification failed:", err);
       alert("کد تایید اشتباه است یا منقضی شده ❌");
+    }
+    finally{
+      console.log("Verification process ended");
+      console.log("email:", emailToVerify);
+      console.log("code:", codeToVerify);
     }
   };
   //end connection
@@ -163,6 +168,7 @@ function SignUp() {
           onSubmit={(data: FieldValues) => {
             setUsername(data.username);
             setEmail(data.email);
+            setIsPressedNext((prev) => !prev);
             console.log("Step1 values:", data);
           }}
         >
@@ -201,7 +207,6 @@ function SignUp() {
                   shadow-[0px_1px_0px_var(--borderDefault)]
                   transition-all duration-300
                 "
-                onClick={() => setIsPressedNext((prev) => !prev)}
               />
             </Form>
           )}
@@ -312,10 +317,11 @@ function SignUp() {
                     <InputOTP
                       value={OTPvalue}
                       maxLength={6}
-                      onChange={(value) => {
+                      onChange={(value:string) => {
                         setOTPValue(value);
                         if (value.length === 6) {
-                          handleVerify();
+                          handleVerify(email,value);
+                          console.log("email:", email);
                           console.log("OTP کامل شد:", value);
                           setIsPressedNext((prev) => !prev);
                         }
@@ -349,7 +355,7 @@ function SignUp() {
                   shadow-[0px_1px_0px_var(--borderDefault)]
                   transition-all duration-300
                 "
-                    onClick={handleClick}
+                    onClick={() => handleClick(email,password)}
                   />
                 </Form>
               )}
