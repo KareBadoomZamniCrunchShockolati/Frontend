@@ -10,6 +10,7 @@ import UserCardList from "@/components/FollowerFollowing/UserCardList";
 import DeleteConfirmationModal from "@/components/FollowerFollowing/DeleteConfirmationModal";
 import { fetchUsers } from "@/services/followerFollowingService";
 import useUserStore from "@/store/userStore/userStore";
+import { removeFollower, removeFollowing } from "@/services/followerFollowingService"; // Import the service methods
 
 interface User {
   id: string;
@@ -77,73 +78,56 @@ const FollowerFollowingPage: React.FC = () => {
     setState(prevState => ({ ...prevState, userToDelete: { id, username }, showDeleteModal: true }));
   };
 
-  const handleDeleteConfirmation = async () => {
-    if (userToDelete && token) { // Ensure there's a token
-      try {
-        let response;
-        const requestBody = {
-          [activeTab === 'followers' ? 'follower_id' : 'following_id']: userToDelete.id,
-        };
   
-        console.log("Request body:", requestBody); // Check the request body structure
-        console.log("Authorization token:", token); // Check the token
-  
-        // Determine the correct endpoint based on active tab
-        if (activeTab === 'followers') {
-          response = await fetch(`http://localhost:8080/api/v1/followers/remove`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify(requestBody),
-          });
-        } else if (activeTab === 'followings') {
-          response = await fetch(`http://localhost:8080/api/v1/follow`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify(requestBody),
-          });
-        }
-  
-        if (response && response.ok) {
-          // Successfully removed the user
-          setState(prevState => ({
-            ...prevState,
-            [activeTab]: prevState[activeTab].filter(user => user.id !== userToDelete.id),
-            showDeleteModal: false,
-            userToDelete: null,
-          }));
-        } else if (response) {
-          const errorMessage = await response.text(); // Get the error message from the response
-          console.error("Failed to remove user:", errorMessage);
-          setState(prevState => ({
-            ...prevState,
-            error: `Failed to remove ${activeTab.slice(0, -1)}: ${errorMessage}`,
-          }));
-        } else {
-          setState(prevState => ({
-            ...prevState,
-            error: 'Failed to communicate with the server. Please try again later.',
-          }));
-        }
-      } catch (error) {
-        console.error('Error deleting user:', error);
+
+const handleDeleteConfirmation = async () => {
+  if (userToDelete && token) { // Ensure there's a token
+    try {
+      let response;
+
+      const requestBody = {
+        [activeTab === 'followers' ? 'follower_id' : 'following_id']: userToDelete.id,
+      };
+
+      console.log("Request body:", requestBody); // Check the request body structure
+      console.log("Authorization token:", token); // Check the token
+
+      // Call the appropriate service method based on active tab
+      if (activeTab === 'followers') {
+        response = await removeFollower(loggedInUserId, userToDelete.id, token); // Using removeFollower service
+      } else if (activeTab === 'followings') {
+        response = await removeFollowing(loggedInUserId, userToDelete.id, token); // Using removeFollowing service
+      }
+
+      // Handle successful deletion
+      if (response) {
         setState(prevState => ({
           ...prevState,
-          error: 'Error deleting user. Please try again later.',
+          [activeTab]: prevState[activeTab].filter(user => user.id !== userToDelete.id),
+          showDeleteModal: false,
+          userToDelete: null,
+        }));
+      } else {
+        setState(prevState => ({
+          ...prevState,
+          error: `Failed to remove ${activeTab.slice(0, -1)}. Please try again.`,
         }));
       }
-    } else {
+    } catch (error) {
+      console.error('Error deleting user:', error);
       setState(prevState => ({
         ...prevState,
-        error: 'Authentication required to perform this action.',
+        error: 'Error deleting user. Please try again later.',
       }));
     }
-  };
+  } else {
+    setState(prevState => ({
+      ...prevState,
+      error: 'Authentication required to perform this action.',
+    }));
+  }
+};
+
   
   
   
@@ -177,7 +161,12 @@ const FollowerFollowingPage: React.FC = () => {
               ) : error ? (
                 <p className="font-semibold text-red-500 text-2xl">{error}</p> // Show error message
               ) : (
-                <UserCardList users={ChosenList} onDelete={handleDeleteClick} isOwner={isOwner} />
+                <UserCardList 
+                  users={Array.isArray(ChosenList) ? ChosenList : []} 
+                  onDelete={handleDeleteClick} 
+                  isOwner={isOwner} 
+                />
+
               )}
             </Form>
           );
