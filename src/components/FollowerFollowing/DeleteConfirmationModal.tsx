@@ -27,12 +27,13 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
         className="fixed bottom-0 left-0 right-0 bg-white shadow-lg rounded-t-lg p-6 z-60 border-2 border-black"
         onClick={(e) => e.stopPropagation()} // Prevent the modal from closing when clicked
       >
-        <div className="flex flex-col items-center text-right">
+        <div className="flex flex-col items-center text-right" dir="rtl">
           <p className="font-bold text-lg mb-4">
             آیا مطمئن هستید که می‌خواهید{' '}
-            <span className="text-primary mx-2">{username}</span> را از لیست{' '}
+            <span className="text-primary mx-2" dir="ltr">{username}</span> را از لیست{' '}
             {listType === 'followers' ? 'دنبال‌کنندگان' : 'دنبال‌شوندگان'} حذف کنید؟
           </p>
+        
 
           <div className="flex flex-col space-y-4">
             <CustomButton

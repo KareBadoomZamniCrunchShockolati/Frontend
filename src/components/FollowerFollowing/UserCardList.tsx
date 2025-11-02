@@ -1,5 +1,5 @@
 import React from 'react';
-import UserCard from '@/components/Follower_Following/UserCard';
+import UserCard from '@/components/FollowerFollowing/UserCard';
 
 interface UserCardListProps {
   users: { id: string; username: string; imagePath: string }[];

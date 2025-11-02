@@ -6,26 +6,50 @@ interface UserCardProps {
   id: string;
   username: string;
   imagePath: string;
+  bio: string;
+  followersCount: number;
+  followingCount: number;
+  doneChallengesCount: number;
   onDelete: (id: string, username: string) => void;
-  isOwner: boolean; // Add isOwner here
+  isOwner: boolean;
 }
 
-const UserCard: React.FC<UserCardProps> = ({ id, username, imagePath, onDelete, isOwner }) => {
+const UserCard: React.FC<UserCardProps> = ({ 
+  id, 
+  username, 
+  imagePath, 
+  bio, 
+  followersCount, 
+  followingCount, 
+  doneChallengesCount, 
+  onDelete, 
+  isOwner 
+}) => {
   const navigate = useNavigate();
 
+  // Handle the card click event to navigate to the user's profile
   const handleCardClick = () => {
-    navigate(`/dashboard/${id}`);
+    // Navigate to the user's profile and pass necessary data as state
+    navigate(`/dashboard/${id}`, {
+      state: {
+        fullName: username,  // Passing the username as fullName
+        bio,
+        followersCount,
+        followingCount,
+        doneChallengesCount
+      }
+    });
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent the card click event
-    onDelete(id, username); // Call the onDelete function passed via props
+    e.stopPropagation();  // Prevent the card click event from firing
+    onDelete(id, username);
   };
 
   return (
     <div
       className="flex items-center justify-between mb-2 p-2 w-88 sm:w-100 md:w-110 h-24 border border-black rounded-[7px] cursor-pointer"
-      onClick={handleCardClick}
+      onClick={handleCardClick}  // Trigger navigation on card click
     >
       <div className="flex items-center space-x-4">
         <img
@@ -35,7 +59,8 @@ const UserCard: React.FC<UserCardProps> = ({ id, username, imagePath, onDelete, 
         />
         <span className="font-bold">{username}</span>
       </div>
-      {isOwner && ( // Only show delete button if the user is the profile owner
+      
+      {isOwner && (
         <button className="text-primary" onClick={handleDeleteClick}>
           <X className='w-6 h-6 mr-2 border-2 border-primary rounded-[11px] hover:bg-orange-100' />
         </button>

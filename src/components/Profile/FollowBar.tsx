@@ -1,7 +1,8 @@
-import { useNavigate } from "react-router-dom"; // Use useNavigate instead of useHistory
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import formatFollowBarNumber from "@/utils/formatFollowBarNumber";
-import React from "react";
+
 interface Props {
   fullName?: string;
   bio?: string;
@@ -9,17 +10,24 @@ interface Props {
   followingCount?: number;
   doneChallengesCount?: number;
 }
-const FollowBar = ({
-  fullName = "saman khajeamiri",
-  bio = "سلااام صبحت بخیررر",
-  followersCount = 12520_000,
-  followingCount = 12_300,
-  doneChallengesCount = 1200,
-}: Props) => {
-  const navigate = useNavigate(); // Use useNavigate hook
+
+const FollowBar = () => {
+  const location = useLocation();  // Retrieve state passed from the navigation
+  const navigate = useNavigate();
+
+  // Destructure the state passed through navigation (using useLocation hook)
+  const {
+    fullName = "saman khajeamiri",
+    bio = "سلااام صبحت بخیررر",
+    followersCount = 12520_000,
+    followingCount = 12_300,
+    doneChallengesCount = 1200
+  } = location.state || {};  // Use default values in case state is undefined
 
   const handleNavigateToFollowerFollowingPage = (tab: "followers" | "followings") => {
-    navigate(`/follow?tab=${tab}`);
+    navigate(`/follow?tab=${tab}`, {
+      state: { fullName } // Passing fullName as part of the state
+    });
   };
 
   return (
@@ -47,7 +55,7 @@ const FollowBar = ({
         <div className="w-px bg-gray-500"></div>
 
         {/* Followers */}
-        <div onClick={() => handleNavigateToFollowerFollowingPage("followers")} tabIndex={0} className="cursor-pointer active:bg-[var(--color-gray-main)] transition-all duration-200" >
+        <div onClick={() => handleNavigateToFollowerFollowingPage("followers")} tabIndex={0} className="cursor-pointer active:bg-[var(--color-gray-main)] transition-all duration-200">
           <p className="text-sm sm:text-base md:text-lg text-black-500">دنبال‌کنیا</p>
           <p className="text-sm sm:text-base md:text-lg font-bold text-black-800">
             {convertToPersianDigits(formatFollowBarNumber(followersCount))}
