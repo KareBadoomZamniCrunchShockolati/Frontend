@@ -1,4 +1,3 @@
-// src/pages/FollowerFollowingPage.tsx
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Formik, Form } from "formik";
@@ -31,11 +30,12 @@ const FollowerFollowingPage: React.FC = () => {
     userToDelete: null as { id: string; username: string } | null,
     followers: [] as User[],
     followings: [] as User[],
+    filteredUsers: [] as User[], // Added state for filtered users
     loading: false,
     error: null as string | null,
   });
 
-  const { activeTab, showDeleteModal, userToDelete, followers, followings, loading, error } = state;
+  const { activeTab, showDeleteModal, userToDelete, followers, followings, filteredUsers, loading, error } = state;
   const fullName = location.state?.fullName || "Unknown User";
   const loggedInUserId = '8'; // Ideally, this comes from authentication context
   const isOwner = loggedInUserId === '8';
@@ -53,6 +53,7 @@ const FollowerFollowingPage: React.FC = () => {
       setState(prevState => ({
         ...prevState,
         [activeTab]: users,
+        filteredUsers: users, // Set the filteredUsers to all users initially
         loading: false,
       }));
     } catch (error) {
@@ -78,62 +79,70 @@ const FollowerFollowingPage: React.FC = () => {
     setState(prevState => ({ ...prevState, userToDelete: { id, username }, showDeleteModal: true }));
   };
 
-  
+  const handleDeleteConfirmation = async () => {
+    if (userToDelete && token) { 
+      try {
+        let response;
 
-const handleDeleteConfirmation = async () => {
-  if (userToDelete && token) { // Ensure there's a token
-    try {
-      let response;
+        const requestBody = {
+          [activeTab === 'followers' ? 'follower_id' : 'following_id']: userToDelete.id,
+        };
 
-      const requestBody = {
-        [activeTab === 'followers' ? 'follower_id' : 'following_id']: userToDelete.id,
-      };
+        console.log("Request body:", requestBody);
+        console.log("Authorization token:", token);
 
-      console.log("Request body:", requestBody); // Check the request body structure
-      console.log("Authorization token:", token); // Check the token
+        if (activeTab === 'followers') {
+          response = await removeFollower(loggedInUserId, userToDelete.id, token);
+        } else if (activeTab === 'followings') {
+          response = await removeFollowing(loggedInUserId, userToDelete.id, token);
+        }
 
-      // Call the appropriate service method based on active tab
-      if (activeTab === 'followers') {
-        response = await removeFollower(loggedInUserId, userToDelete.id, token); // Using removeFollower service
-      } else if (activeTab === 'followings') {
-        response = await removeFollowing(loggedInUserId, userToDelete.id, token); // Using removeFollowing service
-      }
-
-      // Handle successful deletion
-      if (response) {
+        if (response) {
+          setState(prevState => ({
+            ...prevState,
+            [activeTab]: prevState[activeTab].filter(user => user.id !== userToDelete.id),
+            filteredUsers: prevState[activeTab].filter(user => user.id !== userToDelete.id), // Update filtered list as well
+            showDeleteModal: false,
+            userToDelete: null,
+          }));
+        } else {
+          setState(prevState => ({
+            ...prevState,
+            error: `Failed to remove ${activeTab.slice(0, -1)}. Please try again.`,
+          }));
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
         setState(prevState => ({
           ...prevState,
-          [activeTab]: prevState[activeTab].filter(user => user.id !== userToDelete.id),
-          showDeleteModal: false,
-          userToDelete: null,
-        }));
-      } else {
-        setState(prevState => ({
-          ...prevState,
-          error: `Failed to remove ${activeTab.slice(0, -1)}. Please try again.`,
+          error: 'Error deleting user. Please try again later.',
         }));
       }
-    } catch (error) {
-      console.error('Error deleting user:', error);
+    } else {
       setState(prevState => ({
         ...prevState,
-        error: 'Error deleting user. Please try again later.',
+        error: 'Authentication required to perform this action.',
       }));
     }
-  } else {
-    setState(prevState => ({
-      ...prevState,
-      error: 'Authentication required to perform this action.',
-    }));
-  }
-};
-
-  
-  
-  
+  };
 
   const handleDeleteCancel = () => {
     setState(prevState => ({ ...prevState, showDeleteModal: false, userToDelete: null }));
+  };
+
+  // Search function: filters the list based on the search term
+  const handleSearch = (searchTerm: string) => {
+    const filteredList = (activeTab === 'followers' ? followers : followings).filter(user =>
+      user.username.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setState(prevState => ({ ...prevState, filteredUsers: filteredList }));
+  };
+
+  // Prevent form submission on Enter key press
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();  // Prevent form submission when Enter is pressed
+    }
   };
 
   return (
@@ -149,24 +158,33 @@ const handleDeleteConfirmation = async () => {
         validationSchema={Yup.object({
           searchTerm: Yup.string(),
         })}
-        onSubmit={(values) => console.log(values.searchTerm)}
+        onSubmit={() => {}} // We don't use onSubmit here anymore
       >
         {({ values, handleChange, handleBlur }) => {
-          const ChosenList = activeTab === 'followers' ? followers : followings;
           return (
-            <Form className="w-full max-w-md mb-6 flex flex-col items-center justify-center">
-              <SearchBar searchTerm={values.searchTerm} onSearchTermChange={handleChange} onBlur={handleBlur} />
+            <Form
+              className="w-full max-w-md mb-6 flex flex-col items-center justify-center"
+              onKeyDown={handleKeyDown} // Add this handler to prevent Enter key submission
+            >
+              {/* Dynamically filter users as you type */}
+              <SearchBar 
+                searchTerm={values.searchTerm} 
+                onSearchTermChange={(e) => {
+                  handleChange(e);  // Handle form input change
+                  handleSearch(e.target.value); // Update filtered users dynamically
+                }} 
+                onBlur={handleBlur} 
+              />
               {loading ? (
                 <p className="font-semibold text-primary text-2xl">در حال بارگذاری...</p>
               ) : error ? (
-                <p className="font-semibold text-red-500 text-2xl">{error}</p> // Show error message
+                <p className="font-semibold text-red-500 text-2xl">{error}</p>
               ) : (
                 <UserCardList 
-                  users={Array.isArray(ChosenList) ? ChosenList : []} 
+                  users={filteredUsers} // Display the filtered list of users
                   onDelete={handleDeleteClick} 
                   isOwner={isOwner} 
                 />
-
               )}
             </Form>
           );
