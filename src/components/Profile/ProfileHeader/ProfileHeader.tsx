@@ -97,7 +97,7 @@ const ProfileHeader = ({
           ></img>
         </div>
       </div>
-      <FollowBar></FollowBar>
+      <FollowBar fullName={fullName}></FollowBar>
       {/* BUTTON */}
       {isOwner && <OwnerButton></OwnerButton>}
       {!isOwner && <ViewButton></ViewButton>}

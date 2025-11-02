@@ -10,29 +10,7 @@ import {
   Bookmark,
 } from "lucide-react";
 import CustomBtn from "@/components/Custom/CustomBtn";
-
-interface Profile {
-  id: number;
-  image: string;
-  fallback: string;
-}
-
-interface ChallengeCardProps {
-  title: string;
-  description?: string;
-  startDate: string;
-  endDate: string;
-  profiles: Profile[];
-  initialLikes?: number;
-  initialComments?: number;
-  coverImage?: string;
-  isPrivate?: boolean;
-  isJoined?: boolean;
-  creator?: {
-    name: string;
-    avatar: string;
-  };
-}
+import type { ChallengeCardProps } from "@/types/challengeCardTypes";
 
 export default function ChallengeCard({
   title,
@@ -124,7 +102,7 @@ export default function ChallengeCard({
         <div className="relative h-72 bg-gray-100 overflow-hidden">
           {/* اسکلت بارگذاری */}
           {!imageLoaded && (
-            <div className="absolute inset-0 bg-gray-200 animate-pulse"></div>
+            <div className="absolute inset-0 bg-primary animate-pulse"></div>
           )}
 
           {/* تصویر اصلی */}
@@ -271,11 +249,7 @@ export default function ChallengeCard({
 
         {/* دکمه عضویت اصلی */}
         <div>
-          <CustomBtn
-            children={
-              isJoined ? "مشاهده پیشرفت" : "عضویت در چالش"
-            }
-          />
+          <CustomBtn children={isJoined ? "مشاهده پیشرفت" : "عضویت در چالش"} />
         </div>
       </div>
     </Card>
