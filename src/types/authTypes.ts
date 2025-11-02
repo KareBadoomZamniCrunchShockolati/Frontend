@@ -1,3 +1,4 @@
+
 export interface LoginPayload {
 	email: string;
 	username: string | null;
@@ -29,4 +30,9 @@ export interface AuthResponse {
 		username: string;
 	};
 	token: string;
+}
+
+export interface VerifyEmailService {
+	email : string;
+	code : string;
 }

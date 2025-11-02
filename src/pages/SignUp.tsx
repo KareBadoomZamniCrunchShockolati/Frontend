@@ -1,7 +1,7 @@
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomCheckbox from "@/components/Custom/CustomCheckbox";
 import CustomBtn from "@/components/Custom/CustomBtn";
-import { Formik, Form } from "formik";
+import { Formik, Form, type FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { Eye, EyeClosed, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -16,13 +16,20 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { signupService } from "@/services/authService";
+import { resendVerificationCode, signupService, verifyEmailService } from "@/services/authService";
+import { set, type FieldValues } from "react-hook-form";
+import type { SignupPayload } from "@/types/authTypes";
 
 function SignUp() {
-  const initialValues = {
+  const initialValues: SignupPayload & {
+    confirmPassword: string;
+    acceptTerms: boolean;
+  } = {
     username: "",
     email: "",
     password: "",
+    bio: "I thought it is required so just to fill it :/ ",
+    confirmPassword: "",
     acceptTerms: false,
   };
   const [isPressedNext, setIsPressedNext] = useState<boolean>(false);
@@ -32,6 +39,14 @@ function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [timeLeft, setTimeLeft] = useState(10);
   const [emailConfirmDisabled, setDisabled] = useState(true);
+  const [shouldClear, setShouldClear] = useState(false) // for reseting the verification code
+
+    useEffect(() => {
+    if (shouldClear) {
+      setOTPValue("") 
+      setShouldClear(false)
+    }
+  }, [shouldClear])
 
   useEffect(() => {
     if (timeLeft <= 0) return;
@@ -43,9 +58,17 @@ function SignUp() {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  const handleClick = () => {
+  const handleClick = async () => {
+    setShouldClear(true);
     setTimeLeft(10);
     setDisabled(true);
+    try {
+      await resendVerificationCode(email);
+      alert("کد جدید به ایمیل شما ارسال شد ✅");
+    } catch (err) {
+      console.error("Failed to resend code:", err);
+      alert("ارسال مجدد کد با خطا مواجه شد ❌");
+    }
   };
 
   useEffect(() => {
@@ -54,21 +77,40 @@ function SignUp() {
     }
   }, [timeLeft]);
 
-  
-  const handleSignup = async () => {
+  // start connection
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [bio, setBio] = useState(
+    "I thought it is required so just to fill it :/ "
+  );
+
+  const handleSignup = async (values: SignupPayload) => {
     try {
-      const data = await signupService({
-        username,
-        email,
-        password,
-        bio,
-      });
-      localStorage.setItem("token", data.token); // save JWT
-      console.log("Signed up:", data);
-    } catch (err) {
-      console.error(err);
+      const data = await signupService(values);
+      console.log("Signup success! Token:", data.token);
+    } catch (err: any) {
+      console.log("Signup failed:", err.response?.data || err.message || err);
     }
   };
+
+  const handleVerify = async () => {
+    try {
+      const data = await verifyEmailService({
+        email,
+        code: OTPvalue, // 6-digit entered by user
+      });
+
+      localStorage.setItem("token", data.token); // Save JWT
+      console.log("Email verified successfully!");
+      alert("ثبت نام شما تکمیل شد ✅");
+      // redirect or move to next step
+    } catch (err) {
+      console.error("Verification failed:", err);
+      alert("کد تایید اشتباه است یا منقضی شده ❌");
+    }
+  };
+  //end connection
 
   useEffect(() => {
     setIsPressedBack(false);
@@ -118,7 +160,11 @@ function SignUp() {
         <Formik
           initialValues={initialValues}
           validationSchema={SignUpFormSchemaStep1Config}
-          onSubmit={handleSignup}
+          onSubmit={(data: FieldValues) => {
+            setUsername(data.username);
+            setEmail(data.email);
+            console.log("Step1 values:", data);
+          }}
         >
           {({ isSubmitting, isValid, dirty }) => (
             <Form className="flex flex-col items-center gap-4 w-full h-full">
@@ -184,7 +230,18 @@ function SignUp() {
         <Formik
           initialValues={initialValues}
           validationSchema={SignUpFormSchemaStep2Config}
-          onSubmit={handleSignup}
+          onSubmit={(data: FieldValues) => {
+            setPassword(data.password);
+            const payload: SignupPayload = {
+              username: username,
+              email: email,
+              password: password,
+              bio: bio,
+            };
+            console.log("Submitting signup payload:", payload);
+            handleSignup(payload);
+            console.log(bio);
+          }}
         >
           {({ isSubmitting, isValid, dirty }) => (
             <Form className="flex flex-col items-center gap-4 w-full h-full">
@@ -236,34 +293,35 @@ function SignUp() {
             </div>
 
             <div className="text-right mb-8">
-              <div className="text-4xl font-extrabold text-[var(--primary)] mb-2">
+              <div className="text-4xl font-extrabold text-[var(--primary)] mb-A2">
                 تقریبا تمومه! تایید پست الکترونیک
               </div>
               <p className="text-[#666666] text-sm font-extrabold">
-                لطفا کد ارسال شده به پست الکترونیک karebadoomzamini@gamil.com را
-                وارد کنید
+                لطفا کد ارسال شده به پست الکترونیک {email} را وارد کنید
               </p>
             </div>
 
             <Formik
               initialValues={initialValues}
               validationSchema={SignUpFormSchemaStep3Config}
-              onSubmit={handleSignup}
+              onSubmit={() => console.log("Step 3 submitted")} //the submit button is wrong and should be called when the lenght reaches 6 (also commented the button type)
             >
               {({ isSubmitting }) => (
                 <Form className="flex flex-col items-center gap-4 w-full">
                   <div dir="ltr">
                     <InputOTP
+                      value={OTPvalue}
                       maxLength={6}
                       onChange={(value) => {
                         setOTPValue(value);
                         if (value.length === 6) {
+                          handleVerify();
                           console.log("OTP کامل شد:", value);
                           setIsPressedNext((prev) => !prev);
                         }
                       }}
                     >
-                      <InputOTPGroup>
+                      <InputOTPGroup >
                         <InputOTPSlot index={0} />
                         <InputOTPSlot index={1} />
                         <InputOTPSlot index={2} />
@@ -280,7 +338,7 @@ function SignUp() {
                         ? `  ارسال مجدد کد ${timeLeft}s`
                         : "ارسال مجدد کد"
                     }
-                    type="submit"
+                    // type="submit"
                     disabled={isSubmitting || emailConfirmDisabled}
                     className="
                   w-full mt-2 
