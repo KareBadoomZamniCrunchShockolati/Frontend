@@ -89,11 +89,14 @@ export default function CustomInput({
               )}
 
               <label
-                className={`absolute pointer-events-none transition-all duration-200 ease-in-out font-bold
-                  ${isRTL ? "right-4" : "left-4"}
-                  ${isFloating
-                    ? "top-[-10px] text-xs bg-white px-1 text-black"
-                    : "top-1/2 -translate-y-1/2 text-sm text-gray-500"}
+                className={`
+                  absolute pointer-events-none transition-all duration-200 ease-in-out font-bold
+                  ${"right-4" }
+                  ${
+                    isFloating
+                      ? "top-[-10px] text-xs bg-white px-1 text-black"
+                      : "top-1/2 -translate-y-1/2 text-sm text-gray-500"
+                  }
                 `}
               >
                 {label}
