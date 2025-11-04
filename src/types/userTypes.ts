@@ -1,14 +1,9 @@
+// src/types/userTypes.ts
+
 export interface UserState {
 	username: string | null;
+	token: string | null; // Add token to the interface
 	setUsername: (username: string) => void;
-}
-export interface FollowStats {
-  followersCount: number;
-  followingCount: number;
-}
-
-export interface UserSummary {
-  id: string;
-  fullName: string;
-  avatarUrl?: string;
-}
+	setToken: (token: string) => void; // Add setToken function
+  }
+  

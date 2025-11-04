@@ -104,13 +104,11 @@ const ProfileHeader: React.FC<Props> = ({
           />
         </div>
       </div>
-
-      <FollowBar
-        followersCount={followersCount}
-        followingCount={followingCount}
-      />
-
-      {isOwner ? <OwnerButton /> : <ViewButton />}
+      <FollowBar ></FollowBar>
+      {/* BUTTON */}
+      {isOwner && <OwnerButton></OwnerButton>}
+      {!isOwner && <ViewButton></ViewButton>}
+      {/* button selector */}
     </>
   );
 };
