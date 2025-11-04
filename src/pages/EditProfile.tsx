@@ -6,12 +6,7 @@ import CustomTextArea from "@/components/Custom/CustomTextArea";
 import CustomBtn from "@/components/Custom/CustomBtn";
 import { ArrowLeft, Pencil } from "lucide-react"; // ✅ اضافه شد
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
-const ProfileSchema = Yup.object().shape({
-  firstName: Yup.string().required("نام الزامی است"),
-  lastName: Yup.string().required("نام خانوادگی الزامی است"),
-  bio: Yup.string().max(200, "بیو نمی‌تواند بیش از ۲۰۰ کاراکتر باشد"),
-});
+import ProfileSchema from "@/schemas/EditPtofileSchema";
 
 export default function ProfileInfo() {
   const [image, setImage] = useState<string | null>(null);
