@@ -17,7 +17,7 @@ export default function CustomInput({
   icon = null,
   onIconClick,
   type = "text",
-  width = "", 
+  width = "",
   ...props
 }: CustomInputProps) {
   const [isFocused, setIsFocused] = useState(false);

@@ -72,7 +72,7 @@ const ProfileHeader: React.FC<Props> = ({
       <div
         onClick={() => console.log("show the badges!")}
         className={`cursor-pointer flex justify-center ${
-          isOwner ? "mt-2.5" : "mt-14"
+          isOwner ? "mt-2.5" : "mt-14.5"
         }`}
       >
         <div className="relative">
@@ -104,7 +104,7 @@ const ProfileHeader: React.FC<Props> = ({
           />
         </div>
       </div>
-      <FollowBar ></FollowBar>
+      <FollowBar fullName={fullName}></FollowBar>
       {/* BUTTON */}
       {isOwner && <OwnerButton></OwnerButton>}
       {!isOwner && <ViewButton></ViewButton>}
