@@ -1,20 +1,13 @@
 import { Form, Formik, type FormikHelpers } from "formik";
-import mobileBg from "@/assets/Img/Mobile-background.png";
-import desktopBg from "@/assets/Img/Desktop-background-2.png";
 import walkingMan from "@/assets/Img/Walking-man-2.png";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomBtn from "@/components/Custom/CustomBtn";
 import type { FormValues } from "@/types/loginFormTypes";
 import { useMobile, useTablet } from "@/hooks/ResponsiveHooks";
 import loginFormSchemaConfig from "@/schemas/loginFormSchema";
-<<<<<<< HEAD
 import { Eye, EyeClosed } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
 import CustomCheckbox from "@/components/Custom/CustomCheckbox";
 import { useState } from "react";
-=======
-import { Eye } from "lucide-react";
->>>>>>> develop
 export default function Login() {
   const [showPassword, setShowPassword] = useState(true);
   const onSubmit = async (
@@ -32,31 +25,22 @@ export default function Login() {
       }`}
       // style={{ backgroundImage: `url(${bg})` }}
     >
-<<<<<<< HEAD
       <div
         className={`p-5 flex md:flex-row rounded-3xl ${
           useMobile() && "w-9/10"
         } bg-white`}
       >
         <div className="hidden md:opacity-100 md:flex items-end justify-center  h-[410px]">
-=======
-      <div className="md:p-5 flex flex-col-reverse md:flex-row rounded-3xl  bg-white">
-        <div className="flex items-end justify-center  h-[410px]">
->>>>>>> develop
           <img
             className="w-(--walking-man-width) h-(--walking-man-height)"
             src={walkingMan}
             alt=""
           />
         </div>
-<<<<<<< HEAD
         <div className="flex flex-col w-full justify-around sm:w-(--login-from-w) h-(--login-form-h) p-[6px] py-[20px]  rounded-3xl">
           <p className="text-center text-right font-bold text-title mb-10 text-[#ff7700]">
             !خوش اومدی
           </p>
-=======
-        <div className="flex flex-col-reverse justify-around sm:w-(--login-from-w) h-(--login-form-h) p-[6px] py-[20px]">
->>>>>>> develop
           <Formik {...loginFormSchemaConfig} onSubmit={onSubmit}>
             {({ isSubmitting }) => (
               <Form>
@@ -68,7 +52,6 @@ export default function Login() {
                   <CustomInput
                     name="password"
                     label="رمز ورود"
-<<<<<<< HEAD
                     type={showPassword ? "text" : "password"}
                     icon={showPassword ? <EyeClosed /> : <Eye />}
                     onIconClick={() => setShowPassword(!showPassword)}
@@ -77,9 +60,6 @@ export default function Login() {
                     name="loginAcceptTerms"
                     labelText="بیناموس نیستم"
                     textTransparentOnChecked={false}
-=======
-                    icon={<Eye />}
->>>>>>> develop
                   />
                   <CustomBtn
                     disabled={isSubmitting}
