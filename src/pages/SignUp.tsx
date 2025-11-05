@@ -11,7 +11,6 @@ import SignUpFormSchemaStep1Config from "@/schemas/SignUpFormSchemaStep1";
 import SignUpFormSchemaStep2Config from "@/schemas/SignUpFormSchemaStep2";
 import SignUpFormSchemaStep3Config from "@/schemas/SignUpFormSchemaStep3";
 
-
 import {
   InputOTP,
   InputOTPGroup,
@@ -86,15 +85,15 @@ function SignUp() {
         <div className="flex items-center justify-between mb-12 ">
           <img src={telegramLogo} alt="لوگو" className="w-18 h-18 rounded-xl" />
           <button
-            className="p-2 border-2 border-[var(--primary)] rounded-xl hover:bg-orange-50 transition-colors"
+            className="p-2 border-2 border-primary rounded-xl hover:bg-primary-hover transition-colors"
             onClick={() => setIsPressedBack((prev) => !prev)}
           >
-            <ArrowLeft className="w-8 h-8 text-[var(--primary)]" />
+            <ArrowLeft className="w-8 h-8 text-primary" />
           </button>
         </div>
 
         <div className="text-right mb-8">
-          <div className="text-4xl font-extrabold text-[var(--primary)] mb-2">
+          <div className="text-4xl font-extrabold text-primary mb-2">
             ثبت نام
           </div>
 
@@ -124,7 +123,7 @@ function SignUp() {
                     rounded-[4px]
                     border-[2px] border-[#111]
                     bg-white
-                    data-[state=checked]:bg-[var(--primary)]
+                    data-[state=checked]:bg-primary
                     data-[state=checked]:text-black
                   `,
                   }}
@@ -136,7 +135,7 @@ function SignUp() {
                 disabled={isSubmitting || !isValid || !dirty}
                 className="
                   w-full mt-2 
-                  bg-[var(--secondry)] hover:bg-white 
+                  bg-secondary hover:bg-white 
                   text-white py-3 rounded-xl 
                   font-semibold 
                   border-1 border-black 
@@ -152,15 +151,15 @@ function SignUp() {
       <Step>
         <div className="flex items-center justify-end mb-12">
           <button
-            className="p-2 border-2 border-[var(--primary)] rounded-xl hover:bg-orange-50 transition-colors"
+            className="p-2 border-2 border-primary rounded-xl hover:bg-primary-hover transition-colors"
             onClick={() => setIsPressedBack((prev) => !prev)}
           >
-            <ArrowLeft className="w-8 h-8 text-[var(--primary)]" />
+            <ArrowLeft className="w-8 h-8 text-primary" />
           </button>
         </div>
 
         <div className="text-right mb-8">
-          <div className="text-4xl font-extrabold text-[var(--primary)] mb-2">
+          <div className="text-4xl font-extrabold text-primary mb-2">
             ! رمز عبورت رو بساز
           </div>
           <p className="text-[#666666] text-sm font-extrabold">
@@ -198,7 +197,7 @@ function SignUp() {
                 disabled={isSubmitting || !isValid || !dirty}
                 className="
                   w-full mt-2 
-                  bg-[var(--secondry)] hover:bg-[var(--secondry-hover)]
+                  bg-secondary hover:bg-secondry-hover
                   text-white py-3 rounded-xl 
                   font-semibold 
                   border-1 border-black 
@@ -216,16 +215,16 @@ function SignUp() {
           <div>
             <div className="flex items-center justify-end mb-12">
               <button
-                className="p-2 border-2 border-[var(--primary)] rounded-xl hover:bg-orange-50 transition-colors"
+                className="p-2 border-2 border-primary rounded-xl hover:bg-primary-hover transition-colors"
                 onClick={() => setIsPressedBack((prev) => !prev)}
               >
-                <ArrowLeft className="w-8 h-8 text-[var(--primary)]" />
+                <ArrowLeft className="w-8 h-8 text-primary" />
               </button>
             </div>
 
             <div className="text-right mb-8">
-              <div className="text-4xl font-extrabold text-[var(--primary)] mb-2">
-                 تقریبا تمومه! تایید پست الکترونیک 
+              <div className="text-4xl font-extrabold text-primary mb-2">
+                تقریبا تمومه! تایید پست الکترونیک
               </div>
               <p className="text-[#666666] text-sm font-extrabold">
                 لطفا کد ارسال شده به پست الکترونیک karebadoomzamini@gamil.com را
@@ -272,7 +271,7 @@ function SignUp() {
                     disabled={isSubmitting || emailConfirmDisabled}
                     className="
                   w-full mt-2 
-                  bg-[var(--secondry)] hover:bg-[var(--secondry-hover)] 
+                  bg-secondary hover:bg-secondry-hover 
                   text-white py-3 rounded-xl 
                   font-semibold 
                   border-1 border-black 
