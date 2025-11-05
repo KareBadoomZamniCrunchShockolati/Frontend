@@ -214,6 +214,7 @@
   --secondary-hover: #6c96e6;
   --error: #c30025;
   --success: #009262;
+  --neutral-gray : #9d9d9d;
   --disable: #b1b1b1;
   --primary-foreground: oklch(0.985 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -303,7 +304,8 @@
   --color-secondry-hover: var(--secondry-hover);
   --color-error: var(--error);
   --color-success: var(--success);
-  --color--disable: var(--disable);
+  --color-disable: var(--disable);
+  --color-neutral-gray: var(--neutral-gray);
   --shadow-button: var(--shadow-button);
   --shadow-button-active: var(--shadow-button-active);
   --text-title: var(--title-size);
