@@ -108,8 +108,8 @@ function SignUp() {
           onSubmit={handleSubmit}
         >
           {({ isSubmitting, isValid, dirty }) => (
-            <Form className="flex flex-col items-center gap-4 w-full h-full">
-              <CustomInput name="username" label="نام کاربری" />
+            <Form className="flex flex-col items-stretch gap-4 w-full h-full">
+              <CustomInput name="username" label="نام کاربری"/>
 
               <CustomInput name="email" label="پست الکترونیک" />
 
@@ -174,7 +174,7 @@ function SignUp() {
           onSubmit={handleSubmit}
         >
           {({ isSubmitting, isValid, dirty }) => (
-            <Form className="flex flex-col items-center gap-4 w-full h-full">
+            <Form className="flex flex-col items-stretch gap-4 w-full h-full">
               <CustomInput
                 name="password"
                 type={showPassword ? "text" : "password"}
@@ -238,7 +238,7 @@ function SignUp() {
               onSubmit={handleSubmit}
             >
               {({ isSubmitting }) => (
-                <Form className="flex flex-col items-center gap-4 w-full">
+                <Form className="flex flex-col items-stretch gap-4 w-full">
                   <div dir="ltr">
                     <InputOTP
                       maxLength={6}

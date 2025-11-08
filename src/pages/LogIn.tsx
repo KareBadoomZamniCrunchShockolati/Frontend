@@ -38,7 +38,7 @@ export default function Login() {
           />
         </div>
         <div className="flex flex-col w-full justify-around sm:w-(--login-from-w) h-(--login-form-h) p-[6px] py-[20px]  rounded-3xl">
-          <p className="text-center text-right font-bold text-title mb-10 text-[#ff7700]">
+          <p className="text-center text-right font-bold text-title mb-10 text-primary">
             !خوش اومدی
           </p>
           <Formik {...loginFormSchemaConfig} onSubmit={onSubmit}>
@@ -64,7 +64,7 @@ export default function Login() {
                   <CustomBtn
                     disabled={isSubmitting}
                     color="#fff"
-                    className="w-72 bg-[#ff7700] mt-auto"
+                    className="w-72 bg-primary mt-auto"
                     type="submit"
                     loading={isSubmitting}
                   >
@@ -75,7 +75,7 @@ export default function Login() {
             )}
           </Formik>
           <div className="flex justify-end items-center">
-            <a href="" className="text-secondry mr-1">
+            <a href="signup" className="text-secondary mr-1">
               ثبت نام
             </a>
             <p className="">حساب کاربری ندارید؟</p>
