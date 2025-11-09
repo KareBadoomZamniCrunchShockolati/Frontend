@@ -9,7 +9,7 @@ import { Eye, EyeClosed } from "lucide-react";
 import CustomCheckbox from "@/components/Custom/CustomCheckbox";
 import { useState } from "react";
 import { Label } from "@radix-ui/react-label";
-import type { Checkbox } from "@radix-ui/react-checkbox";
+import { Checkbox } from "@radix-ui/react-checkbox";
 export default function Login() {
   const [showPassword, setShowPassword] = useState(true);
   const onSubmit = async (
@@ -62,6 +62,8 @@ export default function Login() {
                     name="loginAcceptTerms"
                     labelText="قوانین و مقررات را خوانده و می پذیرم" 
                     textTransparentOnChecked={false}
+                    classNames={{ label: "text-sm text-gray-600 font-extrabold", checkbox: "" }}
+
                   />
                   <CustomBtn
                     disabled={isSubmitting}
