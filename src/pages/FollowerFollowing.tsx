@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import ToggleButtons from "@/components/FollowerFollowing/ToggleButtons";
@@ -21,39 +21,43 @@ const FollowerFollowingPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Access the token from the Zustand store
   const { token } = useUserStore(state => state);
+  const loggedInUserId = useUserStore(state => state.id);
 
+  const { userId } = useParams(); // Extract userId from the URL
+  const selectedUser = userId || "8"; // If userId is not available, default to "8"
+  
   const [state, setState] = useState({
     activeTab: 'followers' as 'followers' | 'followings',
     showDeleteModal: false,
     userToDelete: null as { id: string; username: string } | null,
-    followers: [] as User[],
-    followings: [] as User[],
-    filteredUsers: [] as User[], // Added state for filtered users
+    followers: [] as User[] | null,
+    followings: [] as User[] | null,
+    filteredUsers: [] as User[],
     loading: false,
     error: null as string | null,
   });
 
   const { activeTab, showDeleteModal, userToDelete, followers, followings, filteredUsers, loading, error } = state;
   const fullName = location.state?.fullName || "Unknown User";
-  const loggedInUserId = '8'; // Ideally, this comes from authentication context
-  const isOwner = loggedInUserId === '8';
+  const isOwner = loggedInUserId === selectedUser;
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tab = params.get("tab") as 'followers' | 'followings' | null;
-    if (tab) setState(prevState => ({ ...prevState, activeTab: tab }));
+    if (tab) {
+      setState(prevState => ({ ...prevState, activeTab: tab }));
+    }
   }, [location.search]);
 
   const fetchUserData = async () => {
     setState(prevState => ({ ...prevState, loading: true, error: null }));
     try {
-      const users = await fetchUsers(loggedInUserId, activeTab);
+      const users = await fetchUsers(selectedUser, activeTab);
       setState(prevState => ({
         ...prevState,
-        [activeTab]: users,
-        filteredUsers: users, // Set the filteredUsers to all users initially
+        [activeTab]: users || [],
+        filteredUsers: users || [],
         loading: false,
       }));
     } catch (error) {
@@ -68,11 +72,11 @@ const FollowerFollowingPage: React.FC = () => {
 
   useEffect(() => {
     fetchUserData();
-  }, [loggedInUserId, activeTab]);
+  }, [selectedUser, activeTab]);
 
   const handleTabSwitch = (tab: 'followers' | 'followings') => {
     setState(prevState => ({ ...prevState, activeTab: tab }));
-    navigate(`/follow?tab=${tab}`, { state: { fullName } });
+    navigate(`/follow/${selectedUser}?tab=${tab}`, { state: { fullName } }); // Pass selectedUser to the next page
   };
 
   const handleDeleteClick = (id: string, username: string) => {
@@ -100,8 +104,8 @@ const FollowerFollowingPage: React.FC = () => {
         if (response) {
           setState(prevState => ({
             ...prevState,
-            [activeTab]: prevState[activeTab].filter(user => user.id !== userToDelete.id),
-            filteredUsers: prevState[activeTab].filter(user => user.id !== userToDelete.id), // Update filtered list as well
+            [activeTab]: (prevState[activeTab] || []).filter(user => user.id !== userToDelete.id),
+            filteredUsers: (prevState[activeTab] || []).filter(user => user.id !== userToDelete.id),
             showDeleteModal: false,
             userToDelete: null,
           }));
@@ -130,18 +134,20 @@ const FollowerFollowingPage: React.FC = () => {
     setState(prevState => ({ ...prevState, showDeleteModal: false, userToDelete: null }));
   };
 
-  // Search function: filters the list based on the search term
   const handleSearch = (searchTerm: string) => {
-    const filteredList = (activeTab === 'followers' ? followers : followings).filter(user =>
-      user.username.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setState(prevState => ({ ...prevState, filteredUsers: filteredList }));
+    const list = activeTab === 'followers' ? followers : followings;
+    if (list) {
+      const filteredList = list.filter(user =>
+        user.username.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setState(prevState => ({ ...prevState, filteredUsers: filteredList }));
+    }
   };
 
-  // Prevent form submission on Enter key press
+
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
-      event.preventDefault();  // Prevent form submission when Enter is pressed
+      event.preventDefault(); 
     }
   };
 
@@ -149,7 +155,7 @@ const FollowerFollowingPage: React.FC = () => {
     <div className="min-h-screen flex flex-col items-center justify-start p-4">
       <BackButtonWithUsername 
         username={fullName} 
-        onBackClick={() => navigate(`/dashboard/${loggedInUserId}`)} 
+        onBackClick={() => navigate(`/dashboard/${selectedUser}`)} 
       />
       <ToggleButtons activeTab={activeTab} onTabSwitch={handleTabSwitch} />
 
@@ -158,30 +164,30 @@ const FollowerFollowingPage: React.FC = () => {
         validationSchema={Yup.object({
           searchTerm: Yup.string(),
         })}
-        onSubmit={() => {}} // We don't use onSubmit here anymore
+        onSubmit={() => {}}
       >
         {({ values, handleChange, handleBlur }) => {
           return (
             <Form
               className="w-full max-w-md mb-6 flex flex-col items-center justify-center"
-              onKeyDown={handleKeyDown} // Add this handler to prevent Enter key submission
+              onKeyDown={handleKeyDown}
             >
               {/* Dynamically filter users as you type */}
               <SearchBar 
                 searchTerm={values.searchTerm} 
                 onSearchTermChange={(e) => {
-                  handleChange(e);  // Handle form input change
-                  handleSearch(e.target.value); // Update filtered users dynamically
+                  handleChange(e);
+                  handleSearch(e.target.value);
                 }} 
                 onBlur={handleBlur} 
               />
               {loading ? (
                 <p className="font-semibold text-primary text-2xl">در حال بارگذاری...</p>
               ) : error ? (
-                <p className="font-semibold text-red-500 text-2xl">{error}</p>
+                <p className="font-semibold text-error text-2xl">{error}</p>
               ) : (
                 <UserCardList 
-                  users={filteredUsers} // Display the filtered list of users
+                  users={filteredUsers}
                   onDelete={handleDeleteClick} 
                   isOwner={isOwner} 
                 />

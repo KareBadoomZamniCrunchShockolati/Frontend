@@ -1,19 +1,12 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import formatFollowBarNumber from "@/utils/formatFollowBarNumber";
-
-interface Props {
-  fullName?: string;
-  bio?: string;
-  followersCount?: number;
-  followingCount?: number;
-  doneChallengesCount?: number;
-}
 
 const FollowBar = () => {
   const location = useLocation();  // Retrieve state passed from the navigation
   const navigate = useNavigate();
+  const { userId } = useParams();  // Extract userId from the URL
 
   // Destructure the state passed through navigation (using useLocation hook)
   const {
@@ -21,12 +14,12 @@ const FollowBar = () => {
     bio = "سلااام صبحت بخیررر",
     followersCount = 12520_000,
     followingCount = 12_300,
-    doneChallengesCount = 1200
+    doneChallengesCount = 1200,
   } = location.state || {};  // Use default values in case state is undefined
 
   const handleNavigateToFollowerFollowingPage = (tab: "followers" | "followings") => {
-    navigate(`/follow?tab=${tab}`, {
-      state: { fullName } // Passing fullName as part of the state
+    navigate(`/follow/${userId}?tab=${tab}`, {
+      state: { userId, fullName }, // Pass userId and fullName as part of the state
     });
   };
 
