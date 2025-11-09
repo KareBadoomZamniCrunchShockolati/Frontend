@@ -90,7 +90,7 @@ const CustomDropdown = ({
           </DropdownMenuItem>
         ))}
         <DropdownMenuItem
-          className="flex justify-center text-[var(--color-red-main)] cursor-pointer hover:outline-none hover:bg-gray-400"
+          className="flex justify-center text-red-500 cursor-pointer hover:outline-none hover:bg-gray-400"
           dir="rtl"
           onSelect={(event) => {
             event.preventDefault(); // Prevents close on clear filter click
