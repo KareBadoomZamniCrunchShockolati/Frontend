@@ -1,41 +1,37 @@
-import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import CustomButton from "../Custom/CustomButton";
-
-// Assuming you have a followUser function to make the API call to follow a user
-const followUser = async (username: string) => {
-  try {
-    // Replace with actual API logic to follow the user
-    // Example: await api.followUser(username);
-    console.log(`Following ${username}`);
-  } catch (error) {
-    console.error("Failed to follow the user:", error);
-  }
-};
+import { followUser, removeFollowing } from "@/services/followerFollowingService";
 
 interface Props {
-  username: string;  // Add username to know which user to follow
-  isFollowing?: boolean;
+  loggedInUserId: string;  // Add the logged-in user ID
+  userIdToFollow: string;  // ID of the user to follow/unfollow
+  isFollowing?: boolean;   // Whether the user is already following
+  token: string;           // Authorization token for API request
 }
 
-const ViewButton = ({ isFollowing = false, username }: Props) => {
+const ViewButton = ({ loggedInUserId, userIdToFollow, isFollowing = false, token }: Props) => {
   const [isUserFollowing, setIsUserFollowing] = useState(isFollowing);
 
   const handleFollowClick = async () => {
-    // Perform the follow action (make API call, etc.)
-    await followUser(username);
-
-    // After successful follow, update the state to reflect the change
-    setIsUserFollowing(true);
+    try {
+      // Follow the user
+      await followUser(loggedInUserId, userIdToFollow, token);
+      // After successful follow, update the state
+      setIsUserFollowing(true);
+    } catch (error) {
+      console.error("Failed to follow the user:", error);
+    }
   };
 
   const handleUnfollowClick = async () => {
-    // Handle unfollow logic (API call to remove from following list)
-    // Example: await api.unfollowUser(username);
-    console.log(`Unfollowed ${username}`);
-
-    // After successful unfollow, update the state
-    setIsUserFollowing(false);
+    try {
+      // Unfollow the user
+      await removeFollowing(loggedInUserId, userIdToFollow, token);
+      // After successful unfollow, update the state
+      setIsUserFollowing(false);
+    } catch (error) {
+      console.error("Failed to unfollow the user:", error);
+    }
   };
 
   return (
@@ -50,7 +46,7 @@ const ViewButton = ({ isFollowing = false, username }: Props) => {
         </CustomButton>
       ) : (
         <CustomButton
-          backgroundColor="bg-secondry"
+          backgroundColor="bg-secondary"
           width="w-60"
           onClick={handleFollowClick}
         >

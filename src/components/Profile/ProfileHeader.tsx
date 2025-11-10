@@ -9,6 +9,7 @@ import FollowBar from "./FollowBar";
 import OwnerButton from "./OwnerButton";
 import ViewButton from "./ViewButton";
 import ProfileSideSheet from "./ProfileSideSheet";
+import useUserStore from "@/store/userStore/userStore";
 function getUserInitials(fullName: string): string {
   if (!fullName) {
     return "";
@@ -27,39 +28,26 @@ function getUserInitials(fullName: string): string {
 
   return initials;
 }
+
 interface Props {
   fullName: string;
   personalColor?: string;
-  // followersCount?: number;
-  // followingCount?: number;
-  // doneChallengesCount?: number;
   isOwner?: boolean;
+  userId: number; // Add userId prop here
 }
+
 const ProfileHeader = ({
   fullName,
   personalColor = "bg-blue-500 text-white",
   isOwner,
+  userId, // Receive userId as a prop
 }: Props) => {
-  
   const initials = getUserInitials(fullName);
 
   return (
     <>
-      {/* <div className="relative w-full h-12">
-        <Button
-          className="absolute top-5 right-2"
-          variant="ghost"
-          onClick={() => console.log("open settings")}
-        >
-          <EllipsisIcon
-            className="rotate-90"
-            style={{ width: "1.5rem", height: "1.5rem" }}
-          ></EllipsisIcon>
-        </Button>
-      </div> */}
-      
       <ProfileSideSheet></ProfileSideSheet>
-      
+
       <div
         onClick={() => console.log("show the badges!")}
         className="flex justify-center mt-2.5"
@@ -77,20 +65,18 @@ const ProfileHeader = ({
             </AvatarFallback>
           </Avatar>
 
-          <img
-            src="/badge.png"
-            alt="badge"
-            className="badge badge-center"
-          ></img>
-          <img src="/badge.png" alt="badge" className="badge badge-right"></img>
-          <img src="/badge.png" alt="badge" className="badge badge-left"></img>
+          <img src="/badge.png" alt="badge" className="badge badge-center" />
+          <img src="/badge.png" alt="badge" className="badge badge-right" />
+          <img src="/badge.png" alt="badge" className="badge badge-left" />
         </div>
       </div>
-      <FollowBar></FollowBar>
-      {/* BUTTON */}
-      {isOwner && <OwnerButton></OwnerButton>}
-      {!isOwner && <ViewButton></ViewButton>}
-      {/* button selector */}
+
+      <FollowBar />
+
+      {/* Pass the userId to ViewButton */}
+      {!isOwner && (
+        <ViewButton loggedInUserId = {useUserStore(state => state.id)} userIdToFollow={userId.toString()} token="your-token-here" />
+      )}
     </>
   );
 };
