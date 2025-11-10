@@ -215,6 +215,7 @@
   --error: #c30025;
   --success: #009262;
   --neutral-gray : #9d9d9d;
+  --neutral-gray-bold : #666666;
   --disable: #b1b1b1;
   --primary-foreground: oklch(0.985 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -306,6 +307,7 @@
   --color-success: var(--success);
   --color-disable: var(--disable);
   --color-neutral-gray: var(--neutral-gray);
+  --color-neutral-gray-bold :var(--neutral-gray-bold);
   --shadow-button: var(--shadow-button);
   --shadow-button-active: var(--shadow-button-active);
   --text-title: var(--title-size);

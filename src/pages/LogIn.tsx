@@ -10,8 +10,11 @@ import CustomCheckbox from "@/components/Custom/CustomCheckbox";
 import { useState } from "react";
 import { Label } from "@radix-ui/react-label";
 import { Checkbox } from "@radix-ui/react-checkbox";
+import { Link } from "react-router-dom";
+
 export default function Login() {
   const [showPassword, setShowPassword] = useState(true);
+
   const onSubmit = async (
     values: FormValues,
     actions: FormikHelpers<FormValues>
@@ -19,6 +22,7 @@ export default function Login() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     console.log("Form submitted!");
   };
+
   const bg = useMobile();
   return (
     <div
@@ -63,7 +67,6 @@ export default function Login() {
                     labelText="قوانین و مقررات را خوانده و می پذیرم" 
                     textTransparentOnChecked={false}
                     classNames={{ label: "text-sm text-gray-600 font-extrabold", checkbox: "" }}
-
                   />
                   <CustomBtn
                     disabled={isSubmitting}
@@ -79,10 +82,10 @@ export default function Login() {
             )}
           </Formik>
           <div className="flex justify-end items-center">
-            <a href="signup" className="text-secondary mr-1">
+            <Link to="/signup" className="text-secondary mr-1">
               ثبت نام
-            </a>
-            <p className="">حساب کاربری ندارید؟</p>
+            </Link>
+            <p>حساب کاربری ندارید؟</p>
           </div>
         </div>
       </div>

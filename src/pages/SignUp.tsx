@@ -97,7 +97,7 @@ function SignUp() {
             ثبت نام
           </div>
 
-          <p className="text-[#666666] text-sm font-extrabold">
+          <p className="text-neutral-gray-bold text-sm font-extrabold">
             لطفا ایمیل و نام کاربری خود را وارد کنید
           </p>
         </div>
@@ -162,7 +162,7 @@ function SignUp() {
           <div className="text-4xl font-extrabold text-primary mb-2">
             ! رمز عبورت رو بساز
           </div>
-          <p className="text-[#666666] text-sm font-extrabold">
+          <p className="text-neutral-gray-bold text-sm font-extrabold">
             رمز عبورت باید حداقل ۸ کاراکتر و شامل عدد و علامت خاص باشد تا امنیت
             حسابت حفظ شود
           </p>
@@ -226,7 +226,7 @@ function SignUp() {
               <div className="text-4xl font-extrabold text-primary mb-2">
                 تقریبا تمومه! تایید پست الکترونیک
               </div>
-              <p className="text-[#666666] text-sm font-extrabold">
+              <p className="text-neutral-gray-bold text-sm font-extrabold">
                 لطفا کد ارسال شده به پست الکترونیک karebadoomzamini@gamil.com را
                 وارد کنید
               </p>
