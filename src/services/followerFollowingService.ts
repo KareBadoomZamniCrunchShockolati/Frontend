@@ -130,3 +130,35 @@ export const followUser = async (
     throw error;
   }
 };
+
+// Method to check if the logged-in user is following the specified user
+export const checkIfFollowing = async (
+  userId: string,
+  token: string
+) => {
+  const endpoint = `/api/v1/follow/status/${userId}`;
+  console.log("API Endpoint:", endpoint);  // Log the endpoint being hit
+
+  try {
+    const data = await getData({
+      endPoint: endpoint,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("API Response:", data);  // Log the response from the API
+
+    // Assuming the response contains an 'is_following' field
+    if (data && typeof data.is_following === "boolean") {
+      return data.is_following; // Return the correct field
+    } else {
+      console.error("Unexpected response format:", data);
+      return false;  // Return false if response format is unexpected
+    }
+  } catch (error) {
+    console.error("Failed to check if following:", error);
+    throw error;
+  }
+};
+
