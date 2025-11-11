@@ -25,11 +25,26 @@ export const removeFollower = async (
   token: string
 ) => {
   const endpoint = `/api/v1/followers/remove`;
+
+
+  const followerIdInt = parseInt(followerId, 10);
+
+
+  if (isNaN(followerIdInt)) {
+    throw new Error(`Invalid followerId: ${followerId}`);
+  }
+
   const requestBody = {
-    follower_id: followerId,
+    following_id: followerIdInt, 
   };
 
   try {
+    console.log("Sending request to remove follower:", {
+      endpoint,
+      requestBody,
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
     const data = await deleteData({
       endPoint: endpoint,
       data: requestBody,
@@ -37,10 +52,15 @@ export const removeFollower = async (
         Authorization: `Bearer ${token}`,
       },
     });
-    return data; // Optionally return response if needed
+
+    return data; 
   } catch (error) {
     console.error("Failed to remove follower:", error);
-    throw error;
+
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+    }
+    throw error; // Re-throw the error so the caller can handle it
   }
 };
 
@@ -51,8 +71,15 @@ export const removeFollowing = async (
   token: string
 ) => {
   const endpoint = `/api/v1/follow`;
+
+  const followingIdInt = parseInt(followingId, 10);
+
+  if (isNaN(followingIdInt)) {
+    throw new Error(`Invalid followingId: ${followingId}`);
+  }
+
   const requestBody = {
-    following_id: followingId,
+    following_id: followingIdInt, 
   };
 
   try {
@@ -63,7 +90,7 @@ export const removeFollowing = async (
         Authorization: `Bearer ${token}`,
       },
     });
-    return data; // Optionally return response if needed
+    return data; 
   } catch (error) {
     console.error("Failed to remove following:", error);
     throw error;
@@ -76,8 +103,17 @@ export const followUser = async (
   token: string
 ) => {
   const endpoint = `/api/v1/follow`;
+
+
+  const userIdToFollowInt = parseInt(userIdToFollow, 10);
+
+
+  if (isNaN(userIdToFollowInt)) {
+    throw new Error(`Invalid userIdToFollow: ${userIdToFollow}`);
+  }
+
   const requestBody = {
-    following_id: userIdToFollow,
+    following_id: userIdToFollowInt,
   };
 
   try {
@@ -94,4 +130,3 @@ export const followUser = async (
     throw error;
   }
 };
-

@@ -9,8 +9,8 @@ const useUserStore = create<UserState>()(
     (set) => ({
       // Hardcoded values
       username: "hardcodedUsername", // Replace with desired username
-      token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo4LCJpc3MiOiJjaGFsbGVuZ2UtYXBwIiwiZXhwIjoxNzYyMTY5MDU4LCJpYXQiOjE3NjIwODI2NTh9.BOYM3JvHUA6dsLa6KNRLWtdwO1WSXEzVxQxj3HuT9No", // Replace with desired token
-      id: "8",
+      token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMSwiaXNzIjoiY2hhbGxlbmdlLWFwcCIsImV4cCI6MTc2Mjk2MDA3OCwiaWF0IjoxNzYyODczNjc4fQ.a5byDGbFVTWKp86Bm3rswHE6BWFmB81zOBqFraEEYUY", // Replace with desired token
+      id: "21",
 
       setUsername: (username: string) =>
         set((prev) => ({ ...prev, username })),

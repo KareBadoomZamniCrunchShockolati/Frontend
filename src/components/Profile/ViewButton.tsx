@@ -1,22 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";  // Import useParams
 import CustomButton from "../Custom/CustomButton";
 import { followUser, removeFollowing } from "@/services/followerFollowingService";
+import useUserStore from "@/store/userStore/userStore";
 
 interface Props {
   loggedInUserId: string;  // Add the logged-in user ID
-  userIdToFollow: string;  // ID of the user to follow/unfollow
   isFollowing?: boolean;   // Whether the user is already following
   token: string;           // Authorization token for API request
 }
 
-const ViewButton = ({ loggedInUserId, userIdToFollow, isFollowing = false, token }: Props) => {
+const ViewButton = ({ loggedInUserId, isFollowing = false, token }: Props) => {
   const [isUserFollowing, setIsUserFollowing] = useState(isFollowing);
+  const { userId } = useParams<{ userId: string }>(); 
+
+
+  const userToken = useUserStore(state => state.token) || ""; 
 
   const handleFollowClick = async () => {
+    if (!userId) {
+      console.error("No user ID found");
+      return;
+    }
     try {
-      // Follow the user
-      await followUser(loggedInUserId, userIdToFollow, token);
-      // After successful follow, update the state
+      await followUser(loggedInUserId, userId, userToken);
       setIsUserFollowing(true);
     } catch (error) {
       console.error("Failed to follow the user:", error);
@@ -24,10 +31,12 @@ const ViewButton = ({ loggedInUserId, userIdToFollow, isFollowing = false, token
   };
 
   const handleUnfollowClick = async () => {
+    if (!userId) {
+      console.error("No user ID found");
+      return;
+    }
     try {
-      // Unfollow the user
-      await removeFollowing(loggedInUserId, userIdToFollow, token);
-      // After successful unfollow, update the state
+      await removeFollowing(loggedInUserId, userId, userToken);
       setIsUserFollowing(false);
     } catch (error) {
       console.error("Failed to unfollow the user:", error);
