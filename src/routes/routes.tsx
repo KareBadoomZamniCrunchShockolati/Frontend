@@ -10,6 +10,7 @@ import SignUp from "@/pages/SignUp";
 import Login from "@/pages/LogIn";
 import Test from "@/pages/test";
 import Edit from "@/pages/EditProfile";
+import Challenge from "@/pages/ChallengeManagement"
 
 // import { LogIn } from "lucide-react";
 
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
         path: "/editprofile",
         element: <Edit fullName=""/>,
       },
+      {
+        path : "/challenge",
+        element : <Challenge />
+      }
     ],
   },
   {
