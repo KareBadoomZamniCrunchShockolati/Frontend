@@ -68,8 +68,8 @@ export default function CustomInput({
                   focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)]
                   focus:!ring-0 focus-visible:!ring-0
                   p-0 rounded-xl h-10 w-full
-                  ${isRTL ? "text-right pr-4" : "text-left pl-4"}
-                  ${icon ? ("pl-12" ) : ""} 
+                  ${isRTL ? "text-right pr-4" : "text-left pl-4 pr-3"}
+                  ${icon ? "pl-12" : ""} 
                   transition-all duration-200 ease-in-out
                   ${hasError
                     ? "!border-[var(--borderInvalid)] shadow-[0px_1px_0px_var(--borderInvalidShadow)]"
@@ -77,6 +77,7 @@ export default function CustomInput({
                   ${props.className ?? ""}
                 `}
               />
+
 
               {icon && (
                 <div
