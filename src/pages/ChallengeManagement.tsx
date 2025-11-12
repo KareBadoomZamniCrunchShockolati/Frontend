@@ -137,13 +137,18 @@ const ChallengeManagementPage: React.FC = () => {
           پیوستن
         </CustomButton>
 
+        {/* Title Above Search Bar (Participated Users) */}
+        <div className="text-right mb-1 mt-6 max-w-2xl w-full" dir="rtl">
+          <h2 className="text-xl font-semibold text-black mb-4">شرکت کنندگان</h2>
+        </div>
+
         {/* Search Bar - Formik integration */}
         <Formik
           initialValues={{ searchTerm: "" }}
           onSubmit={() => {}}
         >
           {({ values, handleChange, handleBlur }) => (
-            <Form className="flex justify-center mt-10 w-full max-w-xl">
+            <Form className="flex justify-center  w-full max-w-xl">
               <Field
                 name="searchTerm"
                 render={({ field }: any) => (
