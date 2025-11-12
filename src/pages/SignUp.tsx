@@ -19,6 +19,8 @@ import {
 import { resendVerificationCode, signupService, verifyEmailService } from "@/services/authService";
 import { set, type FieldValues } from "react-hook-form";
 import type { SignupPayload } from "@/types/authTypes";
+import CustomToast from "@/components/Custom/CustomToast";
+import useUserStore from "@/store/userStore/userStore";
 
 function SignUp() {
   const initialValues: SignupPayload & {
@@ -95,19 +97,28 @@ function SignUp() {
   };
 
   const handleVerify = async (emailToVerify: string, codeToVerify: string) => {
+    const { setToken , setUserId , setUsername } = useUserStore();
     try {
       const data = await verifyEmailService({
         email: emailToVerify,
         code: codeToVerify,
       });
       console.log("Verification success! Token:", data.token);
-      localStorage.setItem("token", data.token); // Save JWT
+      // localStorage.setItem("token", data.token); // Save JWT
+      
+      //setting
+      setToken(data.token);
+      setUserId(data.userId);
+      setUsername(data.username);
+      
       console.log("Email verified successfully!");
-      alert("ثبت نام شما تکمیل شد ✅");
+      // alert("ثبت نام شما تکمیل شد ✅");
+      CustomToast("ثبت نام شما تکمیل شد ✅","success");
       // redirect or move to next step
     } catch (err) {
       console.error("Verification failed:", err);
-      alert("کد تایید اشتباه است یا منقضی شده ❌");
+      // alert("کد تایید اشتباه است یا منقضی شده ❌");
+      CustomToast("کد تایید اشتباه است یا منقضی شده ❌","error");
     }
     finally{
       console.log("Verification process ended");
@@ -121,6 +132,25 @@ function SignUp() {
     setIsPressedBack(false);
     setIsPressedNext(false);
   }, [isPressedBack, isPressedNext]);
+
+  const firstSubmit = (data: FieldValues) => {
+            setUsername(data.username);
+            setEmail(data.email);
+            setIsPressedNext((prev) => !prev);
+            console.log("Step1 values:", data);
+          }
+  const secondSubmit = (data: FieldValues) => {
+            setPassword(data.password);
+            const payload: SignupPayload = {
+              username: username,
+              email: email,
+              password: password,
+              bio: bio,
+            };
+            console.log("Submitting signup payload:", payload);
+            handleSignup(payload);
+            console.log(bio);
+          }
 
   return (
     <Stepper
@@ -165,12 +195,7 @@ function SignUp() {
         <Formik
           initialValues={initialValues}
           validationSchema={SignUpFormSchemaStep1Config}
-          onSubmit={(data: FieldValues) => {
-            setUsername(data.username);
-            setEmail(data.email);
-            setIsPressedNext((prev) => !prev);
-            console.log("Step1 values:", data);
-          }}
+          onSubmit={firstSubmit}
         >
           {({ isSubmitting, isValid, dirty }) => (
             <Form className="flex flex-col items-center gap-4 w-full h-full">
@@ -235,18 +260,7 @@ function SignUp() {
         <Formik
           initialValues={initialValues}
           validationSchema={SignUpFormSchemaStep2Config}
-          onSubmit={(data: FieldValues) => {
-            setPassword(data.password);
-            const payload: SignupPayload = {
-              username: username,
-              email: email,
-              password: password,
-              bio: bio,
-            };
-            console.log("Submitting signup payload:", payload);
-            handleSignup(payload);
-            console.log(bio);
-          }}
+          onSubmit={secondSubmit}
         >
           {({ isSubmitting, isValid, dirty }) => (
             <Form className="flex flex-col items-center gap-4 w-full h-full">

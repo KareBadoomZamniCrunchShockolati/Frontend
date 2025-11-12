@@ -1,4 +1,8 @@
 export interface UserState {
-	username: string | null;
-	setUsername: (username: string) => void;
+  username: string;
+  setUsername: (username: string) => void;
+  token: string;
+  setToken: (token: string) => void;
+  userId: number;
+  setUserId: (id: number) => void;
 }
