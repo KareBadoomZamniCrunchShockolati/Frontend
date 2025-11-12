@@ -2,11 +2,92 @@
 /* src/index.css */
 /* === Peyda Font Faces === */
 @font-face {
-  font-family: "Peyda";
-  src: url("/fonts/Peyda-Thin.ttf") format("truetype");
+  font-family: 'Peyda';
+  src: url('./assets/fonts/Peyda-Thin.ttf') format('truetype');
   font-weight: 100;
   font-style: normal;
   font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/fonts/peyda-extralight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/fonts/Peyda-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/fonts/Peyda-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/fonts/Peyda-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/fonts/Peyda-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/fonts/Peyda-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/fonts/Peyda-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Peyda';
+  src: url('./assets/fonts/Peyda-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* === Tailwind base imports === */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+	.rtl {
+		direction: rtl;
+	}
+	.ltr {
+		direction: ltr;
+	}
+	.vazir {
+		font-family: "Vazir", sans-serif;
+	}
 }
 
 @font-face {
@@ -128,14 +209,15 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
   --primary: #ff7700;
-  --primary-hover: #ff983d;
-  --secondry: #3871dd;
-  --secondry-hover: #6c96e6;
+  --primary-hover: #ffca9b;
+  --secondary: #3871dd;
+  --secondary-hover: #6c96e6;
   --error: #c30025;
   --success: #009262;
+  --neutral-gray : #9d9d9d;
+  --neutral-gray-bold : #666666;
   --disable: #b1b1b1;
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
@@ -177,6 +259,15 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: 15px;
+    /* saman's colors maping with the develop ones */
+  --color-blue-main: var(--secondry);
+  --color-blue-side: var(--secondry-hover);
+  --color-red-main: var(--error);
+  --color-orange-main: var(--primary);
+  --color-gray-main: var(--disable);
+  --color-gray-side: #f1f1f1; /* not defined in develop */
+  --color-skin-main: #FFEAD9; /* not defined in develop */
+  /* end of the mapping */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -214,7 +305,9 @@
   --color-secondry-hover: var(--secondry-hover);
   --color-error: var(--error);
   --color-success: var(--success);
-  --color--disable: var(--disable);
+  --color-disable: var(--disable);
+  --color-neutral-gray: var(--neutral-gray);
+  --color-neutral-gray-bold :var(--neutral-gray-bold);
   --shadow-button: var(--shadow-button);
   --shadow-button-active: var(--shadow-button-active);
   --text-title: var(--title-size);
