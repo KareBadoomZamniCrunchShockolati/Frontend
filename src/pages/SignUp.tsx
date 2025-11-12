@@ -251,7 +251,7 @@ function SignUp() {
           <div className="text-4xl font-extrabold text-[var(--primary)] mb-2">
             ! رمز عبورت رو بساز
           </div>
-          <p className="text-[#666666] text-sm font-extrabold">
+          <p className="text-primary text-sm font-extrabold">
             رمز عبورت باید حداقل ۸ کاراکتر و شامل عدد و علامت خاص باشد تا امنیت
             حسابت حفظ شود
           </p>
