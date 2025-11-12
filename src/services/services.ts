@@ -12,8 +12,10 @@ import type {
 	PostParams,
 	PutParams,
 } from "../types/apiTypes";
+import useUserStore from "@/store/userStore/userStore";
 
 export const baseURL = "http://localhost:8080"; // backend URL
+export const AUTH_BASE = "/api/v1";
 
 const apiClient: AxiosInstance = axios.create({
 	baseURL,
@@ -22,10 +24,10 @@ const apiClient: AxiosInstance = axios.create({
 		"Content-Type": "application/json",
 	},
 });
-
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem("token"); // get JWT from localStorage
+    // const token = localStorage.getItem("token"); // get JWT from localStorage
+	const token = useUserStore.getState().token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`; // attach token
     }

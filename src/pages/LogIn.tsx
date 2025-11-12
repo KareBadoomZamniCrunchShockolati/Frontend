@@ -10,8 +10,11 @@ import loginFormSchemaConfig from "@/schemas/loginFormSchema";
 import { Eye } from "lucide-react";
 import { loginService } from "@/services/authService"; // ✅ import your service
 import type { LoginPayload } from "@/types/authTypes";
+import useUserStore from "@/store/userStore/userStore";
+import CustomToast from "@/components/Custom/CustomToast";
 
 export default function Login() {
+  const {setUsername,setToken,setUserId} = useUserStore();
   const onSubmit = async (
     values: LoginPayload,
     actions: FormikHelpers<FormValues>
@@ -25,7 +28,10 @@ export default function Login() {
 
       // ✅ Example: assuming your backend returns { token, user }
       if (response?.token) {
-        localStorage.setItem("token", response.token); // interceptor will use it
+        // localStorage.setItem("token", response.token); // interceptor will use it
+        setToken(response.token);
+        setUsername(response.user.username);
+        setUserId(response.user.id);
       }
 
       console.log("Login success:", response);
@@ -34,7 +40,8 @@ export default function Login() {
       // e.g., navigate("/dashboard");
     } catch (error: any) {
       console.error("Login failed:", error);
-      alert(error?.response?.data?.message || "Login failed");
+      // alert(error?.response?.data?.message || "Login failed");
+      CustomToast("Login failed","error");
     } finally {
       actions.setSubmitting(false);
     }

@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import type { AuthResponse, LoginPayload, LoginResponse, SignupPayload, VerifyEmailService } from "../types/authTypes";
-import { postData } from "./services";
+import { AUTH_BASE, postData } from "./services";
 
 // Login function
 // export const loginService = async (
@@ -13,7 +13,6 @@ import { postData } from "./services";
 // 		data: credentials,
 // 	});
 // };
-const AUTH_BASE = "/api/v1";
 // Login function
 export const loginService = async (credentials: LoginPayload): Promise<AuthResponse> => {
     return postData({
@@ -48,6 +47,9 @@ export const verifyEmailService = async ({
 };
 
 export const resendVerificationCode = async (email: string): Promise<any> => {
-  const res = await axios.post(`${AUTH_BASE}/resend-verification`, { email });
-  return res.data;
+  const res = await postData({
+    endPoint: `${AUTH_BASE}/resend-verification`,
+    data: { email },
+  });
+  return res;
 };
