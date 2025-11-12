@@ -4,6 +4,7 @@ import axios from "axios";
 import type { AuthResponse, LoginPayload, LoginResponse, SignupPayload, VerifyEmailService } from "../types/authTypes";
 import { AUTH_BASE, postData } from "./services";
 
+
 // Login function
 // export const loginService = async (
 // 	credentials: LoginPayload
