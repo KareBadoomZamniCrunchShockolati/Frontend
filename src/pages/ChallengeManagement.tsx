@@ -14,6 +14,7 @@ import CustomButton from "@/components/Custom/CustomButton";
 import UserCard from "@/components/Custom/UserCard";
 import CustomInput from "@/components/Custom/CustomInput";
 import { Formik, Field, Form } from "formik";
+import ChallengeCard from "@/components/Custom/ChallangeCard"; // Import ChallengeCard for slideshow
 
 const ChallengeManagementPage: React.FC = () => {
   const imageUrl =
@@ -51,9 +52,34 @@ const ChallengeManagementPage: React.FC = () => {
     },
   ];
 
+  const mockChallenges = [
+    {
+      id: "1",
+      title: "Mountain Climb Challenge",
+      description: "Climb a mountain in under 12 hours.",
+      imageUrl:
+        "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg",
+    },
+    {
+      id: "2",
+      title: "Desert Trek Challenge",
+      description: "Complete a 30km desert trek in a single day.",
+      imageUrl:
+        "https://www.travelandleisure.com/thmb/Desert-Dunes_Fancyview_gettyimages-1216349476-f180b973c62f4b74b10b87bb736d9e9d.jpg",
+    },
+    {
+      id: "3",
+      title: "Ocean Swim Challenge",
+      description: "Swim across an open water stretch of 2km.",
+      imageUrl:
+        "https://www.adventure-life.com/sites/default/files/styles/hero_mobile/public/hero_images/hero-the-coastline-of-new-zealand.jpg?itok=V6n33P__",
+    },
+  ];
+
   const [users, setUsers] = useState(mockUsers);
   const [searchTerm, setSearchTerm] = useState("");
   const [likeCount, setLikeCount] = useState(10); // State to track likes
+  const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0); // Slideshow state
 
   const handleDelete = (id: string, username: string) => {
     setUsers(users.filter((user) => user.id !== id));
@@ -76,7 +102,20 @@ const ChallengeManagementPage: React.FC = () => {
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Toggle the like count (increment or decrement)
+  // Slideshow navigation
+  const nextSlide = () => {
+    setCurrentChallengeIndex(
+      (prevIndex) => (prevIndex + 1) % mockChallenges.length
+    );
+  };
+
+  const prevSlide = () => {
+    setCurrentChallengeIndex(
+      (prevIndex) =>
+        (prevIndex - 1 + mockChallenges.length) % mockChallenges.length
+    );
+  };
+
   const handleLike = () => {
     setLikeCount(likeCount === 10 ? 11 : 10); // Toggle between 1 and 0
   };
@@ -124,15 +163,13 @@ const ChallengeManagementPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Like and Save buttons above title */}
+        {/* Like and Save buttons */}
         <div className="flex space-x-4 mt-5 max-w-xl w-full justify-end">
           <div className="flex items-center space-x-2">
-            {/* Like Count displayed outside of the button, to the left */}
-
             <span className="text-black text-xl" style={{ marginTop: "6px" }}>
               {likeCount}
             </span>
-            
+
             <CustomButton
               className="w-min sm:w-min md:w-min bg-white border-primary shadow-primary hover:bg-white rounded-[8px] p-3 flex items-center space-x-2"
               onClick={handleLike}
@@ -146,7 +183,6 @@ const ChallengeManagementPage: React.FC = () => {
             >
               <Bookmark className="text-primary w-5 h-5" />
             </CustomButton>
-
           </div>
         </div>
 
@@ -225,6 +261,40 @@ const ChallengeManagementPage: React.FC = () => {
                 className="w-full sm:w-full md:w-full lg:w-full"
               />
             ))}
+          </div>
+        </div>
+
+        <div className="text-right mt-6 max-w-2xl w-full" dir="rtl">
+          <h2 className="text-xl font-semibold text-black mb-4">
+            چالش های مرتبط
+          </h2>
+        </div>
+        {/* Challenge Cards Slideshow (At the end) */}
+        <div className="w-full max-w-xl mx-auto relative">
+          {/* Challenge Card */}
+          <div className="w-full flex justify-center relative">
+            <ChallengeCard
+              key={mockChallenges[currentChallengeIndex].id}
+              title={mockChallenges[currentChallengeIndex].title}
+              description={mockChallenges[currentChallengeIndex].description}
+              imageUrl={mockChallenges[currentChallengeIndex].imageUrl}
+            />
+          </div>
+
+          {/* Slideshow Navigation Buttons */}
+          <div className="absolute top-1/2 left-0 w-full flex justify-between transform -translate-y-1/2">
+            <CustomButton
+              className="bg-white text-secondary shadow-none hover:bg-blue-400 p-2 w-7 sm:w-8 md:w-8 rounded-[8px]"
+              onClick={prevSlide}
+            >
+              &#8249;
+            </CustomButton>
+            <CustomButton
+              className="bg-white text-secondary shadow-none hover:bg-blue-400 p-2 w-7 sm:w-8 md:w-8 rounded-[8px]"
+              onClick={nextSlide}
+            >
+              &#8250;
+            </CustomButton>
           </div>
         </div>
       </div>
