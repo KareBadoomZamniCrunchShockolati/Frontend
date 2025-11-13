@@ -38,7 +38,7 @@ export default function ProfileInfo() {
 
       {/* Avatar */}
       <div className="flex justify-center relative mb-8">
-        <Avatar className="w-28 h-28 border border-gray-400">
+        <Avatar className="w-28 h-28 border border-neutral-gray">
           {image ? (
             <AvatarImage src={image} alt="Profile" />
           ) : (

@@ -70,7 +70,7 @@ export default function ChallengeCard({
               <span className="font-semibold text-gray-900 text-sm">
                 {creator?.name || "کاربر ناشناس"}
               </span>
-              <span className="text-xs text-gray-500">ایجاد کننده چالش</span>
+              <span className="text-xs text-neutral-gray-bold">ایجاد کننده چالش</span>
             </div>
           </div>
 
@@ -80,7 +80,7 @@ export default function ChallengeCard({
               className={`p-2 rounded-full transition-all duration-200 border  ${
                 isSaved
                   ? "bg-amber-100 text-amber-600 border-primary "
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200 border-secondry"
+                  : "bg-gray-100 text-neutral-gray-bold hover:bg-neutral-gray border-secondry"
               }`}
             >
               <Bookmark
@@ -187,17 +187,17 @@ export default function ChallengeCard({
           <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
             <div className="flex items-center gap-4 text-sm">
               <div className="flex flex-col items-end" dir="ltr">
-                <span className="text-gray-500 text-xs">شروع</span>
+                <span className="text-neutral-gray-bold text-xs">شروع</span>
                 <span className="text-gray-900 font-bold">{startDate}</span>
               </div>
               <div className="w-px h-6 bg-gray-300"></div>
               <div className="flex flex-col items-end" dir="ltr">
-                <span className="text-gray-500 text-xs">پایان</span>
+                <span className="text-neutral-gray-bold text-xs">پایان</span>
                 <span className="text-gray-900 font-bold">{endDate}</span>
               </div>
             </div>
             <div className="flex items-center gap-2 text-gray-700">
-              <Calendar className="h-4 w-4 text-gray-500" />
+              <Calendar className="h-4 w-4 text-neutral-gray-bold" />
             </div>
           </div>
         </div>
@@ -210,14 +210,14 @@ export default function ChallengeCard({
           <div className="flex items-center gap-4 text-xs">
             <div
               className={`flex items-center gap-1 ${
-                isLiked ? "text-blue-600" : "text-gray-500"
+                isLiked ? "text-blue-600" : "text-neutral-gray-bold"
               }`}
             >
               <ThumbsUp className="h-3 w-3" />
               <span>{likes} پسندیدند</span>
             </div>
 
-            <div className="flex items-center gap-1 text-gray-500">
+            <div className="flex items-center gap-1 text-neutral-gray-bold">
               <MessageCircle className="h-3 w-3" />
               <span>{comments} نظر</span>
             </div>
@@ -230,7 +230,7 @@ export default function ChallengeCard({
               className={`p-2 rounded-lg transition-all duration-200 ${
                 isLiked
                   ? "bg-blue-100 text-blue-600"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                  : "bg-gray-100 text-neutral-gray-bold hover:bg-gray-200"
               }`}
             >
               <ThumbsUp
@@ -240,7 +240,7 @@ export default function ChallengeCard({
 
             <button
               onClick={handleShare}
-              className="p-2 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all"
+              className="p-2 rounded-lg bg-gray-100 text-neutral-gray-bold hover:bg-gray-200 transition-all"
             >
               <Share className="h-4 w-4" />
             </button>
