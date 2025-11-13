@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Formik, Form } from "formik";
-import * as Yup from "yup";
+import { searchSchema } from "@/schemas/searchSchema"; // Import the search schema
 import ToggleButtons from "@/components/FollowerFollowing/ToggleButtons";
 import BackButtonWithUsername from "@/components/FollowerFollowing/BackButtonWithUsername";
 import SearchBar from "@/components/FollowerFollowing/SearchBar";
@@ -24,13 +24,9 @@ const FollowerFollowingPage: React.FC = () => {
 
   const [followers, setFollowers] = useState<FollowerFollowingUser[]>([]);
   const [followings, setFollowings] = useState<FollowerFollowingUser[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<FollowerFollowingUser[]>(
-    []
-  );
+  const [filteredUsers, setFilteredUsers] = useState<FollowerFollowingUser[]>([]);
 
-  const [activeTab, setActiveTab] = useState<"followers" | "followings">(
-    "followers"
-  );
+  const [activeTab, setActiveTab] = useState<"followers" | "followings">("followers");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<{
     id: string;
@@ -111,23 +107,15 @@ const FollowerFollowingPage: React.FC = () => {
 
         if (response) {
           if (activeTab === "followers") {
-            setFollowers((prev) =>
-              prev.filter((user) => user.id !== userToDelete.id)
-            );
+            setFollowers((prev) => prev.filter((user) => user.id !== userToDelete.id));
           } else {
-            setFollowings((prev) =>
-              prev.filter((user) => user.id !== userToDelete.id)
-            );
+            setFollowings((prev) => prev.filter((user) => user.id !== userToDelete.id));
           }
-          setFilteredUsers((prev) =>
-            prev.filter((user) => user.id !== userToDelete.id)
-          );
+          setFilteredUsers((prev) => prev.filter((user) => user.id !== userToDelete.id));
           setShowDeleteModal(false);
           setUserToDelete(null);
         } else {
-          setError(
-            `Failed to remove ${activeTab.slice(0, -1)}. Please try again.`
-          );
+          setError(`Failed to remove ${activeTab.slice(0, -1)}. Please try again.`);
         }
       } catch (error) {
         console.error("Error deleting user:", error);
@@ -172,9 +160,7 @@ const FollowerFollowingPage: React.FC = () => {
 
       <Formik
         initialValues={{ searchTerm: "" }}
-        validationSchema={Yup.object({
-          searchTerm: Yup.string(),
-        })}
+        validationSchema={searchSchema} // Use the schema here
         onSubmit={() => {}}
       >
         {({ values, handleChange, handleBlur }) => (
