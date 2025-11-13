@@ -28,7 +28,7 @@ export const signupService = async ({
   email,
   password,
   bio,
-}: SignupPayload): Promise<AuthResponse> => {
+}: SignupPayload) => {
   const data = await postData({
     endPoint: `${AUTH_BASE}/auth/signup`,
     data: { username, email, password, bio },
@@ -39,7 +39,7 @@ export const signupService = async ({
 export const verifyEmailService = async ({
   email,
   code,
-}: VerifyEmailService): Promise<any> => {
+}: VerifyEmailService) => {
   const data = await postData({
     endPoint: `${AUTH_BASE}/verify`,
     data: { email, code },
@@ -47,10 +47,11 @@ export const verifyEmailService = async ({
   return data;
 };
 
-export const resendVerificationCode = async (email: string): Promise<any> => {
-  const res = await postData({
+export const resendVerificationCode = async (email: string,password:string) => {
+  // const res = await axios.post(`${AUTH_BASE}/resend-verification`, { email });
+  const data = await postData({
     endPoint: `${AUTH_BASE}/resend-verification`,
-    data: { email },
+    data: { email,password },
   });
-  return res;
+  return data;
 };

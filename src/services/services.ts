@@ -24,10 +24,13 @@ const apiClient: AxiosInstance = axios.create({
 		"Content-Type": "application/json",
 	},
 });
+
+const { token } = useUserStore();
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // const token = localStorage.getItem("token"); // get JWT from localStorage
 	const token = useUserStore.getState().token;
+	
     if (token) {
       config.headers.Authorization = `Bearer ${token}`; // attach token
     }
