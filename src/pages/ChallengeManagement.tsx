@@ -182,7 +182,7 @@ const ChallengeManagementPage: React.FC = () => {
                 imagePath={user.imagePath}
                 bio={user.bio}
                 onDelete={handleDelete}
-                isOwner={true}
+                isOwner={false}
                 className="w-full sm:w-full md:w-full lg:w-full"
               />
             ))}
