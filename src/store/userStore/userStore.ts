@@ -7,19 +7,16 @@ import type { UserState } from "../../types/userTypes";
 const useUserStore = create<UserState>()(
   persist(
     (set) => ({
-      // Hardcoded values
-      username: "hardcodedUsername", // Replace with desired username
-      token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyMSwiaXNzIjoiY2hhbGxlbmdlLWFwcCIsImV4cCI6MTc2Mjk2MDA3OCwiaWF0IjoxNzYyODczNjc4fQ.a5byDGbFVTWKp86Bm3rswHE6BWFmB81zOBqFraEEYUY", // Replace with desired token
-      id: "21",
-
+      username: "",
+      token: "", 
+	  userId: 0, 
       setUsername: (username: string) =>
         set((prev) => ({ ...prev, username })),
 
       setToken: (token: string) =>
         set((prev) => ({ ...prev, token })),
-
-      setId: (id: string) =>
-        set((prev) => ({ ...prev, id})),
+	  setUserId: (userId: number) =>
+        set((prev) => ({ ...prev, userId })),
     }),
     {
       name: "profile-storage", // Store name
