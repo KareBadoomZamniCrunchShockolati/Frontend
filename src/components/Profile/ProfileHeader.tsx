@@ -10,6 +10,8 @@ import OwnerButton from "./OwnerButton";
 import ViewButton from "./ViewButton";
 import ProfileSideSheet from "./ProfileSideSheet";
 import useUserStore from "@/store/userStore/userStore";
+import type { ProfileHeaderProps } from "@/types/profileHeader"; // Use type-only import
+
 function getUserInitials(fullName: string): string {
   if (!fullName) {
     return "";
@@ -29,24 +31,17 @@ function getUserInitials(fullName: string): string {
   return initials;
 }
 
-interface Props {
-  fullName: string;
-  personalColor?: string;
-  isOwner?: boolean;
-  userId: number; // Add userId prop here
-}
-
 const ProfileHeader = ({
   fullName,
   personalColor = "bg-blue-500 text-white",
   isOwner,
-  userId, // Receive userId as a prop
-}: Props) => {
+  userId,
+}: ProfileHeaderProps) => {
   const initials = getUserInitials(fullName);
 
   return (
     <>
-      <ProfileSideSheet></ProfileSideSheet>
+      <ProfileSideSheet />
 
       <div
         onClick={() => console.log("show the badges!")}
@@ -75,7 +70,11 @@ const ProfileHeader = ({
 
       {/* Pass the userId to ViewButton */}
       {!isOwner && (
-        <ViewButton loggedInUserId = {useUserStore(state => state.id)} userIdToFollow={userId.toString()} token="your-token-here" />
+        <ViewButton
+          loggedInUserId={useUserStore((state) => state.id)}
+          userIdToFollow={userId.toString()}
+          token="your-token-here"
+        />
       )}
     </>
   );

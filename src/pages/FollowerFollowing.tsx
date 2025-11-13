@@ -7,21 +7,16 @@ import BackButtonWithUsername from "@/components/FollowerFollowing/BackButtonWit
 import SearchBar from "@/components/FollowerFollowing/SearchBar";
 import UserCardList from "@/components/FollowerFollowing/UserCardList";
 import DeleteConfirmationModal from "@/components/FollowerFollowing/DeleteConfirmationModal";
-import { fetchUsers } from "@/services/followerFollowingService";
+import { fetchUsers, removeFollower, removeFollowing } from "@/services/followerFollowingService";
 import useUserStore from "@/store/userStore/userStore";
-import { removeFollower, removeFollowing } from "@/services/followerFollowingService";
 import type { FollowerFollowingUser } from "@/types/followerFollowing";
-
 
 const FollowerFollowingPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
   const { token, id: loggedInUserId } = useUserStore(state => state);
-
   const { userId } = useParams();
   const selectedUser = userId || "0";
-
 
   const [userData, setUserData] = useState({
     followers: [] as FollowerFollowingUser[],
@@ -41,6 +36,7 @@ const FollowerFollowingPage: React.FC = () => {
   const fullName = location.state?.fullName || "Unknown User";
   const isOwner = loggedInUserId === selectedUser;
 
+  // Effect to update the active tab from URL query params
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const tab = params.get("tab") as 'followers' | 'followings' | null;
@@ -49,6 +45,7 @@ const FollowerFollowingPage: React.FC = () => {
     }
   }, [location.search]);
 
+  // Fetch user data based on selected user and active tab
   const fetchUserData = async () => {
     setUiState(prevState => ({ ...prevState, loading: true, error: null }));
     try {
@@ -69,32 +66,35 @@ const FollowerFollowingPage: React.FC = () => {
     }
   };
 
+  // Fetch user data on page load or when activeTab or selectedUser changes
   useEffect(() => {
     fetchUserData();
   }, [selectedUser, activeTab]);
 
+  // Switch between followers and followings tab
   const handleTabSwitch = (tab: 'followers' | 'followings') => {
     setUiState(prevState => ({ ...prevState, activeTab: tab }));
     navigate(`/follow/${selectedUser}?tab=${tab}`, { state: { fullName } });
   };
 
+  // Handle delete button click
   const handleDeleteClick = (id: string, username: string) => {
     setUiState(prevState => ({ ...prevState, userToDelete: { id, username }, showDeleteModal: true }));
   };
 
+  // Handle confirmation of user deletion
   const handleDeleteConfirmation = async () => {
     if (userToDelete && token) {
       try {
         let response;
-  
         console.log("Authorization token:", token);
-  
+
         if (activeTab === 'followers') {
           response = await removeFollower(loggedInUserId, userToDelete.id, token);
         } else if (activeTab === 'followings') {
           response = await removeFollowing(loggedInUserId, userToDelete.id, token);
         }
-  
+
         if (response) {
           setUserData(prevState => ({
             ...prevState,
@@ -126,12 +126,13 @@ const FollowerFollowingPage: React.FC = () => {
       }));
     }
   };
-  
 
+  // Handle canceling the delete action
   const handleDeleteCancel = () => {
     setUiState(prevState => ({ ...prevState, showDeleteModal: false, userToDelete: null }));
   };
 
+  // Search for users
   const handleSearch = (searchTerm: string) => {
     const list = activeTab === 'followers' ? userData.followers : userData.followings;
     if (list) {
@@ -142,9 +143,10 @@ const FollowerFollowingPage: React.FC = () => {
     }
   };
 
+  // Prevent form submit on Enter keypress
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
-      event.preventDefault(); 
+      event.preventDefault();
     }
   };
 
