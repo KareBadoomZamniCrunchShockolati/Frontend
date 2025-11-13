@@ -1,18 +1,26 @@
 import React, { useState } from "react";
-import { ArrowLeft, Menu, Hexagon, Calendar, MapPin, Search } from "lucide-react";
+import {
+  ArrowLeft,
+  Menu,
+  Hexagon,
+  Calendar,
+  MapPin,
+  Search,
+  ThumbsUp,
+  Bookmark,
+} from "lucide-react"; // Import necessary icons
 import { useNavigate } from "react-router-dom";
-import CustomButton from '@/components/Custom/CustomButton';
-import UserCard from '@/components/Custom/UserCard';
-import CustomInput from '@/components/Custom/CustomInput';
-import { Formik, Field, Form } from "formik"; // Import Formik components
+import CustomButton from "@/components/Custom/CustomButton";
+import UserCard from "@/components/Custom/UserCard";
+import CustomInput from "@/components/Custom/CustomInput";
+import { Formik, Field, Form } from "formik";
 
 const ChallengeManagementPage: React.FC = () => {
   const imageUrl =
-    "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg"; // Direct URL
+    "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
 
   const navigate = useNavigate();
 
-  // Mock data for participated users
   const mockUsers = [
     {
       id: "1",
@@ -21,7 +29,7 @@ const ChallengeManagementPage: React.FC = () => {
       bio: "Passionate about climbing and adventure.",
       followersCount: 120,
       followingCount: 80,
-      doneChallengesCount: 5
+      doneChallengesCount: 5,
     },
     {
       id: "2",
@@ -30,7 +38,7 @@ const ChallengeManagementPage: React.FC = () => {
       bio: "Love hiking and nature.",
       followersCount: 150,
       followingCount: 100,
-      doneChallengesCount: 7
+      doneChallengesCount: 7,
     },
     {
       id: "3",
@@ -39,16 +47,16 @@ const ChallengeManagementPage: React.FC = () => {
       bio: "Fitness enthusiast and challenge seeker.",
       followersCount: 180,
       followingCount: 90,
-      doneChallengesCount: 6
-    }
+      doneChallengesCount: 6,
+    },
   ];
 
   const [users, setUsers] = useState(mockUsers);
   const [searchTerm, setSearchTerm] = useState("");
+  const [likeCount, setLikeCount] = useState(10); // State to track likes
 
-  // Handle user card delete
   const handleDelete = (id: string, username: string) => {
-    setUsers(users.filter(user => user.id !== id));
+    setUsers(users.filter((user) => user.id !== id));
     console.log(`${username} has been removed.`);
   };
 
@@ -60,15 +68,22 @@ const ChallengeManagementPage: React.FC = () => {
     console.log("Menu clicked");
   };
 
-  // Handle search term change in Formik
   const handleSearchTermChange = (value: string) => {
     setSearchTerm(value);
   };
 
-  // Filter users based on search term
-  const filteredUsers = users.filter(user =>
+  const filteredUsers = users.filter((user) =>
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Toggle the like count (increment or decrement)
+  const handleLike = () => {
+    setLikeCount(likeCount === 10 ? 11 : 10); // Toggle between 1 and 0
+  };
+
+  const handleSave = () => {
+    console.log("Saved!");
+  };
 
   return (
     <div className="min-h-screen flex flex-col justify-between p-4">
@@ -92,11 +107,10 @@ const ChallengeManagementPage: React.FC = () => {
         {/* Image container with shadow */}
         <div className="relative w-full max-w-xl mb-4">
           <img
-            src={imageUrl} // Direct image URL
+            src={imageUrl}
             alt="Scenic Landscape"
             className="w-full h-auto rounded-[8px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
           />
-          {/* Badge container with solid shadow (zero blur) */}
           <div className="absolute h-11 bottom-[-10px] right-[-0px] bg-secondary border-1 border-black p-1 rounded-[8px] flex space-x-2 items-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             <button className="w-10 h-10 flex items-center justify-center bg-secondary p-1 rounded-full">
               <Hexagon className="w-full h-full text-yellow-500" />
@@ -110,13 +124,39 @@ const ChallengeManagementPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Like and Save buttons above title */}
+        <div className="flex space-x-4 mt-5 max-w-xl w-full justify-end">
+          <div className="flex items-center space-x-2">
+            {/* Like Count displayed outside of the button, to the left */}
+
+            <span className="text-black text-xl" style={{ marginTop: "6px" }}>
+              {likeCount}
+            </span>
+            
+            <CustomButton
+              className="w-min sm:w-min md:w-min bg-white border-primary shadow-primary hover:bg-white rounded-[8px] p-3 flex items-center space-x-2"
+              onClick={handleLike}
+            >
+              <ThumbsUp className="text-primary w-5 h-5" />
+            </CustomButton>
+
+            <CustomButton
+              className="w-min sm:w-min md:w-min bg-white border-primary shadow-primary hover:bg-white rounded-[8px] p-3 flex items-center space-x-2"
+              onClick={handleSave}
+            >
+              <Bookmark className="text-primary w-5 h-5" />
+            </CustomButton>
+
+          </div>
+        </div>
+
         {/* Title and Description in RTL (Persian) */}
         <div className="text-right mb-6 mt-6 max-w-2xl w-full" dir="rtl">
           <h1 className="text-2xl font-semibold text-black mb-4">عنوان چالش</h1>
           <p className="text-md text-gray-700 text-justify">
             این چالش برای آزمایش استقامت و مهارت‌های حل مسئله شما طراحی شده است.
-            سفر شامل پیمودن زمین‌های سخت و غلبه بر موانع مختلف است.
-            آیا آماده‌اید تا این ماجراجویی را شروع کنید و مرزهای خود را بسنجید؟
+            سفر شامل پیمودن زمین‌های سخت و غلبه بر موانع مختلف است. آیا
+            آماده‌اید تا این ماجراجویی را شروع کنید و مرزهای خود را بسنجید؟
           </p>
         </div>
 
@@ -139,16 +179,15 @@ const ChallengeManagementPage: React.FC = () => {
 
         {/* Title Above Search Bar (Participated Users) */}
         <div className="text-right mb-1 mt-6 max-w-2xl w-full" dir="rtl">
-          <h2 className="text-xl font-semibold text-black mb-4">شرکت کنندگان</h2>
+          <h2 className="text-xl font-semibold text-black mb-4">
+            شرکت کنندگان
+          </h2>
         </div>
 
         {/* Search Bar - Formik integration */}
-        <Formik
-          initialValues={{ searchTerm: "" }}
-          onSubmit={() => {}}
-        >
+        <Formik initialValues={{ searchTerm: "" }} onSubmit={() => {}}>
           {({ values, handleChange, handleBlur }) => (
-            <Form className="flex justify-center  w-full max-w-xl">
+            <Form className="flex justify-center w-full max-w-xl">
               <Field
                 name="searchTerm"
                 render={({ field }: any) => (
@@ -158,7 +197,7 @@ const ChallengeManagementPage: React.FC = () => {
                     value={values.searchTerm}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       handleChange(e);
-                      handleSearchTermChange(e.target.value); // Update the state for live search
+                      handleSearchTermChange(e.target.value);
                     }}
                     onBlur={handleBlur}
                     label="جستجو"
@@ -171,7 +210,7 @@ const ChallengeManagementPage: React.FC = () => {
           )}
         </Formik>
 
-        {/* User Card List - Ensure center alignment with same width as button */}
+        {/* User Card List */}
         <div className="w-full mt-4 max-w-xl mx-auto">
           <div className="w-full flex flex-col items-center space-y-4">
             {filteredUsers.map((user) => (
