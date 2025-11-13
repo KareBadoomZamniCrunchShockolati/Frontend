@@ -8,13 +8,13 @@ import {
   Search,
   ThumbsUp,
   Bookmark,
-} from "lucide-react"; // Import necessary icons
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CustomButton from "@/components/Custom/CustomButton";
 import UserCard from "@/components/Custom/UserCard";
 import CustomInput from "@/components/Custom/CustomInput";
 import { Formik, Field, Form } from "formik";
-import ChallengeCard from "@/components/Custom/ChallangeCard"; // Import ChallengeCard for slideshow
+import ChallengeCard from "@/components/Custom/ChallangeCard";
 
 const ChallengeManagementPage: React.FC = () => {
   const imageUrl =
@@ -27,6 +27,24 @@ const ChallengeManagementPage: React.FC = () => {
       id: "1",
       username: "Alice",
       imagePath: "https://randomuser.me/api/portraits/women/1.jpg",
+      bio: "Passionate about climbing and adventure.",
+      followersCount: 120,
+      followingCount: 80,
+      doneChallengesCount: 5,
+    },
+    {
+      id: "4",
+      username: "Damon",
+      imagePath: "https://randomuser.me/api/portraits/men/3.jpg",
+      bio: "Passionate about climbing and adventure.",
+      followersCount: 120,
+      followingCount: 80,
+      doneChallengesCount: 5,
+    },
+    {
+      id: "5",
+      username: "ching chang chong",
+      imagePath: "https://randomuser.me/api/portraits/women/2.jpg",
       bio: "Passionate about climbing and adventure.",
       followersCount: 120,
       followingCount: 80,
@@ -248,7 +266,14 @@ const ChallengeManagementPage: React.FC = () => {
 
         {/* User Card List */}
         <div className="w-full mt-4 max-w-xl mx-auto">
-          <div className="w-full flex flex-col items-center space-y-4">
+          <div
+            className="w-full flex flex-col items-center space-y-4 overflow-y-auto max-h-[300px]"
+            style={{
+              overflowY: "scroll",
+              scrollbarWidth: "none", // For Firefox
+              msOverflowStyle: "none", // For IE and Edge
+            }}
+          >
             {filteredUsers.map((user) => (
               <UserCard
                 key={user.id}
@@ -265,10 +290,16 @@ const ChallengeManagementPage: React.FC = () => {
         </div>
 
         <div className="text-right mt-6 max-w-2xl w-full" dir="rtl">
-          <h2 className="text-xl font-semibold text-black mb-4">
-            چالش های مرتبط
+          <h2 className="text-xl font-semibold text-black mb-4 flex items-center">
+            <img
+              src="src/assets/Img/staircase.jpg"
+              alt="Staircase"
+              className="w-8 h-8 ml-2"
+            />
+            <span className="mr-2">چالش های مرتبط</span>
           </h2>
         </div>
+
         {/* Challenge Cards Slideshow (At the end) */}
         <div className="w-full max-w-xl mx-auto relative">
           {/* Challenge Card */}

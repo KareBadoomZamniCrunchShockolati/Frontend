@@ -10,7 +10,8 @@ import SignUp from "@/pages/SignUp";
 import Login from "@/pages/LogIn";
 import Test from "@/pages/test";
 import Edit from "@/pages/EditProfile";
-import Challenge from "@/pages/ChallengeManagement"
+import Challenge from "@/pages/ChallengeInfo"
+import ChallengeEdit from "@/pages/ChallengeEdit"
 
 // import { LogIn } from "lucide-react";
 
@@ -56,6 +57,10 @@ export const router = createBrowserRouter([
         path: "/follow",  // Updated route for Follower/Following page
         element: <FollowerFollowing />,
       },
+      {
+        path : "/editChallenge",
+        element: <ChallengeEdit />
+      }
     ],
   },
 ]);
