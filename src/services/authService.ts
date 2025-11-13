@@ -15,9 +15,9 @@ import { AUTH_BASE, postData } from "./services";
 // 	});
 // };
 // Login function
-export const loginService = async (credentials: LoginPayload): Promise<LoginResponse> => {
+export const loginService = async (credentials: LoginPayload): Promise<AuthResponse> => {
     return postData({
-        endPoint: `/api/v1/auth/login`,
+        endPoint: `${AUTH_BASE}/auth/login`,
         data: credentials,
     });
 };
