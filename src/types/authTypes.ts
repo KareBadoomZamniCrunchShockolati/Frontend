@@ -1,8 +1,17 @@
+
 export interface LoginPayload {
 	email: string;
 	username: string | null;
 	password: string;
 }
+
+export interface SignupPayload {
+  username: string;
+  email: string;
+  password: string;
+  bio: string;
+}
+
 
 export interface LoginResponse {
 	user: {
@@ -11,4 +20,19 @@ export interface LoginResponse {
 		email: string;
 		username: string;
 	};
+}
+
+export interface AuthResponse {
+	user: {
+		id: number;
+		name: string;
+		email: string;
+		username: string;
+	};
+	token: string;
+}
+
+export interface VerifyEmailService {
+	email : string;
+	code : string;
 }
