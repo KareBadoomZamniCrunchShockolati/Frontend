@@ -10,8 +10,8 @@ import SignUp from "@/pages/SignUp";
 import Login from "@/pages/LogIn";
 import Test from "@/pages/test";
 import Edit from "@/pages/EditProfile";
-import Challenge from "@/pages/ChallengeInfo"
-import ChallengeEdit from "@/pages/ChallengeEdit"
+import Challenge from "@/pages/ChallengeInfo";
+import ChallengeEdit from "@/pages/ChallengeEdit";
 
 // import { LogIn } from "lucide-react";
 
@@ -38,29 +38,29 @@ export const router = createBrowserRouter([
       },
       {
         path: "/editprofile",
-        element: <Edit fullName=""/>,
+        element: <Edit fullName="" />,
       },
       {
-        path : "/challenge",
-        element : <Challenge />
-      }
+        path: "/challenge",
+        element: <Challenge />,
+      },
     ],
   },
   {
     element: <PrivateLayout />,
     children: [
       {
-        path: "/dashboard/:id",  // Dynamic route for user profile
+        path: "/dashboard/:id", // Dynamic route for user profile
         element: <DashBoard />,
       },
       {
-        path: "/follow",  // Updated route for Follower/Following page
+        path: "/follow", // Updated route for Follower/Following page
         element: <FollowerFollowing />,
       },
       {
-        path : "/editChallenge",
-        element: <ChallengeEdit />
-      }
+        path: "/editChallenge",
+        element: <ChallengeEdit />,
+      },
     ],
   },
 ]);

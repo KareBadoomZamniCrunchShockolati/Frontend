@@ -8,6 +8,7 @@ import DateAndLocation from "@/components/ChallengeManagement/info/DateAndLocati
 import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
 import UserCardList from "@/components/ChallengeManagement/public/UserCardsList";
 import ChallengeSlideshow from "@/components/ChallengeManagement/info/SlideShow";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const ChallengeManagementPage: React.FC = () => {
   const imageUrl =
@@ -90,13 +91,28 @@ const ChallengeManagementPage: React.FC = () => {
   const [likeCount, setLikeCount] = useState(10); // State to track likes
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0); // Slideshow state
 
+  // Initialize navigate
+  const navigate = useNavigate();
+
   const handleDelete = (id: string, username: string) => {
     setUsers(users.filter((user) => user.id !== id));
     console.log(`${username} has been removed.`);
   };
 
   const handleMenu = () => {
-    console.log("Menu clicked");
+    const challengeData = {
+      imageUrl: imageUrl,
+      title: "عنوان چالش",
+      description:
+        "این چالش برای آزمایش استقامت و مهارت‌های حل مسئله شما طراحی شده است. سفر شامل پیمودن زمین‌های سخت و غلبه بر موانع مختلف است. آیا آماده‌اید تا این ماجراجویی را شروع کنید و مرزهای خود را بسنجید؟",
+      dateRange: "از 28 اردیبهشت تا 8 شهریور - سه روز در هفته",
+      location: "قله کوه اورست",
+      participants: filteredUsers,
+    };
+
+    navigate("/editChallenge", {
+      state: { challenge: challengeData }, // Pass the challenge data as state
+    });
   };
 
   const handleSearchTermChange = (value: string) => {
