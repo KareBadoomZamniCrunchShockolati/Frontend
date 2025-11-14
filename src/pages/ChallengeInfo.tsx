@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import CustomButton from "@/components/Custom/CustomButton";
-import BackButtonAndMenu from "@/components/ChallengeManagement/BackButtonAndMenu";
-import ImageAndBadgeContainer from "@/components/ChallengeManagement/ImageAndBadgeContainer";
-import LikeAndSaveButtons from "@/components/ChallengeManagement/LikeAndSaveButtons";
-import TitleAndDescription from "@/components/ChallengeManagement/TitleAndDescription";
-import DateAndLocation from "@/components/ChallengeManagement/DateAndLocation";
-import SearchBar from "@/components/ChallengeManagement/SearchBar";
-import UserCardList from "@/components/ChallengeManagement/UserCardsList";
-import ChallengeSlideshow from "@/components/ChallengeManagement/SlideShow";
+import BackButtonAndMenu from "@/components/ChallengeManagement/info/BackButtonAndMenu";
+import ImageAndBadgeContainer from "@/components/ChallengeManagement/info/ImageAndBadgeContainer";
+import LikeAndSaveButtons from "@/components/ChallengeManagement/info/LikeAndSaveButtons";
+import TitleAndDescription from "@/components/ChallengeManagement/info/TitleAndDescription";
+import DateAndLocation from "@/components/ChallengeManagement/info/DateAndLocation";
+import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
+import UserCardList from "@/components/ChallengeManagement/public/UserCardsList";
+import ChallengeSlideshow from "@/components/ChallengeManagement/info/SlideShow";
 
 const ChallengeManagementPage: React.FC = () => {
   const imageUrl =
@@ -165,7 +165,11 @@ const ChallengeManagementPage: React.FC = () => {
 
         <SearchBar searchTerm="" onSearchTermChange={handleSearchTermChange} />
 
-        <UserCardList users={filteredUsers} onDelete={handleDelete} />
+        <UserCardList
+          users={filteredUsers}
+          onDelete={handleDelete}
+          isOwner={false}
+        />
 
         <div className="text-right mt-6 max-w-2xl w-full" dir="rtl">
           <h2 className="text-xl font-semibold text-black mb-4 flex items-center">

@@ -11,9 +11,14 @@ interface UserCardListProps {
     bio: string;
   }>;
   onDelete: (id: string, username: string) => void;
+  isOwner: boolean;
 }
 
-const UserCardList: React.FC<UserCardListProps> = ({ users, onDelete }) => {
+const UserCardList: React.FC<UserCardListProps> = ({
+  users,
+  onDelete,
+  isOwner,
+}) => {
   return (
     <div className="w-full mt-4 max-w-xl mx-auto">
       <div
@@ -32,7 +37,7 @@ const UserCardList: React.FC<UserCardListProps> = ({ users, onDelete }) => {
             imagePath={user.imagePath}
             bio={user.bio}
             onDelete={onDelete}
-            isOwner={false}
+            isOwner={isOwner}
             className="w-full sm:w-full md:w-full lg:w-full"
           />
         ))}

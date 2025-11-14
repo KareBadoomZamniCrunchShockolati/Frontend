@@ -1,17 +1,12 @@
 import React, { useState } from "react";
-import {
-  ArrowLeft,
-  Menu,
-  Hexagon,
-  Calendar,
-  MapPin,
-  Search,
-} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CustomButton from "@/components/Custom/CustomButton";
-import UserCard from "@/components/Custom/UserCard";
-import CustomInput from "@/components/Custom/CustomInput";
-import { Formik, Field, Form } from "formik";
+import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
+import UserCardList from "@/components/ChallengeManagement/public/UserCardsList";
+import BackButton from "@/components/ChallengeManagement/edit/BackButton";
+import ImageAndBadgeContainerEdit from "@/components/ChallengeManagement/edit/ImageAndBadgeContainerEdit";
+import TitleAndDescriptionInput from "@/components/ChallengeManagement/edit/TitleAndDescriptionInput";
+import DateAndLocationInput from "@/components/ChallengeManagement/edit/DateAndLocationInput";
 
 const ChallengeEdit: React.FC = () => {
   const imageUrl =
@@ -70,10 +65,9 @@ const ChallengeEdit: React.FC = () => {
   const [image, setImage] = useState(imageUrl);
   const [users, setUsers] = useState(mockUsers);
   const [searchTerm, setSearchTerm] = useState("");
-  const [likeCount, setLikeCount] = useState(10);
   const [challengeTitle, setChallengeTitle] = useState("عنوان چالش");
   const [challengeDescription, setChallengeDescription] = useState(
-    "این چالش برای آزمایش استقامت و مهارت‌های حل مسئله شما طراحی شده است..."
+    "این چالش برای آزمایش استقامت و مهارت‌های حل مسئله شما طراحی شده است. سفر شامل پیمودن زمین‌های سخت و غلبه بر موانع مختلف است. آیا آماده‌اید تا این ماجراجویی را شروع کنید و مرزهای خود را بسنجید؟"
   );
   const [challengeDate, setChallengeDate] = useState(
     "از 28 اردیبهشت تا 8 شهریور - سه روز در هفته"
@@ -87,10 +81,6 @@ const ChallengeEdit: React.FC = () => {
 
   const handleBack = () => {
     navigate(-1);
-  };
-
-  const handleMenu = () => {
-    console.log("Menu clicked");
   };
 
   const handleSearchTermChange = (value: string) => {
@@ -130,187 +120,29 @@ const ChallengeEdit: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col justify-between p-4">
-      <div className="flex-1 flex flex-col justify-center items-center">
-        {/* Top buttons */}
-        <div className="flex justify-between w-full items-center mb-4 max-w-xl">
-          <button
-            onClick={handleBack}
-            className="text-primary w-11 h-11 border-2 border-primary rounded-[12.5px] px-2 py-2 flex items-center justify-center mr-4 hover:bg-orange-50"
-          >
-            <ArrowLeft className="w-full h-full text-primary" />
-          </button>
-          <button
-            onClick={handleMenu}
-            className="text-primary w-11 h-11 border-2 border-primary rounded-[12.5px] px-2 py-2 flex items-center justify-center hover:bg-orange-50"
-          >
-            <Menu className="w-full h-full text-primary" />
-          </button>
-        </div>
+      <div className="flex-1 flex flex-col  justify-center items-start">
+        <BackButton onClick={handleBack} />
+        <ImageAndBadgeContainerEdit
+          onImageChange={handleImageChange}
+          imageUrl={imageUrl}
+        />
 
-        {/* Image container with shadow and blur effect */}
-        <div className="relative w-full max-w-xl mb-4">
-          {/* Image with blur effect */}
-          <img
-            src={imageUrl}
-            alt="Scenic Landscape"
-            className="w-full h-auto rounded-[8px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] filter blur-xs"
-          />
-
-          {/* Badge container */}
-          <div className="absolute h-11 bottom-[-10px] right-[-0px] bg-secondary border-1 border-black p-1 rounded-[8px] flex space-x-2 items-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <button className="w-10 h-10 flex items-center justify-center bg-secondary p-1 rounded-full">
-              <Hexagon className="w-full h-full text-yellow-500" />
-            </button>
-            <button className="w-10 h-10 flex items-center justify-center bg-secondary p-1 rounded-full">
-              <Hexagon className="w-full h-full text-orange-900" />
-            </button>
-            <button className="w-10 h-10 flex items-center justify-center bg-secondary p-1 rounded-full">
-              <Hexagon className="w-full h-full text-gray-400" />
-            </button>
-          </div>
-
-          {/* Custom button in the center to change the image */}
-          <div className="absolute inset-0 flex justify-center items-center">
-            <CustomButton
-              className="bg-secondary text-white hover:bg-secondary px-6 py-2 rounded-[8px] shadow-md"
-              onClick={() =>
-                document.getElementById("imageUploadInput")?.click()
-              }
-            >
-              تغییر تصویر
-            </CustomButton>
-            <input
-              id="imageUploadInput"
-              type="file"
-              className="hidden"
-              accept="image/*"
-              onChange={handleImageChange}
-            />
-          </div>
-        </div>
-
-        {/* Title and Description in RTL (Persian) */}
-        <div className="text-right mb-6 mt-6 max-w-2xl w-full" dir="rtl">
-          <h1 className="text-2xl font-semibold text-black mb-4">
-            {/* Challenge title input */}
-            <Formik
-              initialValues={{ challengeTitle }}
-              onSubmit={(values) => {
-                console.log(values);
-              }}
-            >
-              {({ values, handleChange }) => (
-                <Field name="challengeTitle">
-                  {({ field }: any) => (
-                    <CustomInput
-                      {...field}
-                      value={values.challengeTitle}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        handleChange(e);
-                        handleTitleChange(e.target.value);
-                      }}
-                      label="عنوان چالش"
-                      width="w-full"
-                      className="rounded-[8px]"
-                    />
-                  )}
-                </Field>
-              )}
-            </Formik>
-          </h1>
-        </div>
-
-        {/* Challenge description input */}
-        <div className="text-right mb-6 mt-6 max-w-2xl w-full" dir="rtl">
-          <Formik
-            initialValues={{ challengeDescription }}
-            onSubmit={(values) => {
-              console.log(values);
-            }}
-          >
-            {({ values, handleChange }) => (
-              <Field name="challengeDescription">
-                {({ field }: any) => (
-                  <CustomInput
-                    {...field}
-                    value={values.challengeDescription}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                      handleChange(e);
-                      handleDescriptionChange(e.target.value);
-                    }}
-                    label="توضیحات چالش"
-                    width="w-full"
-                    className="rounded-[8px] resize-none"
-                    as="textarea"
-                    rows={5}
-                  />
-                )}
-              </Field>
-            )}
-          </Formik>
-        </div>
+        <TitleAndDescriptionInput
+          title={challengeTitle}
+          onTitleChange={handleTitleChange}
+          description={challengeDescription}
+          onDescriptionChange={handleDescriptionChange}
+        />
 
         {/* Date and Location Fields */}
-        <div className="space-y-4 mt-6 mb-4 text-right w-full max-w-xl">
+        <div className="space-y-4 mb-4 text-right w-full max-w-xl">
           {/* Date Field */}
-          <div className="flex items-center text-sm text-gray-700 justify-end w-full">
-            <CustomButton className="w-min sm:w-min md:w-min max-w-xl mr-2 h-9.5 bg-secondary rounded-[8px]  text-md sm:text-md md:text-md hover:bg-secondary">
-              تغییر تاریخ
-            </CustomButton>
-            <Formik
-              initialValues={{ challengeDate }}
-              onSubmit={(values) => {
-                console.log(values);
-              }}
-            >
-              {({ values, handleChange }) => (
-                <Field name="challengeDate">
-                  {({ field }: any) => (
-                    <CustomInput
-                      {...field}
-                      type="text"
-                      value={values.challengeDate}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        handleChange(e);
-                        handleDateChange(e.target.value);
-                      }}
-                      label="تاریخ"
-                      width="w-full"
-                      className="rounded-[8px]"
-                    />
-                  )}
-                </Field>
-              )}
-            </Formik>
-          </div>
-
-          {/* Location Field */}
-          <div className="flex items-center text-sm text-gray-700 justify-end w-full">
-            <Formik
-              initialValues={{ challengeLocation }}
-              onSubmit={(values) => {
-                console.log(values);
-              }}
-            >
-              {({ values, handleChange }) => (
-                <Field name="challengeLocation">
-                  {({ field }: any) => (
-                    <CustomInput
-                      {...field}
-                      value={values.challengeLocation}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        handleChange(e);
-                        handleLocationChange(e.target.value);
-                      }}
-                      label="مکان"
-                      width="w-full"
-                      className="rounded-[8px]"
-                    />
-                  )}
-                </Field>
-              )}
-            </Formik>
-          </div>
+          <DateAndLocationInput
+            challengeDate={challengeDate}
+            challengeLocation={challengeLocation}
+            onDateChange={handleDateChange}
+            onLocationChange={handleLocationChange}
+          />
         </div>
 
         {/* Title Above Search Bar (Participated Users) */}
@@ -320,30 +152,13 @@ const ChallengeEdit: React.FC = () => {
           </h2>
         </div>
 
-        {/* User Card List */}
-        <div className="w-full mt-4 max-w-xl mx-auto">
-          <div
-            className="w-full flex flex-col items-center space-y-4 overflow-y-auto max-h-[300px]"
-            style={{
-              overflowY: "scroll",
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
-          >
-            {filteredUsers.map((user) => (
-              <UserCard
-                key={user.id}
-                id={user.id}
-                username={user.username}
-                imagePath={user.imagePath}
-                bio={user.bio}
-                onDelete={handleDelete}
-                isOwner={true}
-                className="w-full sm:w-full md:w-full lg:w-full"
-              />
-            ))}
-          </div>
-        </div>
+        <SearchBar searchTerm="" onSearchTermChange={handleSearchTermChange} />
+
+        <UserCardList
+          users={filteredUsers}
+          onDelete={handleDelete}
+          isOwner={true}
+        />
       </div>
       {/* Custom Button placed at the bottom and centered */}
       <CustomButton className="mt-10 w-full sm:w-full md:w-full max-w-xl bg-primary rounded-[8px] p-5 text-lg sm:text-lg md:text-lg hover:bg-primary">
