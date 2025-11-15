@@ -12,6 +12,7 @@ import Test from "@/pages/test";
 import Edit from "@/pages/EditProfile";
 import Challenge from "@/pages/ChallengeInfo";
 import ChallengeEdit from "@/pages/ChallengeEdit";
+import ChallengeCreate from "@/pages/ChallengeCreate";
 
 // import { LogIn } from "lucide-react";
 
@@ -61,6 +62,10 @@ export const router = createBrowserRouter([
         path: "/editChallenge",
         element: <ChallengeEdit />,
       },
+      {
+        path: "/createChallenge",
+        element: <ChallengeCreate />
+      }
     ],
   },
 ]);

@@ -14,19 +14,17 @@ const ChallengeEdit: React.FC = () => {
   const location = useLocation();
   const challenge = location.state?.challenge;
 
-  
-
   if (!challenge) {
     return <div>Challenge not found!</div>;
   }
 
   const {
-    imageUrl,
-    title,
-    description,
-    dateRange,
-    location: challengeLocation,
-    participants,
+    imageUrl = "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg",
+    title = "عنوان چالش",
+    description = "توضیحات چالش...",
+    dateRange = "تاریخ چالش",
+    location: challengeLocation = "مکان چالش",
+    participants = [],
   } = challenge;
 
   const [image, setImage] = useState(imageUrl);
@@ -35,8 +33,7 @@ const ChallengeEdit: React.FC = () => {
   const [challengeTitle, setChallengeTitle] = useState(title);
   const [challengeDescription, setChallengeDescription] = useState(description);
   const [challengeDate, setChallengeDate] = useState(dateRange);
-  const [challengeLocationState, setChallengeLocation] =
-    useState(challengeLocation);
+  const [challengeLocationState, setChallengeLocation] = useState(challengeLocation);
 
   const handleDelete = (id: string, username: string) => {
     setUsers(users.filter((user) => user.id !== id));
@@ -44,7 +41,7 @@ const ChallengeEdit: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate(-1); // Go back to previous page
+    navigate(-1);
   };
 
   const handleSearchTermChange = (value: string) => {
@@ -85,19 +82,18 @@ const ChallengeEdit: React.FC = () => {
   );
 
   const handleFinishEditing = () => {
-    // Save the updated challenge info and navigate back to the info page
     const updatedChallenge = {
+      Img: image,                    // Must be `Img` to match ChallengeInfo
       title: challengeTitle,
       description: challengeDescription,
       dateRange: challengeDate,
       location: challengeLocationState,
-      Img: image,
       participants: users,
     };
 
-    // You can use navigate with state to pass updated challenge back to the info page
     navigate("/challenge", {
-      state: { challenge: updatedChallenge }, // Passing updated challenge as state
+      state: { challenge: updatedChallenge },
+      replace: true, // Optional: cleans history
     });
   };
 
@@ -108,13 +104,11 @@ const ChallengeEdit: React.FC = () => {
           <BackButton onClick={handleBack} />
         </div>
 
-        {/* Image and Badge Section */}
         <ImageAndBadgeContainerEdit
           onImageChange={handleImageChange}
           imageUrl={image}
         />
 
-        {/* Challenge Title and Description */}
         <div className="w-full max-w-xl">
           <TitleAndDescriptionInput
             title={challengeTitle}
@@ -124,7 +118,6 @@ const ChallengeEdit: React.FC = () => {
           />
         </div>
 
-        {/* Date and Location Fields */}
         <div className="space-y-4 mb-4 text-right w-full max-w-xl">
           <DateAndLocationInput
             challengeDate={challengeDate}
@@ -134,14 +127,12 @@ const ChallengeEdit: React.FC = () => {
           />
         </div>
 
-        {/* Title Above Search Bar (Participated Users) */}
         <div className="text-right mb-1 mt-6 max-w-2xl w-full" dir="rtl">
           <h2 className="text-xl font-semibold text-black mb-4">
             شرکت کنندگان
           </h2>
         </div>
 
-        {/* Search Bar */}
         <SearchBar
           searchTerm={searchTerm}
           onSearchTermChange={handleSearchTermChange}
@@ -154,11 +145,10 @@ const ChallengeEdit: React.FC = () => {
         />
       </div>
 
-      {/* Custom Button placed at the bottom and centered */}
       <div className="flex justify-center w-full mt-10">
         <CustomButton
           className="w-full sm:w-full md:w-full max-w-xl bg-primary rounded-[8px] p-5 text-lg sm:text-lg md:text-lg hover:bg-primary"
-          onClick={handleFinishEditing} // On button click, save changes and navigate back
+          onClick={handleFinishEditing}
         >
           اتمام ویرایش
         </CustomButton>

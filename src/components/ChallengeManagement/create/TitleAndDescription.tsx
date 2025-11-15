@@ -4,11 +4,14 @@ import { Field, Formik } from "formik";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomTextArea from "@/components/Custom/CustomTextArea";
 import type { ChallengeTitleAndDescriptionInputProps } from "@/types/challengeElementsTypes";
+import { NotebookText } from "lucide-react";
 
-
-const TitleAndDescriptionInput: React.FC<
-  ChallengeTitleAndDescriptionInputProps
-> = ({ title, description, onTitleChange, onDescriptionChange }) => {
+const TitleAndDescription: React.FC<ChallengeTitleAndDescriptionInputProps> = ({
+  title,
+  description,
+  onTitleChange,
+  onDescriptionChange,
+}) => {
   return (
     <div
       className="space-y-6 text-right mb-6
@@ -16,7 +19,7 @@ const TitleAndDescriptionInput: React.FC<
       dir="rtl"
     >
       {/* Title Field */}
-      <h1 className="text-2xl font-semibold text-black mb-4">
+      <h1 className="text-2xl font-semibold text-black mb-12">
         <Formik
           initialValues={{ challengeTitle: title }}
           onSubmit={(values) => {
@@ -35,7 +38,7 @@ const TitleAndDescriptionInput: React.FC<
                   }}
                   label="عنوان چالش"
                   width="w-full"
-                  className="rounded-[8px] mb-4"
+                  className="rounded-[8px]"
                 />
               )}
             </Field>
@@ -60,10 +63,10 @@ const TitleAndDescriptionInput: React.FC<
                   handleChange(e);
                   onDescriptionChange(e.target.value);
                 }}
-                width="w-full"
                 label="توضیحات چالش"
+                width="w-full"
                 className="rounded-[8px] resize-none"
-                as = "textarea"
+                as="textarea"
                 rows={5}
               />
             )}
@@ -74,4 +77,4 @@ const TitleAndDescriptionInput: React.FC<
   );
 };
 
-export default TitleAndDescriptionInput;
+export default TitleAndDescription;
