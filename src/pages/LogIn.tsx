@@ -30,13 +30,13 @@ export default function Login() {
 
       // ✅ Call the login service
       const response = await loginService(values);
-
+      const user = response.user_response
       // ✅ Example: assuming your backend returns { token, user }
-      if (response?.token) {
-        // localStorage.setItem("token", response.token); // interceptor will use it
-        setToken(response.token);
-        setUsername(response.user.username);
-        setUserId(response.user.id);
+      if (user?.token) {
+        // localStorage.setItem("token", user.token); // interceptor will use it
+        setToken(user.token);
+        setUsername(user.username);
+        setUserId(user.id);
       }
 
       console.log("Login success:", response);

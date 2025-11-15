@@ -10,6 +10,7 @@ import SignUp from "@/pages/SignUp";
 import Login from "@/pages/LogIn";
 import Test from "@/pages/test";
 import Edit from "@/pages/EditProfile";
+import PostCreation from "@/pages/PostCreation";
 
 // import { LogIn } from "lucide-react";
 
@@ -51,6 +52,10 @@ export const router = createBrowserRouter([
         path: "/follow",  // Updated route for Follower/Following page
         element: <FollowerFollowing />,
       },
+	      {
+      path: "/create-post", 
+      element: <PostCreation />,
+    },
     ],
   },
 ]);

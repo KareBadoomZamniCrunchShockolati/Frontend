@@ -8,7 +8,8 @@ type CustomInputProps = InputHTMLAttributes<HTMLInputElement> & {
   name: string;
   icon?: ReactNode;
   onIconClick?: () => void;
-  width? : string;
+  width?: string;
+  isTextarea?: boolean;
 };
 
 export default function CustomInput({
@@ -18,6 +19,7 @@ export default function CustomInput({
   onIconClick,
   type = "text",
   width = "",
+  isTextarea = false,
   ...props
 }: CustomInputProps) {
   const [isFocused, setIsFocused] = useState(false);
@@ -54,14 +56,35 @@ export default function CustomInput({
         return (
           <div className={"flex flex-col " + width}>
             <div className="relative">
-              <Input
-                {...field}
-                {...props}
-                type={inputType}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                dir={isRTL ? "rtl" : "ltr"}
-                className={`
+              {isTextarea ? (
+                <textarea
+                  {...field}
+                  dir={isRTL ? "rtl" : "ltr"}
+                  className={`
+      border !border-[var(--borderDefault)]
+      shadow-[0px_1px_0px_var(--borderDefault)]
+      focus:!border-[var(--borderFoucus)]
+      focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)]
+      focus:!ring-0 focus-visible:!ring-0
+      p-3 rounded-xl w-full h-32 resize-none
+      ${isRTL ? "text-right pr-4" : "text-left pl-4"} 
+      transition-all duration-200 ease-in-out
+      ${
+        hasError
+          ? "!border-[var(--borderInvalid)] shadow-[0px_1px_0px_var(--borderInvalidShadow)]"
+          : ""
+      }
+    `}
+                />
+              ) : (
+                <Input
+                  {...field}
+                  {...props}
+                  type={inputType}
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  dir={isRTL ? "rtl" : "ltr"}
+                  className={`
                   border !border-[var(--borderDefault)]
                   shadow-[0px_1px_0px_var(--borderDefault)]
                   focus:!border-[var(--borderFoucus)]
@@ -71,17 +94,20 @@ export default function CustomInput({
                   ${isRTL ? "text-right pr-4" : "text-left pl-4"}
                   ${icon ? (isRTL ? "pl-12" : "pr-12") : ""} 
                   transition-all duration-200 ease-in-out
-                  ${hasError
-                    ? "!border-[var(--borderInvalid)] shadow-[0px_1px_0px_var(--borderInvalidShadow)]"
-                    : ""}
+                  ${
+                    hasError
+                      ? "!border-[var(--borderInvalid)] shadow-[0px_1px_0px_var(--borderInvalidShadow)]"
+                      : ""
+                  }
                   ${props.className ?? ""}
                 `}
-              />
+                />
+              )}
 
               {icon && (
                 <div
                   className={`absolute top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer
-                    ${isRTL ? "left-4" : "right-4"}`} 
+                    ${isRTL ? "left-4" : "right-4"}`}
                   onClick={onIconClick}
                 >
                   {icon}
@@ -91,11 +117,13 @@ export default function CustomInput({
               <label
                 className={`
                   absolute pointer-events-none transition-all duration-200 ease-in-out font-bold
-                  ${"right-4" }
+                  ${"right-4"}
                   ${
                     isFloating
                       ? "top-[-10px] text-xs bg-white px-1 text-black"
-                      : "top-1/2 -translate-y-1/2 text-sm text-gray-500"
+                      : isTextarea
+                        ? "top-2 text-sm text-gray-500"
+                        : "top-1/2 -translate-y-1/2 text-sm text-gray-500"
                   }
                 `}
               >
@@ -104,9 +132,7 @@ export default function CustomInput({
             </div>
 
             {hasError && (
-              <div
-                className={`mt-1 text-xs ${"pr-4 text-right"}`}
-              >
+              <div className={`mt-1 text-xs ${"pr-4 text-right"}`}>
                 <p className="text-red-500">{meta.error}</p>
               </div>
             )}
