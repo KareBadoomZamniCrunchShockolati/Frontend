@@ -9,6 +9,7 @@ import CustomDropdown from "@/components/Custom/CustomDropdown";
 import { Formik, Form } from "formik";
 import AutocompleteSingleSelect from "@/components/Custom/AutocompleteSingleSelect";
 import { Card, CardContent } from "@/components/ui/card";
+import { FileX } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -18,7 +19,7 @@ import {
 } from "@/components/ui/carousel";
 const PostCreation = () => {
   const { token, userId } = useUserStore.getState();
-
+  const [imageURLs, setImageURLs] = useState<string[]>([]);
   if (!token) {
     CustomToast("you need to login first!", "error");
     return <div>you need to login first!</div>;
@@ -30,8 +31,16 @@ const PostCreation = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      setImages((prevImages) => [...prevImages, ...newFiles]);
+      const newURLs = newFiles.map((file) => URL.createObjectURL(file));
+
+      setImages((prev) => [...prev, ...newFiles]);
+      setImageURLs((prev) => [...prev, ...newURLs]);
     }
+  };
+  const handleDelete = (index: number) => {
+    URL.revokeObjectURL(imageURLs[index]); // free memory
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setImageURLs((prev) => prev.filter((_, i) => i !== index));
   };
 
   const challenges = [
@@ -82,12 +91,19 @@ const PostCreation = () => {
                   <Carousel className="w-full h-full relative">
                     <CarouselContent className="h-full">
                       {images.map((img, index) => (
-                        <CarouselItem key={index} className="w-full h-full flex items-center justify-center">
-                            <img
-                              src={URL.createObjectURL(img)}
-                              alt={`Preview ${index}`}
-                              className="w-full h-full object-contain"
-                            />
+                        <CarouselItem
+                          key={index}
+                          className="w-full h-full flex items-center justify-center relative"
+                        >
+                          <FileX
+                            className="absolute top-2 right-2 w-6 h-6 text-destructive cursor-pointer z-20"
+                            onClick={() => handleDelete(index)}
+                          />
+                          <img
+                            src={imageURLs[index]}
+                            alt={`Preview ${index}`}
+                            className="w-full h-full object-contain"
+                          />
                         </CarouselItem>
                       ))}
                     </CarouselContent>
