@@ -51,6 +51,9 @@ const AutocompleteSingleSelect = ({
                 p-2 
                 text-right
                 transition-all duration-200 ease-in-out
+                placeholder:text-gray-500
+                placeholder:text-sm
+                placeholder:font-bold
               "
         value={inputValue}
         onChange={handleInputChange}

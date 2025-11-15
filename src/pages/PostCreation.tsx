@@ -8,7 +8,14 @@ import CustomInput from "@/components/Custom/CustomInput";
 import CustomDropdown from "@/components/Custom/CustomDropdown";
 import { Formik, Form } from "formik";
 import AutocompleteSingleSelect from "@/components/Custom/AutocompleteSingleSelect";
-
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 const PostCreation = () => {
   const { token, userId } = useUserStore.getState();
 
@@ -18,11 +25,12 @@ const PostCreation = () => {
   }
 
   const navigate = useNavigate();
-  const [image, setImage] = useState<File | null>(null);
+  const [images, setImages] = useState<File[]>([]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setImages((prevImages) => [...prevImages, ...newFiles]);
     }
   };
 
@@ -56,12 +64,12 @@ const PostCreation = () => {
           challenge: "",
         }}
         onSubmit={(values) => {
-          if (!image) {
+          if (!images) {
             CustomToast("لطفا تصویر را بارگذاری کنید", "error");
             return;
           }
 
-          console.log("Form submitted:", { ...values, image });
+          console.log("Form submitted:", { ...values, image: images });
           CustomToast("پست با موفقیت ساخته شد!", "success");
         }}
       >
@@ -70,12 +78,24 @@ const PostCreation = () => {
             {/* Image preview + Upload */}
             <div className="flex flex-col items-center gap-2 mr-[24px] ml-[24px] mt-[20px]">
               <label className="w-full h-64 border-2 border-gray-400 rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden">
-                {image ? (
-                  <img
-                    src={URL.createObjectURL(image)}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
+                {images.length > 0 ? (
+                  <Carousel className="w-full h-full relative">
+                    <CarouselContent className="h-full">
+                      {images.map((img, index) => (
+                        <CarouselItem key={index} className="w-full h-full flex items-center justify-center">
+                            <img
+                              src={URL.createObjectURL(img)}
+                              alt={`Preview ${index}`}
+                              className="w-full h-full object-contain"
+                            />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+
+                    {/* Absolute buttons on the edges of the label */}
+                    <CarouselPrevious className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
+                    <CarouselNext className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
+                  </Carousel>
                 ) : (
                   <span className="text-neutral-gray font-bold text-center">
                     پیش‌نمایه
@@ -91,6 +111,7 @@ const PostCreation = () => {
                 <input
                   type="file"
                   accept="image/*"
+                  multiple
                   onChange={handleImageChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
