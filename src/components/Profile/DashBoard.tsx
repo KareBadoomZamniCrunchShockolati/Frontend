@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ProfileHeader from "./ProfileHeader/ProfileHeader";
+import HexagonComponent from "../Custom/Badge";
 import FollowBar from "./FollowBar";
 import { useParams } from "react-router-dom";
 import ProfileBody from "./ProfileBody";
@@ -13,8 +14,8 @@ const DashBoard = () => {
 
   return (
     <>
-      <ProfileHeader userId= {4} isOwner={true} />
-      <ProfileBody></ProfileBody>
+      <ProfileHeader userId={4} isOwner={true} />
+      <ProfileBody />
     </>
   );
 };

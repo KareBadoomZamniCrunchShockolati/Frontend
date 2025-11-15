@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import CustomButton from "../Custom/CustomButton";
+import type { ViewBtnProps } from "@/types/profile";
 
 // Assuming you have a followUser function to make the API call to follow a user
 const followUser = async (username: string) => {
@@ -13,12 +14,7 @@ const followUser = async (username: string) => {
   }
 };
 
-interface Props {
-  username: string;  // Add username to know which user to follow
-  isFollowing?: boolean;
-}
-
-const ViewButton = ({ isFollowing = false, username }: Props) => {
+const ViewButton = ({ isFollowing = false, username }: ViewBtnProps) => {
   const [isUserFollowing, setIsUserFollowing] = useState(isFollowing);
 
   const handleFollowClick = async () => {
@@ -39,22 +35,24 @@ const ViewButton = ({ isFollowing = false, username }: Props) => {
   };
 
   return (
-    <div className="flex justify-center mt-5">
+    <div className="px-2 mt-5 flex w-full justify-center">
       {isUserFollowing ? (
         <CustomButton
           backgroundColor="bg-red-500"
-          width="w-60"
+          width="w-full"
           onClick={handleUnfollowClick}
+          className="font-bold !text-white text-profile-title-size"
         >
           لغو دنبال
         </CustomButton>
       ) : (
         <CustomButton
-          backgroundColor="bg-secondry"
-          width="w-60"
+          backgroundColor="bg-primary"
+          width="w-full"
           onClick={handleFollowClick}
+          className="font-bold !text-white text-profile-title-size"
         >
-          بزن دنبالش
+          دنبال کن
         </CustomButton>
       )}
     </div>
