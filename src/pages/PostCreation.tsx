@@ -42,7 +42,13 @@ const PostCreation = () => {
     setImages((prev) => prev.filter((_, i) => i !== index));
     setImageURLs((prev) => prev.filter((_, i) => i !== index));
   };
-
+  const handleSubmit = (values: any) => {
+    if(images.length === 0) {
+      CustomToast("لطفا تصویر را بارگذاری کنید", "error");
+      return;
+    }
+    console.log("Post submitted:", values);
+  };
   const challenges = [
     { id: 1, name: "چالش روزی 8 لیوان آب خوردن" },
     { id: 2, name: "چالش پیاده‌روی هفتگی" },
@@ -72,15 +78,7 @@ const PostCreation = () => {
           description: "",
           challenge: "",
         }}
-        onSubmit={(values) => {
-          if (!images) {
-            CustomToast("لطفا تصویر را بارگذاری کنید", "error");
-            return;
-          }
-
-          console.log("Form submitted:", { ...values, image: images });
-          CustomToast("پست با موفقیت ساخته شد!", "success");
-        }}
+        onSubmit={handleSubmit}
       >
         {({ values, setFieldValue }) => (
           <Form>
@@ -109,8 +107,8 @@ const PostCreation = () => {
                     </CarouselContent>
 
                     {/* Absolute buttons on the edges of the label */}
-                    <CarouselPrevious className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
-                    <CarouselNext className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
+                    <CarouselPrevious type="button" className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
+                    <CarouselNext type="button" className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
                   </Carousel>
                 ) : (
                   <span className="text-neutral-gray font-bold text-center">
@@ -147,7 +145,6 @@ const PostCreation = () => {
                 isTextarea={true}
               />
             </div>
-
             {/* challenge selector */}
             <div className="mr-[24px] ml-[24px] mt-[12.5px]">
               <p className="text-right text-xl font-bold mb-2">
@@ -167,6 +164,7 @@ const PostCreation = () => {
             {/* Submit Button */}
             <div className="mt-10 mr-[24px] ml-[24px]">
               <CustomButton
+                type="submit"
                 width="w-full"
                 backgroundColor="bg-secondary"
                 height="h-[46.6px]"

@@ -12,6 +12,7 @@ interface Props {
   onClick?: () => void;
   className?: string;
   height?: string;
+  type?: "button" | "submit" | "reset";
 }
 
 const CustomButton = ({
@@ -22,6 +23,7 @@ const CustomButton = ({
   className= "",
   onClick,
   height = "h-[40px]",
+  type = "button"
 }: Props) => {
   const navigate = useNavigate();
   const handleClick = () => {
@@ -36,6 +38,7 @@ const CustomButton = ({
   };
   return (
     <Button
+      {...(type ? { type } : {})}
       onClick={handleClick}
       className={`${width} hover:${backgroundColor} sm:text-sm md:text-base cursor-pointer ${height} sm:h-10 rounded-[12.5px] text-white font-bold ${backgroundColor} active:shadow-none active:translate-y-[3px] shadow-[0_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-25 border-2 border-black ${className} `}
     >
