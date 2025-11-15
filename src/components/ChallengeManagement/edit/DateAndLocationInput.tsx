@@ -3,13 +3,9 @@ import React from "react";
 import CustomInput from "@/components/Custom/CustomInput";
 import { Field, Formik } from "formik";
 import CustomButton from "@/components/Custom/CustomButton";
+import type { DateAndLocationInputProps } from "@/types/challengeElementsTypes";
 
-interface DateAndLocationInputProps {
-  challengeDate: string;
-  challengeLocation: string;
-  onDateChange: (value: string) => void;
-  onLocationChange: (value: string) => void;
-}
+
 
 const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
   challengeDate,

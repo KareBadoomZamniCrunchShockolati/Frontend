@@ -2,12 +2,8 @@
 import React from "react";
 import { ThumbsUp, Bookmark } from "lucide-react";
 import CustomButton from "@/components/Custom/CustomButton";
+import type { LikeSaveButtonsProps } from "@/types/challengeElementsTypes";
 
-interface LikeSaveButtonsProps {
-  likeCount: number;
-  onLike: () => void;
-  onSave: () => void;
-}
 
 const LikeAndSaveButtons: React.FC<LikeSaveButtonsProps> = ({
   likeCount,

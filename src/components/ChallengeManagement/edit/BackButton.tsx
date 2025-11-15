@@ -1,10 +1,9 @@
 // src/components/Custom/BackButton.tsx
 import React from "react";
 import { ArrowLeft } from "lucide-react";
+import type { BackButtonProps } from "@/types/challengeElementsTypes";
 
-interface BackButtonProps {
-  onClick: () => void; // This is the click handler prop
-}
+
 
 const BackButton: React.FC<BackButtonProps> = ({ onClick }) => {
   return (

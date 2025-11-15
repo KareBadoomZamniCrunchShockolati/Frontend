@@ -1,10 +1,6 @@
 // components/ChallengeManagement/ChallengeDescription.tsx
 import React from "react";
-
-interface ChallengeDescriptionProps {
-  title: string;
-  description: string;
-}
+import type { ChallengeDescriptionProps } from "@/types/challengeElementsTypes";
 
 const TitleAndDescription: React.FC<ChallengeDescriptionProps> = ({
   title,

@@ -2,11 +2,8 @@
 
 import React from "react";
 import { Calendar, MapPin } from "lucide-react";
+import type { DateAndLocationProps } from "@/types/challengeElementsTypes";
 
-interface DateAndLocationProps {
-  dateRange: string;
-  location: string;
-}
 
 const DateAndLocation: React.FC<DateAndLocationProps> = ({ dateRange, location }) => {
   return (

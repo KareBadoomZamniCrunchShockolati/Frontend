@@ -2,13 +2,8 @@
 import React from "react";
 import { Field, Formik } from "formik";
 import CustomInput from "@/components/Custom/CustomInput";
+import type { ChallengeTitleAndDescriptionInputProps } from "@/types/challengeElementsTypes";
 
-interface ChallengeTitleAndDescriptionInputProps {
-  title: string;
-  description: string;
-  onTitleChange: (value: string) => void;
-  onDescriptionChange: (value: string) => void;
-}
 
 const TitleAndDescriptionInput: React.FC<
   ChallengeTitleAndDescriptionInputProps

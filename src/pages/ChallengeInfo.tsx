@@ -9,18 +9,9 @@ import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
 import UserCardList from "@/components/ChallengeManagement/public/UserCardsList";
 import ChallengeSlideshow from "@/components/ChallengeManagement/info/SlideShow";
 import { useNavigate, useLocation } from "react-router-dom";
+import type { UserProfile } from "@/types/userTypes";
 
 const ChallengeInfo: React.FC = () => {
-  interface User {
-    id: string;
-    username: string;
-    imagePath: string;
-    bio: string;
-    followersCount: number;
-    followingCount: number;
-    doneChallengesCount: number;
-  }
-
   const location = useLocation();
   const challenge = location.state?.challenge;
 
@@ -119,7 +110,7 @@ const ChallengeInfo: React.FC = () => {
   ];
 
   const [image] = useState(imageUrl);
-  const [users, setUsers] = useState<User[]>(participants || mockUsers);
+  const [users, setUsers] = useState<UserProfile[]>(participants || mockUsers);
   const [challengeTitle] = useState(title);
   const [challengeDescription] = useState(description);
   const [searchTerm, setSearchTerm] = useState("");

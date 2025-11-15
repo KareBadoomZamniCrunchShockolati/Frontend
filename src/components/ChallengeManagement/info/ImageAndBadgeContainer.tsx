@@ -1,14 +1,11 @@
 // src/components/Custom/ImageContainerWithShadow.tsx
 import React from "react";
-import {
-    Hexagon
-  } from "lucide-react";
+import { Hexagon } from "lucide-react";
+import type { ImageContainerWithShadowProps } from "@/types/challengeElementsTypes";
 
-interface ImageContainerWithShadowProps {
-  imageUrl: string;
-}
-
-const ImageAndBadgeContainer: React.FC<ImageContainerWithShadowProps> = ({ imageUrl }) => {
+const ImageAndBadgeContainer: React.FC<ImageContainerWithShadowProps> = ({
+  imageUrl,
+}) => {
   return (
     <div className="relative w-full max-w-xl mb-4">
       <img

@@ -2,19 +2,22 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import CustomButton from "@/components/Custom/CustomButton";
 import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
-import UserCardList from "@/components/ChallengeManagement/public/UserCardsList";
-import BackButton from "@/components/ChallengeManagement/edit/BackButton";
-import ImageAndBadgeContainerEdit from "@/components/ChallengeManagement/edit/ImageAndBadgeContainerEdit";
-import TitleAndDescriptionInput from "@/components/ChallengeManagement/edit/TitleAndDescriptionInput";
-import DateAndLocationInput from "@/components/ChallengeManagement/edit/DateAndLocationInput";
-import type { UserProfile } from "@/types/userTypes";
+
 
 const ChallengeEdit: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const challenge = location.state?.challenge;
 
-  
+  interface User {
+    id: string;
+    username: string;
+    imagePath: string;
+    bio: string;
+    followersCount: number;
+    followingCount: number;
+    doneChallengesCount: number;
+  }
 
   if (!challenge) {
     return <div>Challenge not found!</div>;
@@ -30,7 +33,7 @@ const ChallengeEdit: React.FC = () => {
   } = challenge;
 
   const [image, setImage] = useState(imageUrl);
-  const [users, setUsers] = useState<UserProfile[]>(participants);
+  const [users, setUsers] = useState<User[]>(participants);
   const [searchTerm, setSearchTerm] = useState("");
   const [challengeTitle, setChallengeTitle] = useState(title);
   const [challengeDescription, setChallengeDescription] = useState(description);
@@ -79,7 +82,7 @@ const ChallengeEdit: React.FC = () => {
   };
 
   const filteredUsers = users.filter(
-    (user: UserProfile) =>
+    (user: User) =>
       user.username &&
       user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );

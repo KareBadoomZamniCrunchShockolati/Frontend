@@ -1,10 +1,8 @@
 import React from "react";
 import { ArrowLeft, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import type { BackButtonAndMenuProps } from "@/types/challengeElementsTypes";
 
-interface BackButtonAndMenuProps {
-  onMenuClick?: () => void;
-}
 
 const BackButtonAndMenu: React.FC<BackButtonAndMenuProps> = ({ onMenuClick }) => {
   const navigate = useNavigate();

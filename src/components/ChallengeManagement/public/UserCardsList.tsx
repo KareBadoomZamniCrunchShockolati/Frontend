@@ -2,17 +2,9 @@
 
 import React from "react";
 import UserCard from "@/components/Custom/UserCard";
+import type { UserCardListProps } from "@/types/userCardListType";
 
-interface UserCardListProps {
-  users: Array<{
-    id: string;
-    username: string;
-    imagePath: string;
-    bio: string;
-  }>;
-  onDelete: (id: string, username: string) => void;
-  isOwner: boolean;
-}
+
 
 const UserCardList: React.FC<UserCardListProps> = ({
   users,

@@ -3,18 +3,8 @@
 import React from "react";
 import CustomButton from "@/components/Custom/CustomButton";
 import ChallengeCard from "@/components/Custom/ChallangeCard";
+import type { ChallengeSlideshowProps } from "@/types/challengeElementsTypes";
 
-interface ChallengeSlideshowProps {
-  currentChallengeIndex: number;
-  mockChallenges: {
-    id: string;
-    title: string;
-    description: string;
-    imageUrl: string;
-  }[];
-  nextSlide: () => void;
-  prevSlide: () => void;
-}
 
 const ChallengeSlideshow: React.FC<ChallengeSlideshowProps> = ({
   currentChallengeIndex,

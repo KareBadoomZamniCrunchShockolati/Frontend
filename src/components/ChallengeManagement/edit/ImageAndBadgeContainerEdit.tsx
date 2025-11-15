@@ -2,11 +2,9 @@
 import React from "react";
 import { Hexagon } from "lucide-react";
 import CustomButton from "@/components/Custom/CustomButton";
+import type { ChallengeImageProps } from "@/types/challengeElementsTypes";
 
-interface ChallengeImageProps {
-  imageUrl: string;
-  onImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}
+
 
 const ImageAndBadgeContainerEdit: React.FC<ChallengeImageProps> = ({
   imageUrl,
