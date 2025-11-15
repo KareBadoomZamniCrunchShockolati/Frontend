@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import CustomButton from "@/components/Custom/CustomButton";
 import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
@@ -12,7 +12,6 @@ const ChallengeEdit: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const challenge = location.state?.challenge;
-  
 
   interface User {
     id: string;
@@ -23,7 +22,6 @@ const ChallengeEdit: React.FC = () => {
     followingCount: number;
     doneChallengesCount: number;
   }
-  
 
   if (!challenge) {
     return <div>Challenge not found!</div>;
@@ -37,14 +35,15 @@ const ChallengeEdit: React.FC = () => {
     location: challengeLocation,
     participants,
   } = challenge;
-  
+
   const [image, setImage] = useState(imageUrl);
   const [users, setUsers] = useState<User[]>(participants);
   const [searchTerm, setSearchTerm] = useState("");
   const [challengeTitle, setChallengeTitle] = useState(title);
   const [challengeDescription, setChallengeDescription] = useState(description);
-  const [challengeDate, setChallengeDate] = useState(dateRange); 
-  const [challengeLocationState, setChallengeLocation] = useState(challengeLocation); 
+  const [challengeDate, setChallengeDate] = useState(dateRange);
+  const [challengeLocationState, setChallengeLocation] =
+    useState(challengeLocation);
 
   const handleDelete = (id: string, username: string) => {
     setUsers(users.filter((user) => user.id !== id));
@@ -86,33 +85,34 @@ const ChallengeEdit: React.FC = () => {
     }
   };
 
-  const filteredUsers = users.filter((user: User) =>
-  user.username && user.username.toLowerCase().includes(searchTerm.toLowerCase())
-);
-
+  const filteredUsers = users.filter(
+    (user: User) =>
+      user.username &&
+      user.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleFinishEditing = () => {
     // Save the updated challenge info and navigate back to the info page
     const updatedChallenge = {
       title: challengeTitle,
       description: challengeDescription,
-      date: challengeDate,
+      dateRange: challengeDate,
       location: challengeLocationState,
-      image: image,
-      participants: participants,
+      Img: image,
+      participants: users,
     };
 
     // You can use navigate with state to pass updated challenge back to the info page
     navigate("/challenge", {
-      state: {challenge : updatedChallenge}, // Passing updated challenge as state
+      state: { challenge: updatedChallenge }, // Passing updated challenge as state
     });
   };
 
   return (
     <div className="min-h-screen flex flex-col p-4">
       <div className="flex-1 flex flex-col justify-start items-center w-full">
-      <div className="flex justify-between w-full items-center max-w-xl">
-        <BackButton onClick={handleBack} />
+        <div className="flex justify-between w-full items-center max-w-xl">
+          <BackButton onClick={handleBack} />
         </div>
 
         {/* Image and Badge Section */}
@@ -143,7 +143,9 @@ const ChallengeEdit: React.FC = () => {
 
         {/* Title Above Search Bar (Participated Users) */}
         <div className="text-right mb-1 mt-6 max-w-2xl w-full" dir="rtl">
-          <h2 className="text-xl font-semibold text-black mb-4">شرکت کنندگان</h2>
+          <h2 className="text-xl font-semibold text-black mb-4">
+            شرکت کنندگان
+          </h2>
         </div>
 
         {/* Search Bar */}

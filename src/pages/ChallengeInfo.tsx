@@ -8,11 +8,43 @@ import DateAndLocation from "@/components/ChallengeManagement/info/DateAndLocati
 import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
 import UserCardList from "@/components/ChallengeManagement/public/UserCardsList";
 import ChallengeSlideshow from "@/components/ChallengeManagement/info/SlideShow";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate, useLocation } from "react-router-dom";
 
-const ChallengeManagementPage: React.FC = () => {
-  const imageUrl =
-    "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
+const ChallengeInfo: React.FC = () => {
+  interface User {
+    id: string;
+    username: string;
+    imagePath: string;
+    bio: string;
+    followersCount: number;
+    followingCount: number;
+    doneChallengesCount: number;
+  }
+
+  const location = useLocation();
+  const challenge = location.state?.challenge;
+
+  // Default values for when challenge is not found
+  const defaultChallenge = {
+    Img: "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg",
+    title: "عنوان چالش",
+    description:
+      "این چالش برای آزمایش استقامت و مهارت‌های حل مسئله شما طراحی شده است. سفر شامل پیمودن زمین‌های سخت و غلبه بر موانع مختلف است. آیا آماده‌اید تا این ماجراجویی را شروع کنید و مرزهای خود را بسنجید؟",
+    dateRange: "از 28 اردیبهشت تا 8 شهریور - سه روز در هفته",
+    location: "قله کوه اورست",
+    participants: null,
+  };
+
+  const {
+    Img,
+    title,
+    description,
+    dateRange,
+    location: challengeLocation,
+    participants,
+  } = challenge || defaultChallenge; // Use default values if challenge is not found
+
+  const imageUrl = Img;
 
   const mockUsers = [
     {
@@ -86,10 +118,15 @@ const ChallengeManagementPage: React.FC = () => {
     },
   ];
 
-  const [users, setUsers] = useState(mockUsers);
+  const [image] = useState(imageUrl);
+  const [users, setUsers] = useState<User[]>(participants || mockUsers);
+  const [challengeTitle] = useState(title);
+  const [challengeDescription] = useState(description);
   const [searchTerm, setSearchTerm] = useState("");
-  const [likeCount, setLikeCount] = useState(10); // State to track likes
-  const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0); // Slideshow state
+  const [likeCount, setLikeCount] = useState(10);
+  const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
+  const [challengeDate] = useState(dateRange);
+  const [challengeLocationState] = useState(challengeLocation);
 
   // Initialize navigate
   const navigate = useNavigate();
@@ -101,17 +138,16 @@ const ChallengeManagementPage: React.FC = () => {
 
   const handleMenu = () => {
     const challengeData = {
-      imageUrl: imageUrl,
-      title: "عنوان چالش",
-      description:
-        "این چالش برای آزمایش استقامت و مهارت‌های حل مسئله شما طراحی شده است. سفر شامل پیمودن زمین‌های سخت و غلبه بر موانع مختلف است. آیا آماده‌اید تا این ماجراجویی را شروع کنید و مرزهای خود را بسنجید؟",
-      dateRange: "از 28 اردیبهشت تا 8 شهریور - سه روز در هفته",
-      location: "قله کوه اورست",
-      participants: filteredUsers,
+      imageUrl: image,
+      title: challengeTitle,
+      description: challengeDescription,
+      dateRange: challengeDate,
+      location: challengeLocationState,
+      participants: mockUsers,
     };
 
     navigate("/editChallenge", {
-      state: { challenge: challengeData }, // Pass the challenge data as state
+      state: { challenge: challengeData },
     });
   };
 
@@ -138,7 +174,7 @@ const ChallengeManagementPage: React.FC = () => {
   };
 
   const handleLike = () => {
-    setLikeCount(likeCount === 10 ? 11 : 10); // Toggle between 1 and 0
+    setLikeCount(likeCount === 10 ? 11 : 10);
   };
 
   const handleSave = () => {
@@ -150,7 +186,7 @@ const ChallengeManagementPage: React.FC = () => {
       <div className="flex-1 flex flex-col justify-center items-center">
         <BackButtonAndMenu onMenuClick={handleMenu} />
 
-        <ImageAndBadgeContainer imageUrl={imageUrl} />
+        <ImageAndBadgeContainer imageUrl={image} />
 
         <LikeAndSaveButtons
           onLike={handleLike}
@@ -159,20 +195,19 @@ const ChallengeManagementPage: React.FC = () => {
         />
 
         <TitleAndDescription
-          title="عنوان چالش"
-          description="این چالش برای آزمایش استقامت و مهارت‌های حل مسئله شما طراحی شده است. سفر شامل پیمودن زمین‌های سخت و غلبه بر موانع مختلف است. آیا آماده‌اید تا این ماجراجویی را شروع کنید و مرزهای خود را بسنجید؟"
+          title={challengeTitle}
+          description={challengeDescription}
         />
 
         <DateAndLocation
-          dateRange="از 28 اردیبهشت تا 8 شهریور - سه روز در هفته"
-          location="قله کوه اورست"
+          dateRange={challengeDate}
+          location={challengeLocation}
         />
 
         <CustomButton className="w-full sm:w-full md:w-full max-w-xl bg-primary rounded-[8px] p-5 text-lg sm:text-lg md:text-lg hover:bg-primary">
           پیوستن
         </CustomButton>
 
-        {/* Title Above Search Bar (Participated Users) */}
         <div className="text-right mb-1 mt-6 max-w-2xl w-full" dir="rtl">
           <h2 className="text-xl font-semibold text-black mb-4">
             شرکت کنندگان
@@ -209,4 +244,4 @@ const ChallengeManagementPage: React.FC = () => {
   );
 };
 
-export default ChallengeManagementPage;
+export default ChallengeInfo;
