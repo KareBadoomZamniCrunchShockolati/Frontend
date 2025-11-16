@@ -16,13 +16,15 @@ export interface UserCardListProps {
   users: User[];
   searchTerm: string;
   onAddUser: (user: User) => void;
-  onDelete?: (id: string, username: string) => void;   // not used here
+  onDelete?: (id: string, username: string) => void;
+  disabled?: boolean; // NEW: disables all add buttons
 }
 
 const UserCardListToAdd: React.FC<UserCardListProps> = ({
   users,
   searchTerm,
   onAddUser,
+  disabled = false, // default to false
 }) => {
   const filtered = users.filter(
     (u) =>
@@ -40,7 +42,7 @@ const UserCardListToAdd: React.FC<UserCardListProps> = ({
         }}
       >
         {filtered.length === 0 ? (
-          <p className="text-center text-gray-500 py-4">کاربری یافت نشد</p>
+          <p className="text-center text-primary py-4">کاربری یافت نشد</p>
         ) : (
           filtered.map((user) => (
             <UserCardWithAddButton
@@ -52,10 +54,11 @@ const UserCardListToAdd: React.FC<UserCardListProps> = ({
               followersCount={user.followersCount ?? 0}
               followingCount={user.followingCount ?? 0}
               doneChallengesCount={user.doneChallengesCount ?? 0}
-              onDelete={() => {}}               // placeholder
+              onDelete={() => {}} // placeholder
               isOwner={true}
               className="w-full"
-              onAdd={() => onAddUser(user)}     // NEW
+              onAdd={() => onAddUser(user)}
+              disabled={disabled} // PASS DISABLED STATE
             />
           ))
         )}

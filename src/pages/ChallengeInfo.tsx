@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+/*  ChallengeInfo.tsx  */
+import React, { useState, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import CustomButton from "@/components/Custom/CustomButton";
 import BackButtonAndMenu from "@/components/ChallengeManagement/info/BackButtonAndMenu";
 import ImageAndBadgeContainer from "@/components/ChallengeManagement/info/ImageAndBadgeContainer";
@@ -8,23 +10,134 @@ import DateAndLocation from "@/components/ChallengeManagement/info/DateAndLocati
 import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
 import UserCardList from "@/components/ChallengeManagement/public/UserCardsList";
 import ChallengeSlideshow from "@/components/ChallengeManagement/info/SlideShow";
-import { useNavigate, useLocation } from "react-router-dom";
 import type { UserProfile } from "@/types/userTypes";
 
+/* --------------------------------------------------------------
+   Default image (fallback when no image is provided)
+   -------------------------------------------------------------- */
+const DEFAULT_CHALLENGE_IMG =
+  "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
+
+/* --------------------------------------------------------------
+   Types – keep in sync with ChallengeCreate.tsx
+   -------------------------------------------------------------- */
+interface ChallengePayload {
+  Img: string | null;
+  title: string;
+  description: string;
+  dateRange: string;
+  location: string;
+  commentsEnabled: boolean;
+  categories: string[];
+  type: string;
+  memberCount: string;
+  members: UserProfile[];
+}
+
+/* --------------------------------------------------------------
+   Default fallback challenge
+   -------------------------------------------------------------- */
+const defaultChallenge: ChallengePayload = {
+  Img: DEFAULT_CHALLENGE_IMG,
+  title: "عنوان چالش",
+  description:
+    "این چالش برای آزمایش استقامت و مهارت‌های حل مسئله شما طراحی شده است. سفر شامل پیمودن زمین‌های سخت و غلبه بر موانع مختلف است. آیا آماده‌اید تا این ماجراجویی را شروع کنید و مرزهای خود را بسنجید؟",
+  dateRange: "از 28 اردیبهشت تا 8 شهریور - سه روز در هفته",
+  location: "قله کوه اورست",
+  commentsEnabled: false,
+  categories: [],
+  type: "عمومی",
+  memberCount: "0",
+  members: [],
+};
+
+/* --------------------------------------------------------------
+   Mock members (fallback when no real users)
+   -------------------------------------------------------------- */
+const mockMembers: UserProfile[] = [
+  {
+    id: "1",
+    username: "Alice",
+    imagePath: "https://randomuser.me/api/portraits/women/1.jpg",
+    bio: "Passionate about climbing and adventure.",
+    followersCount: 120,
+    followingCount: 80,
+    doneChallengesCount: 5,
+  },
+  {
+    id: "4",
+    username: "Damon",
+    imagePath: "https://randomuser.me/api/portraits/men/3.jpg",
+    bio: "Passionate about climbing and adventure.",
+    followersCount: 120,
+    followingCount: 80,
+    doneChallengesCount: 5,
+  },
+  {
+    id: "5",
+    username: "ching chang chong",
+    imagePath: "https://randomuser.me/api/portraits/women/2.jpg",
+    bio: "Passionate about climbing and adventure.",
+    followersCount: 120,
+    followingCount: 80,
+    doneChallengesCount: 5,
+  },
+  {
+    id: "2",
+    username: "Bob",
+    imagePath: "https://randomuser.me/api/portraits/men/1.jpg",
+    bio: "Love hiking and nature.",
+    followersCount: 150,
+    followingCount: 100,
+    doneChallengesCount: 7,
+  },
+  {
+    id: "3",
+    username: "Charlie",
+    imagePath: "https://randomuser.me/api/portraits/men/2.jpg",
+    bio: "Fitness enthusiast and challenge seeker.",
+    followersCount: 180,
+    followingCount: 90,
+    doneChallengesCount: 6,
+  },
+];
+
+/* --------------------------------------------------------------
+   Related challenges (slideshow)
+   -------------------------------------------------------------- */
+const mockChallenges = [
+  {
+    id: "1",
+    title: "Mountain Climb Challenge",
+    description: "Climb a mountain in under 12 hours.",
+    imageUrl:
+      "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg",
+  },
+  {
+    id: "2",
+    title: "Desert Trek Challenge",
+    description: "Complete a 30km desert trek in a single day.",
+    imageUrl:
+      "https://www.travelandleisure.com/thmb/Desert-Dunes_Fancyview_gettyimages-1216349476-f180b973c62f4b74b10b87bb736d9e9d.jpg",
+  },
+  {
+    id: "3",
+    title: "Ocean Swim Challenge",
+    description: "Swim across an open water stretch of 2km.",
+    imageUrl:
+      "https://www.adventure-life.com/sites/default/files/styles/hero_mobile/public/hero_images/hero-the-coastline-of-new-zealand.jpg?itok=V6n33P__",
+  },
+];
+
+/* --------------------------------------------------------------
+   Component
+   -------------------------------------------------------------- */
 const ChallengeInfo: React.FC = () => {
   const location = useLocation();
-  const challenge = location.state?.challenge;
+  const navigate = useNavigate();
 
-  // Default values for when challenge is not found
-  const defaultChallenge = {
-    Img: "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg",
-    title: "عنوان چالش",
-    description:
-      "این چالش برای آزمایش استقامت و مهارت‌های حل مسئله شما طراحی شده است. سفر شامل پیمودن زمین‌های سخت و غلبه بر موانع مختلف است. آیا آماده‌اید تا این ماجراجویی را شروع کنید و مرزهای خود را بسنجید؟",
-    dateRange: "از 28 اردیبهشت تا 8 شهریور - سه روز در هفته",
-    location: "قله کوه اورست",
-    participants: null,
-  };
+  /* ----- 1. Extract payload ----- */
+  const payload: ChallengePayload = (location.state?.challenge as ChallengePayload) ?? defaultChallenge;
 
   const {
     Img,
@@ -32,204 +145,116 @@ const ChallengeInfo: React.FC = () => {
     description,
     dateRange,
     location: challengeLocation,
-    participants,
-  } = challenge || defaultChallenge; // Use default values if challenge is not found
+    memberCount,
+    members: incomingMembers,
+  } = payload;
 
-  const imageUrl = Img;
+  /* ----- 2. Safe image URL (fallback to default) ----- */
+  const safeImageUrl = Img && Img.trim() !== "" ? Img : DEFAULT_CHALLENGE_IMG;
 
-  const mockUsers = [
-    {
-      id: "1",
-      username: "Alice",
-      imagePath: "https://randomuser.me/api/portraits/women/1.jpg",
-      bio: "Passionate about climbing and adventure.",
-      followersCount: 120,
-      followingCount: 80,
-      doneChallengesCount: 5,
-    },
-    {
-      id: "4",
-      username: "Damon",
-      imagePath: "https://randomuser.me/api/portraits/men/3.jpg",
-      bio: "Passionate about climbing and adventure.",
-      followersCount: 120,
-      followingCount: 80,
-      doneChallengesCount: 5,
-    },
-    {
-      id: "5",
-      username: "ching chang chong",
-      imagePath: "https://randomuser.me/api/portraits/women/2.jpg",
-      bio: "Passionate about climbing and adventure.",
-      followersCount: 120,
-      followingCount: 80,
-      doneChallengesCount: 5,
-    },
-    {
-      id: "2",
-      username: "Bob",
-      imagePath: "https://randomuser.me/api/portraits/men/1.jpg",
-      bio: "Love hiking and nature.",
-      followersCount: 150,
-      followingCount: 100,
-      doneChallengesCount: 7,
-    },
-    {
-      id: "3",
-      username: "Charlie",
-      imagePath: "https://randomuser.me/api/portraits/men/2.jpg",
-      bio: "Fitness enthusiast and challenge seeker.",
-      followersCount: 180,
-      followingCount: 90,
-      doneChallengesCount: 6,
-    },
-  ];
+  /* ----- 3. Participants (real or mock) ----- */
+  const participants = incomingMembers.length > 0 ? incomingMembers : mockMembers;
 
-  const mockChallenges = [
-    {
-      id: "1",
-      title: "Mountain Climb Challenge",
-      description: "Climb a mountain in under 12 hours.",
-      imageUrl:
-        "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg",
-    },
-    {
-      id: "2",
-      title: "Desert Trek Challenge",
-      description: "Complete a 30km desert trek in a single day.",
-      imageUrl:
-        "https://www.travelandleisure.com/thmb/Desert-Dunes_Fancyview_gettyimages-1216349476-f180b973c62f4b74b10b87bb736d9e9d.jpg",
-    },
-    {
-      id: "3",
-      title: "Ocean Swim Challenge",
-      description: "Swim across an open water stretch of 2km.",
-      imageUrl:
-        "https://www.adventure-life.com/sites/default/files/styles/hero_mobile/public/hero_images/hero-the-coastline-of-new-zealand.jpg?itok=V6n33P__",
-    },
-  ];
-
-  const [image] = useState(imageUrl);
-  const [users, setUsers] = useState<UserProfile[]>(participants || mockUsers);
-  const [challengeTitle] = useState(title);
-  const [challengeDescription] = useState(description);
+  /* ----- 4. UI state ----- */
   const [searchTerm, setSearchTerm] = useState("");
   const [likeCount, setLikeCount] = useState(10);
-  const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
-  const [challengeDate] = useState(dateRange);
-  const [challengeLocationState] = useState(challengeLocation);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Initialize navigate
-  const navigate = useNavigate();
+  /* ----- 5. Filtered users ----- */
+  const filteredUsers = useMemo(() => {
+    return participants.filter((u) =>
+      u.username.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [participants, searchTerm]);
 
+  /* ----- 6. Handlers ----- */
   const handleDelete = (id: string, username: string) => {
-    setUsers(users.filter((user) => user.id !== id));
-    console.log(`${username} has been removed.`);
+    console.log(`${username} (id:${id}) removed`);
   };
 
   const handleMenu = () => {
-    const challengeData = {
-      imageUrl: image,
-      title: challengeTitle,
-      description: challengeDescription,
-      dateRange: challengeDate,
-      location: challengeLocationState,
-      participants: mockUsers,
+    const editPayload = {
+      imageUrl: safeImageUrl,
+      title,
+      description,
+      dateRange,
+      location: challengeLocation,
+      participants,
     };
-
-    navigate("/editChallenge", {
-      state: { challenge: challengeData },
-    });
+    navigate("/editChallenge", { state: { challenge: editPayload } });
   };
 
-  const handleSearchTermChange = (value: string) => {
-    setSearchTerm(value);
-  };
+  const handleLike = () => setLikeCount((c) => (c === 10 ? 11 : 10));
+  const handleSave = () => console.log("Challenge saved!");
 
-  const filteredUsers = users.filter((user) =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const nextSlide = () => setCurrentSlide((i) => (i + 1) % mockChallenges.length);
+  const prevSlide = () =>
+    setCurrentSlide((i) => (i - 1 + mockChallenges.length) % mockChallenges.length);
 
-  // Slideshow navigation
-  const nextSlide = () => {
-    setCurrentChallengeIndex(
-      (prevIndex) => (prevIndex + 1) % mockChallenges.length
-    );
-  };
-
-  const prevSlide = () => {
-    setCurrentChallengeIndex(
-      (prevIndex) =>
-        (prevIndex - 1 + mockChallenges.length) % mockChallenges.length
-    );
-  };
-
-  const handleLike = () => {
-    setLikeCount(likeCount === 10 ? 11 : 10);
-  };
-
-  const handleSave = () => {
-    console.log("Saved!");
-  };
-
+  /* ----- 7. Render ----- */
   return (
     <div className="min-h-screen flex flex-col justify-between p-4">
-      <div className="flex-1 flex flex-col justify-center items-center">
+      <div className="flex-1 flex flex-col items-center">
+        {/* Back + Menu */}
         <BackButtonAndMenu onMenuClick={handleMenu} />
 
-        <ImageAndBadgeContainer imageUrl={image} />
+        {/* Main image – always has a valid URL */}
+        <ImageAndBadgeContainer imageUrl={safeImageUrl} />
 
+        {/* Like / Save */}
         <LikeAndSaveButtons
           onLike={handleLike}
           onSave={handleSave}
           likeCount={likeCount}
         />
 
-        <TitleAndDescription
-          title={challengeTitle}
-          description={challengeDescription}
-        />
+        {/* Title + description */}
+        <TitleAndDescription title={title} description={description} />
 
-        <DateAndLocation
-          dateRange={challengeDate}
-          location={challengeLocation}
-        />
+        {/* Date & location */}
+        <DateAndLocation dateRange={dateRange} location={challengeLocation} />
 
-        <CustomButton className="w-full sm:w-full md:w-full max-w-xl bg-primary rounded-[8px] p-5 text-lg sm:text-lg md:text-lg hover:bg-primary">
+        {/* Join button */}
+        <CustomButton className="mt-6 w-full max-w-xl bg-primary rounded-[8px] p-5 text-lg hover:bg-primary">
           پیوستن
         </CustomButton>
 
-        <div className="text-right mb-1 mt-6 max-w-2xl w-full" dir="rtl">
-          <h2 className="text-xl font-semibold text-black mb-4">
-            شرکت کنندگان
+        {/* ---------- Participants section ---------- */}
+        <div className="w-full max-w-2xl mt-8" dir="rtl">
+          <h2 className="text-xl font-semibold mb-4">
+            شرکت‌کنندگان 
           </h2>
+
+          <SearchBar
+            searchTerm={searchTerm}
+            onSearchTermChange={setSearchTerm}
+          />
+
+          <UserCardList
+            users={filteredUsers}
+            onDelete={handleDelete}
+            isOwner={false}
+          />
         </div>
 
-        <SearchBar searchTerm="" onSearchTermChange={handleSearchTermChange} />
-
-        <UserCardList
-          users={filteredUsers}
-          onDelete={handleDelete}
-          isOwner={false}
-        />
-
-        <div className="text-right mt-6 max-w-2xl w-full" dir="rtl">
-          <h2 className="text-xl font-semibold text-black mb-4 flex items-center">
+        {/* ---------- Related challenges ---------- */}
+        <div className="w-full max-w-2xl mt-10" dir="rtl">
+          <h2 className="text-xl font-semibold mb-4 flex items-center">
             <img
-              src="src/assets/Img/staircase.jpg"
+              src="/src/assets/Img/staircase.jpg"
               alt="Staircase"
               className="w-8 h-8 ml-2"
             />
-            <span className="mr-2">چالش های مرتبط</span>
+            چالش‌های مرتبط
           </h2>
-        </div>
 
-        <ChallengeSlideshow
-          currentChallengeIndex={currentChallengeIndex}
-          mockChallenges={mockChallenges}
-          nextSlide={nextSlide}
-          prevSlide={prevSlide}
-        />
+          <ChallengeSlideshow
+            currentChallengeIndex={currentSlide}
+            mockChallenges={mockChallenges}
+            nextSlide={nextSlide}
+            prevSlide={prevSlide}
+          />
+        </div>
       </div>
     </div>
   );
