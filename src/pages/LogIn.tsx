@@ -13,14 +13,39 @@ import { Checkbox } from "@radix-ui/react-checkbox";
 import { Link } from "react-router-dom";
 
 export default function Login() {
+  const {setUsername,setToken,setUserId} = useUserStore();
   const [showPassword, setShowPassword] = useState(true);
-
+  
   const onSubmit = async (
-    values: FormValues,
+    values: LoginPayload,
     actions: FormikHelpers<FormValues>
   ): Promise<void> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Form submitted!");
+    try {
+      // Optional loading delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // ✅ Call the login service
+      const response = await loginService(values);
+
+      // ✅ Example: assuming your backend returns { token, user }
+      if (response?.token) {
+        // localStorage.setItem("token", response.token); // interceptor will use it
+        setToken(response.token);
+        setUsername(response.user.username);
+        setUserId(response.user.id);
+      }
+
+      console.log("Login success:", response);
+
+      // You could redirect or show a toast here
+      // e.g., navigate("/dashboard");
+    } catch (error: any) {
+      console.error("Login failed:", error);
+      // alert(error?.response?.data?.message || "Login failed");
+      CustomToast("Login failed","error");
+    } finally {
+      actions.setSubmitting(false);
+    }
   };
 
   const bg = useMobile();

@@ -16,3 +16,10 @@ export  interface UserProfile {
     followingCount: number;
     doneChallengesCount: number;
   }
+  username: string;
+  setUsername: (username: string) => void;
+  token: string;
+  setToken: (token: string) => void;
+  userId: number;
+  setUserId: (id: number) => void;
+}

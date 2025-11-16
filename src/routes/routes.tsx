@@ -14,8 +14,6 @@ import Challenge from "@/pages/ChallengeInfo";
 import ChallengeEdit from "@/pages/ChallengeEdit";
 import ChallengeCreate from "@/pages/ChallengeCreate";
 
-// import { LogIn } from "lucide-react";
-
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -51,12 +49,12 @@ export const router = createBrowserRouter([
     element: <PrivateLayout />,
     children: [
       {
-        path: "/dashboard/:id", // Dynamic route for user profile
+        path: "/dashboard/:userId",  // Dynamic route for user profile
         element: <DashBoard />,
       },
       {
-        path: "/follow", // Updated route for Follower/Following page
-        element: <FollowerFollowing />,
+        path: "/follow/:userId",  // Route to the FollowBar or FollowerFollowing page
+        element: <FollowerFollowing />,  // Follower/Following page
       },
       {
         path: "/editChallenge",
