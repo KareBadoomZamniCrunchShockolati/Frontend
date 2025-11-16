@@ -10,30 +10,8 @@ import CustomInput from "@/components/Custom/CustomInput";
 import CustomCheckbox from "@/components/Custom/CustomCheckbox";
 import CustomSelect from "@/components/ChallengeManagement/create/CustomDropList";
 import UserCardListToAdd from "@/components/ChallengeManagement/create/UserCardListToAdd";
-
-// Define types
-interface User {
-  id: string;
-  username: string;
-  imagePath: string;
-  bio: string;
-  followersCount: number;
-  followingCount: number;
-  doneChallengesCount: number;
-}
-
-interface ChallengeData {
-  title: string;
-  description: string;
-  dateRange: string;
-  location: string;
-  Img: string | null;
-  commentsEnabled: boolean;
-  categories: string[];
-  type: string;
-  memberCount: string;
-  members: User[];
-}
+import type { UserProfile } from "@/types/userTypes";
+import type { ChallengeData } from "@/types/challengeElementsTypes";
 
 const ChallengeCreate: React.FC = () => {
   const navigate = useNavigate();
@@ -50,11 +28,11 @@ const ChallengeCreate: React.FC = () => {
 
   // Step 3 – users
   const [userSearch, setUserSearch] = useState("");
-  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<UserProfile[]>([]);
   const [memberLimitError, setMemberLimitError] = useState(false); // NEW: error when limit exceeded
 
   // Mock data
-  const mockUsers: User[] = [
+  const mockUsers: UserProfile[] = [
     {
       id: "1",
       username: "Alice",
@@ -167,7 +145,7 @@ const ChallengeCreate: React.FC = () => {
   };
 
   // Add user (with limit check)
-  const addUser = (user: User, memberCount: string) => {
+  const addUser = (user: UserProfile, memberCount: string) => {
     const count = parseInt(memberCount) || 0;
 
     // Check if already selected
@@ -191,7 +169,7 @@ const ChallengeCreate: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col p-4 items-center">
-      <div className="flex justify-center items-center w-full max-w-xl mb-10 mt-4">
+      <div className="flex justify-center items-center w-full max-w-xl mt-4">
         <BackButtonWithSteps onClick={handleBack} />
         <div className="flex justify-end w-full">
           <span className="text-primary text-3xl font-bold">ساخت چالش</span>

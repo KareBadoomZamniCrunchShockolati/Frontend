@@ -33,7 +33,8 @@ const ChallengeEdit: React.FC = () => {
   const [challengeTitle, setChallengeTitle] = useState(title);
   const [challengeDescription, setChallengeDescription] = useState(description);
   const [challengeDate, setChallengeDate] = useState(dateRange);
-  const [challengeLocationState, setChallengeLocation] = useState(challengeLocation);
+  const [challengeLocationState, setChallengeLocation] =
+    useState(challengeLocation);
 
   const handleDelete = (id: string, username: string) => {
     setUsers(users.filter((user) => user.id !== id));
@@ -83,7 +84,7 @@ const ChallengeEdit: React.FC = () => {
 
   const handleFinishEditing = () => {
     const updatedChallenge = {
-      Img: image,                    // Must be `Img` to match ChallengeInfo
+      Img: image, // Must be `Img` to match ChallengeInfo
       title: challengeTitle,
       description: challengeDescription,
       dateRange: challengeDate,

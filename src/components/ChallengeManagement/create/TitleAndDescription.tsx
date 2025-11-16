@@ -15,7 +15,7 @@ const TitleAndDescription: React.FC<ChallengeTitleAndDescriptionInputProps> = ({
   return (
     <div
       className="space-y-6 text-right mb-6
-     mt-6 max-w-2xl w-full"
+      max-w-2xl w-full"
       dir="rtl"
     >
       {/* Title Field */}

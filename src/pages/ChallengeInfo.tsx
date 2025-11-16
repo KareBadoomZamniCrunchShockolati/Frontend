@@ -11,33 +11,19 @@ import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
 import UserCardList from "@/components/ChallengeManagement/public/UserCardsList";
 import ChallengeSlideshow from "@/components/ChallengeManagement/info/SlideShow";
 import type { UserProfile } from "@/types/userTypes";
+import type { ChallengeData } from "@/types/challengeElementsTypes";
 
-/* --------------------------------------------------------------
-   Default image (fallback when no image is provided)
-   -------------------------------------------------------------- */
 const DEFAULT_CHALLENGE_IMG =
   "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
 
 /* --------------------------------------------------------------
    Types – keep in sync with ChallengeCreate.tsx
    -------------------------------------------------------------- */
-interface ChallengePayload {
-  Img: string | null;
-  title: string;
-  description: string;
-  dateRange: string;
-  location: string;
-  commentsEnabled: boolean;
-  categories: string[];
-  type: string;
-  memberCount: string;
-  members: UserProfile[];
-}
 
 /* --------------------------------------------------------------
    Default fallback challenge
    -------------------------------------------------------------- */
-const defaultChallenge: ChallengePayload = {
+const defaultChallenge: ChallengeData = {
   Img: DEFAULT_CHALLENGE_IMG,
   title: "عنوان چالش",
   description:
@@ -137,7 +123,8 @@ const ChallengeInfo: React.FC = () => {
   const navigate = useNavigate();
 
   /* ----- 1. Extract payload ----- */
-  const payload: ChallengePayload = (location.state?.challenge as ChallengePayload) ?? defaultChallenge;
+  const payload: ChallengeData =
+    (location.state?.challenge as ChallengeData) ?? defaultChallenge;
 
   const {
     Img,
@@ -153,7 +140,8 @@ const ChallengeInfo: React.FC = () => {
   const safeImageUrl = Img && Img.trim() !== "" ? Img : DEFAULT_CHALLENGE_IMG;
 
   /* ----- 3. Participants (real or mock) ----- */
-  const participants = incomingMembers.length > 0 ? incomingMembers : mockMembers;
+  const participants =
+    incomingMembers.length > 0 ? incomingMembers : mockMembers;
 
   /* ----- 4. UI state ----- */
   const [searchTerm, setSearchTerm] = useState("");
@@ -187,9 +175,12 @@ const ChallengeInfo: React.FC = () => {
   const handleLike = () => setLikeCount((c) => (c === 10 ? 11 : 10));
   const handleSave = () => console.log("Challenge saved!");
 
-  const nextSlide = () => setCurrentSlide((i) => (i + 1) % mockChallenges.length);
+  const nextSlide = () =>
+    setCurrentSlide((i) => (i + 1) % mockChallenges.length);
   const prevSlide = () =>
-    setCurrentSlide((i) => (i - 1 + mockChallenges.length) % mockChallenges.length);
+    setCurrentSlide(
+      (i) => (i - 1 + mockChallenges.length) % mockChallenges.length
+    );
 
   /* ----- 7. Render ----- */
   return (
@@ -221,9 +212,7 @@ const ChallengeInfo: React.FC = () => {
 
         {/* ---------- Participants section ---------- */}
         <div className="w-full max-w-2xl mt-8" dir="rtl">
-          <h2 className="text-xl font-semibold mb-4">
-            شرکت‌کنندگان 
-          </h2>
+          <h2 className="text-xl font-semibold mb-4">شرکت‌کنندگان</h2>
 
           <SearchBar
             searchTerm={searchTerm}
