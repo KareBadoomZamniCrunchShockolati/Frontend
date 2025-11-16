@@ -14,15 +14,14 @@ const DashBoard: React.FC = () => {
 
   useEffect(() => {
     if (!userId) {
-      navigate("/login"); // ← اگر توکن یا userId نبود، برگرد به login
+      navigate("/");
     }
   }, [userId, navigate]);
 
   if (!userId) return <p>در حال بارگذاری...</p>;
 
-  console.log(viewedUserId)
-  console.log(userId)
-
+  console.log(viewedUserId);
+  console.log(userId);
 
   const profileId = viewedUserId || userId;
   const isOwner = profileId === userId;
