@@ -13,26 +13,28 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, onSearchTermChange })
   return (
     <Formik initialValues={{ searchTerm }} onSubmit={() => {}}>
       {({ values, handleChange, handleBlur }) => (
-        <Form className="flex justify-center w-full max-w-xl">
-          <Field
-            name="searchTerm"
-            render={({ field }: any) => (
-              <CustomInput
-                {...field}
-                icon={<Search />}
-                value={values.searchTerm}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  handleChange(e);
-                  onSearchTermChange(e.target.value);
-                }}
-                onBlur={handleBlur}
-                label="جستجو"
-                width="w-full"
-                className="rounded-[8px]"
-              />
-            )}
-          />
-        </Form>
+        <div className="w-full max-w-xl mx-auto">
+          <Form className="w-full">
+            <Field
+              name="searchTerm"
+              render={({ field }: any) => (
+                <CustomInput
+                  {...field}
+                  icon={<Search className="w-5 h-5 text-gray-500" />}
+                  value={values.searchTerm}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    handleChange(e);
+                    onSearchTermChange(e.target.value);
+                  }}
+                  onBlur={handleBlur}
+                  label='جست و جو'
+                  width="w-full"
+                  className="rounded-[8px]"
+                />
+              )}
+            />
+          </Form>
+        </div>
       )}
     </Formik>
   );

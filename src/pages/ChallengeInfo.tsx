@@ -16,9 +16,6 @@ import type { ChallengeData } from "@/types/challengeElementsTypes";
 const DEFAULT_CHALLENGE_IMG =
   "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
 
-/* --------------------------------------------------------------
-   Default fallback challenge
-   -------------------------------------------------------------- */
 const defaultChallenge: ChallengeData = {
   Img: DEFAULT_CHALLENGE_IMG,
   title: "عنوان چالش",
@@ -33,9 +30,6 @@ const defaultChallenge: ChallengeData = {
   members: [],
 };
 
-/* --------------------------------------------------------------
-   Mock members (fallback when no real users)
-   -------------------------------------------------------------- */
 const mockMembers: UserProfile[] = [
   {
     id: "1",
@@ -84,9 +78,6 @@ const mockMembers: UserProfile[] = [
   },
 ];
 
-/* --------------------------------------------------------------
-   Related challenges (slideshow)
-   -------------------------------------------------------------- */
 const mockChallenges = [
   {
     id: "1",
@@ -111,14 +102,10 @@ const mockChallenges = [
   },
 ];
 
-/* --------------------------------------------------------------
-   Component
-   -------------------------------------------------------------- */
 const ChallengeInfo: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  /* ----- 1. Extract payload ----- */
   const payload: ChallengeData =
     (location.state?.challenge as ChallengeData) ?? defaultChallenge;
 
@@ -131,26 +118,21 @@ const ChallengeInfo: React.FC = () => {
     members: incomingMembers = [],
   } = payload;
 
-  /* ----- 2. Safe image URL ----- */
   const safeImageUrl = Img && Img.trim() !== "" ? Img : DEFAULT_CHALLENGE_IMG;
 
-  /* ----- 3. Participants (real or mock) ----- */
   const participants =
     incomingMembers.length > 0 ? incomingMembers : mockMembers;
 
-  /* ----- 4. UI state ----- */
   const [searchTerm, setSearchTerm] = useState("");
   const [likeCount, setLikeCount] = useState(10);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  /* ----- 5. Filtered users ----- */
   const filteredUsers = useMemo(() => {
     return participants.filter((u) =>
       u.username.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [participants, searchTerm]);
 
-  /* ----- 6. Handlers ----- */
   const handleDelete = (id: string, username: string) => {
     console.log(`${username} (id:${id}) removed`);
   };
@@ -178,35 +160,27 @@ const ChallengeInfo: React.FC = () => {
       (i) => (i - 1 + mockChallenges.length) % mockChallenges.length
     );
 
-  /* ----- 7. Render ----- */
   return (
     <div className="min-h-screen flex flex-col justify-between p-4">
       <div className="flex-1 flex flex-col items-center">
-        {/* Back + Menu */}
         <BackButtonAndMenu onMenuClick={handleMenu} />
 
-        {/* Main image */}
         <ImageAndBadgeContainer imageUrl={safeImageUrl} />
 
-        {/* Like / Save */}
         <LikeAndSaveButtons
           onLike={handleLike}
           onSave={handleSave}
           likeCount={likeCount}
         />
 
-        {/* Title + description */}
         <TitleAndDescription title={title} description={description} />
 
-        {/* Date & location */}
         <DateAndLocation dateRange={dateRange} location={challengeLocation} />
 
-        {/* Join button */}
-        <CustomButton className="mt-6 w-full max-w-xl bg-primary rounded-[8px] p-5 text-lg hover:bg-primary">
+        <CustomButton className="mt-6 w-full sm:w-full md:w-full max-w-xl bg-primary rounded-[8px] p-5 text-lg hover:bg-primary">
           پیوستن
         </CustomButton>
 
-        {/* ---------- Participants section ---------- */}
         <div className="w-full max-w-2xl mt-8" dir="rtl">
           <h2 className="text-xl font-semibold mb-4">شرکت‌کنندگان</h2>
 
@@ -222,7 +196,6 @@ const ChallengeInfo: React.FC = () => {
           />
         </div>
 
-        {/* ---------- Related challenges ---------- */}
         <div className="w-full max-w-2xl mt-10" dir="rtl">
           <h2 className="text-xl font-semibold mb-4 flex items-center">
             <img

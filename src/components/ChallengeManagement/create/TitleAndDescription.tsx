@@ -2,9 +2,7 @@
 import React from "react";
 import { Field, Formik } from "formik";
 import CustomInput from "@/components/Custom/CustomInput";
-import CustomTextArea from "@/components/Custom/CustomTextArea";
 import type { ChallengeTitleAndDescriptionInputProps } from "@/types/challengeElementsTypes";
-import { NotebookText } from "lucide-react";
 
 const TitleAndDescription: React.FC<ChallengeTitleAndDescriptionInputProps> = ({
   title,

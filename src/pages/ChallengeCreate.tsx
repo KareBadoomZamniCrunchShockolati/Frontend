@@ -1,4 +1,3 @@
-// src/components/ChallengeManagement/create/ChallengeCreate.tsx
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form } from "formik";
@@ -30,7 +29,6 @@ const ChallengeCreate: React.FC = () => {
   const [selectedUsers, setSelectedUsers] = useState<UserProfile[]>([]);
   const [memberLimitError, setMemberLimitError] = useState(false);
 
-  // ── MOCK USERS (still here!) ─────────────────────
   const mockUsers: UserProfile[] = [
     {
       id: "1",
@@ -90,7 +88,6 @@ const ChallengeCreate: React.FC = () => {
     "غذا",
   ];
 
-  // ── Filters ─────────────────────────────────────
   const filteredCategories = mockCategories.filter(
     (c) => c.includes(categorySearch) && !selectedCategories.includes(c)
   );
@@ -103,7 +100,6 @@ const ChallengeCreate: React.FC = () => {
       );
   }, [selectedUsers, userSearch]);
 
-  // ── Handlers ───────────────────────────────────
   const handleBack = () =>
     currentStep === 1 ? navigate(-1) : setCurrentStep((s) => s - 1);
   const handleNext = () => currentStep < 3 && setCurrentStep((s) => s + 1);
@@ -139,7 +135,6 @@ const ChallengeCreate: React.FC = () => {
     navigate("/challenge", { state: { challenge: newChallenge } });
   };
 
-  // ── Formik ─────────────────────────────────────
   return (
     <div className="min-h-screen flex flex-col p-4 items-center">
       <div className="flex justify-center items-center w-full max-w-xl mb-10 mt-4">
@@ -204,15 +199,14 @@ const ChallengeCreate: React.FC = () => {
                 />
               )}
 
-              {/* ── NAVIGATION ── */}
               <div className="flex justify-center w-full mt-10">
                 <CustomButton
                   type={currentStep === 3 ? "submit" : "button"}
                   onClick={currentStep < 3 ? handleNext : undefined}
                   className={
                     currentStep === 3
-                      ? "w-full max-w-xl bg-primary rounded-[8px] p-5 text-lg"
-                      : "w-full max-w-xl bg-secondary rounded-[8px] p-5 text-lg"
+                      ? "w-full sm:w-full md:w-full max-w-xl bg-primary rounded-[8px] p-5 text-lg hover:bg-primary"
+                      : "w-full sm:w-full md:w-full max-w-xl bg-secondary rounded-[8px] p-5 text-lg hover:bg-secondary"
                   }
                 >
                   {currentStep === 3 ? "ثبت چالش" : "بعدی"}
