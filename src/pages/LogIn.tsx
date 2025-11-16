@@ -11,6 +11,10 @@ import { useState } from "react";
 import { Label } from "@radix-ui/react-label";
 import { Checkbox } from "@radix-ui/react-checkbox";
 import { Link } from "react-router-dom";
+import useUserStore from "@/store/userStore/userStore";
+import type { LoginPayload } from "@/types/authTypes";
+import { loginService } from "@/services/authService";
+import CustomToast from "@/components/Custom/CustomToast";
 
 export default function Login() {
   const {setUsername,setToken,setUserId} = useUserStore();
@@ -26,13 +30,14 @@ export default function Login() {
 
       // ✅ Call the login service
       const response = await loginService(values);
+      const user = response.user_response;
 
       // ✅ Example: assuming your backend returns { token, user }
-      if (response?.token) {
+      if (user?.token) {
         // localStorage.setItem("token", response.token); // interceptor will use it
-        setToken(response.token);
-        setUsername(response.user.username);
-        setUserId(response.user.id);
+        setToken(user.token);
+        setUsername(user.username);
+        setUserId(user.id);
       }
 
       console.log("Login success:", response);

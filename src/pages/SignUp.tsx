@@ -80,7 +80,7 @@ function SignUp() {
   }, [timeLeft]);
 
   // start connection
-  const [username, setUsername] = useState("");
+  const [username, setusername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [bio, setBio] = useState(
@@ -96,8 +96,8 @@ function SignUp() {
     }
   };
 
+  const { setToken , setUserId , setUsername } = useUserStore();
   const handleVerify = async (emailToVerify: string, codeToVerify: string) => {
-    const { setToken , setUserId , setUsername } = useUserStore();
     try {
       const data = await verifyEmailService({
         email: emailToVerify,
@@ -109,7 +109,7 @@ function SignUp() {
       //setting
       setToken(data.token);
       setUserId(data.userId);
-      setUsername(data.username);
+      setusername(data.username);
       
       console.log("Email verified successfully!");
       // alert("ثبت نام شما تکمیل شد ✅");
@@ -134,7 +134,7 @@ function SignUp() {
   }, [isPressedBack, isPressedNext]);
 
   const firstSubmit = (data: FieldValues) => {
-            setUsername(data.username);
+            setusername(data.username);
             setEmail(data.email);
             setIsPressedNext((prev) => !prev);
             console.log("Step1 values:", data);
