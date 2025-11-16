@@ -17,10 +17,6 @@ const DEFAULT_CHALLENGE_IMG =
   "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
 
 /* --------------------------------------------------------------
-   Types – keep in sync with ChallengeCreate.tsx
-   -------------------------------------------------------------- */
-
-/* --------------------------------------------------------------
    Default fallback challenge
    -------------------------------------------------------------- */
 const defaultChallenge: ChallengeData = {
@@ -132,11 +128,10 @@ const ChallengeInfo: React.FC = () => {
     description,
     dateRange,
     location: challengeLocation,
-    memberCount,
-    members: incomingMembers,
+    members: incomingMembers = [],
   } = payload;
 
-  /* ----- 2. Safe image URL (fallback to default) ----- */
+  /* ----- 2. Safe image URL ----- */
   const safeImageUrl = Img && Img.trim() !== "" ? Img : DEFAULT_CHALLENGE_IMG;
 
   /* ----- 3. Participants (real or mock) ----- */
@@ -161,15 +156,16 @@ const ChallengeInfo: React.FC = () => {
   };
 
   const handleMenu = () => {
-    const editPayload = {
-      imageUrl: safeImageUrl,
-      title,
-      description,
-      dateRange,
-      location: challengeLocation,
-      participants,
+    const editPayload: ChallengeData = {
+      ...payload,
+      Img: safeImageUrl,
+      members: participants,
+      memberCount: participants.length.toString(),
     };
-    navigate("/editChallenge", { state: { challenge: editPayload } });
+
+    navigate("/editChallenge", {
+      state: { challenge: editPayload },
+    });
   };
 
   const handleLike = () => setLikeCount((c) => (c === 10 ? 11 : 10));
@@ -189,7 +185,7 @@ const ChallengeInfo: React.FC = () => {
         {/* Back + Menu */}
         <BackButtonAndMenu onMenuClick={handleMenu} />
 
-        {/* Main image – always has a valid URL */}
+        {/* Main image */}
         <ImageAndBadgeContainer imageUrl={safeImageUrl} />
 
         {/* Like / Save */}

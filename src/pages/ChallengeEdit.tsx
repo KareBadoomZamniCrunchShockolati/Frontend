@@ -8,36 +8,43 @@ import ImageAndBadgeContainerEdit from "@/components/ChallengeManagement/edit/Im
 import TitleAndDescriptionInput from "@/components/ChallengeManagement/edit/TitleAndDescriptionInput";
 import DateAndLocationInput from "@/components/ChallengeManagement/edit/DateAndLocationInput";
 import type { UserProfile } from "@/types/userTypes";
+import type { ChallengeData } from "@/types/challengeElementsTypes";
+
+const DEFAULT_IMG =
+  "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
 
 const ChallengeEdit: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const challenge = location.state?.challenge;
+  const incoming = (location.state?.challenge as ChallengeData) ?? {};
 
-  if (!challenge) {
+  if (!incoming) {
     return <div>Challenge not found!</div>;
   }
 
   const {
-    imageUrl = "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg",
+    Img = DEFAULT_IMG,
     title = "عنوان چالش",
     description = "توضیحات چالش...",
     dateRange = "تاریخ چالش",
     location: challengeLocation = "مکان چالش",
-    participants = [],
-  } = challenge;
+    members: participants = [],
+    commentsEnabled = false,
+    categories = [],
+    type = "عمومی",
+    memberCount = "0",
+  } = incoming;
 
-  const [image, setImage] = useState(imageUrl);
+  const [image, setImage] = useState(Img);
   const [users, setUsers] = useState<UserProfile[]>(participants);
   const [searchTerm, setSearchTerm] = useState("");
   const [challengeTitle, setChallengeTitle] = useState(title);
   const [challengeDescription, setChallengeDescription] = useState(description);
   const [challengeDate, setChallengeDate] = useState(dateRange);
-  const [challengeLocationState, setChallengeLocation] =
-    useState(challengeLocation);
+  const [challengeLocationState, setChallengeLocation] = useState(challengeLocation);
 
   const handleDelete = (id: string, username: string) => {
-    setUsers(users.filter((user) => user.id !== id));
+    setUsers((prev) => prev.filter((user) => user.id !== id));
     console.log(`${username} has been removed.`);
   };
 
@@ -83,18 +90,23 @@ const ChallengeEdit: React.FC = () => {
   );
 
   const handleFinishEditing = () => {
-    const updatedChallenge = {
-      Img: image, // Must be `Img` to match ChallengeInfo
+    const updatedChallenge: ChallengeData = {
+      ...incoming, // keep everything not edited
+      Img: image,
       title: challengeTitle,
       description: challengeDescription,
       dateRange: challengeDate,
       location: challengeLocationState,
-      participants: users,
+      members: users,
+      memberCount: users.length.toString(),
+      commentsEnabled,
+      categories,
+      type,
     };
 
     navigate("/challenge", {
       state: { challenge: updatedChallenge },
-      replace: true, // Optional: cleans history
+      replace: true,
     });
   };
 
