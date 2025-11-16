@@ -80,7 +80,7 @@ const PostCreation = () => {
         }}
         onSubmit={handleSubmit}
       >
-        {({ values, setFieldValue }) => (
+        {({ values, setFieldValue, isSubmitting }) => (
           <Form>
             {/* Image preview + Upload */}
             <div className="flex flex-col items-center gap-2 mr-[24px] ml-[24px] mt-[20px]">
@@ -168,6 +168,9 @@ const PostCreation = () => {
                 width="w-full"
                 backgroundColor="bg-secondary"
                 height="h-[46.6px]"
+                pageAddress={`/dashboard/${userId}`}
+                // disabled={isSubmitting || images.length === 0}
+                // loading={isSubmitting}
               >
                 <p className="text-center text-base">ساخت</p>
                 <ArrowRight className="!w-[25px] !h-[25px]" />
