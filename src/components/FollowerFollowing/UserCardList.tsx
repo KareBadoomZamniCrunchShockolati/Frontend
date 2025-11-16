@@ -35,7 +35,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
           ))}
         </div>
       ) : (
-        <p className="font-semibold m-10 text-primary text-5xl">
+        <p className="font-semibold m-4 sm:m-6 md:m-10 text-primary text-3xl sm:text-4xl md:text-5xl">
           !موردی یافت نشد
         </p>
       )}
