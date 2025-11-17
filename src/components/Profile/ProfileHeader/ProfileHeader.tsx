@@ -52,17 +52,18 @@ const ProfileHeader: React.FC<Props> = ({
         // else if (userData?.username) setFullName(userData.username);
 
         const followersRes = await getFollowersService(userId);
-        if (followersRes?.count !== undefined) setFollowersCount(followersRes.count);
+        if (followersRes?.count !== undefined)
+          setFollowersCount(followersRes.count);
 
         const followingRes = await getFollowingService(userId);
-        if (followingRes?.count !== undefined) setFollowingCount(followingRes.count);
+        if (followingRes?.count !== undefined)
+          setFollowingCount(followingRes.count);
       } catch (err) {
         console.error("Error fetching user data:", err);
       }
     }
 
-    console.log(followersCount)
-
+    console.log(followersCount);
 
     fetchUserData();
   }, [userId]);
@@ -83,7 +84,9 @@ const ProfileHeader: React.FC<Props> = ({
               alt={fullName}
               src="https://samanskh.github.io/assets/images/bio-photo.jpg"
             />
-            <AvatarFallback className={`text-2xl font-semibold ${personalColor}`}>
+            <AvatarFallback
+              className={`text-2xl font-semibold ${personalColor}`}
+            >
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -106,13 +109,14 @@ const ProfileHeader: React.FC<Props> = ({
           />
         </div>
       </div>
-      <FollowBar fullName={fullName}
-      followersCount={followersCount}
-      followingCount={followingCount}
-      ></FollowBar>
+      <FollowBar
+        fullName={fullName}
+        followersCount={followersCount}
+        followingCount={followingCount}
+      />
       {/* BUTTON */}
-      {isOwner && <OwnerButton></OwnerButton>}
-      {!isOwner && <ViewButton></ViewButton>}
+      {isOwner && <OwnerButton />}
+      {!isOwner && <ViewButton />}
       {/* button selector */}
     </>
   );
