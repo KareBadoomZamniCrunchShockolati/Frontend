@@ -4,8 +4,12 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Skeleton } from "../ui/skeleton";
 import { useNavigate } from "react-router-dom";
-
-export const posts = [
+interface Post{
+  id:number;
+  imageUrl?:string;  //=======> string []
+  text : string;
+}
+export const posts:Post[] = [
   {
     id: 1,
     imageUrl: "https://picsum.photos/id/1011/600/800",
