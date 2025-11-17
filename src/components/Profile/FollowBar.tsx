@@ -1,12 +1,13 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import formatFollowBarNumber from "@/utils/formatFollowBarNumber";
 import type { Props } from "@/types/followbarTypes";
 
-const FollowBar: React.FC<Props> = (props) => {
-  const location = useLocation();
+const FollowBar = () => {
+  const location = useLocation();  // Retrieve state passed from the navigation
   const navigate = useNavigate();
+  const { userId } = useParams();  // Extract userId from the URL
 
   const {
     fullName = props.fullName || "saman khajeamiri",
@@ -18,8 +19,8 @@ const FollowBar: React.FC<Props> = (props) => {
 
 
   const handleNavigateToFollowerFollowingPage = (tab: "followers" | "followings") => {
-    navigate(`/follow?tab=${tab}`, {
-      state: { fullName } // Passing fullName as part of the state
+    navigate(`/follow/${userId}?tab=${tab}`, {
+      state: { userId, fullName }, // Pass userId and fullName as part of the state
     });
   };
 
@@ -37,7 +38,7 @@ const FollowBar: React.FC<Props> = (props) => {
       {/* Stats row */}
       <div className="flex justify-around text-center mr-5 ml-5">
         {/* Done challenges */}
-        <div onClick={() => console.log("done challenges")} tabIndex={0} className="cursor-pointer active:bg-[var(--color-gray-main)] transition-all duration-200">
+        <div onClick={() => console.log("done challenges")} tabIndex={0} className="cursor-pointer active:bg-neutral-500 transition-all duration-200">
           <p className="text-sm sm:text-base md:text-lg text-black-500">موفقیت‌ها</p>
           <p className="text-sm sm:text-base md:text-lg font-bold text-black-800">
             {convertToPersianDigits(formatFollowBarNumber(doneChallengesCount))}
@@ -48,7 +49,7 @@ const FollowBar: React.FC<Props> = (props) => {
         <div className="w-px bg-gray-500"></div>
 
         {/* Followers */}
-        <div onClick={() => handleNavigateToFollowerFollowingPage("followers")} tabIndex={0} className="cursor-pointer active:bg-[var(--color-gray-main)] transition-all duration-200">
+        <div onClick={() => handleNavigateToFollowerFollowingPage("followers")} tabIndex={0} className="cursor-pointer active:bg-neutral-500 transition-all duration-200">
           <p className="text-sm sm:text-base md:text-lg text-black-500">دنبال‌کنیا</p>
           <p className="text-sm sm:text-base md:text-lg font-bold text-black-800">
             {convertToPersianDigits(formatFollowBarNumber(followersCount))}
@@ -59,7 +60,7 @@ const FollowBar: React.FC<Props> = (props) => {
         <div className="w-px bg-gray-500"></div>
 
         {/* Following */}
-        <div onClick={() => handleNavigateToFollowerFollowingPage("followings")} tabIndex={0} className="cursor-pointer active:bg-[var(--color-gray-main)] transition-all duration-200">
+        <div onClick={() => handleNavigateToFollowerFollowingPage("followings")} tabIndex={0} className="cursor-pointer active:bg-neutral-500 transition-all duration-200">
           <p className="text-sm sm:text-base md:text-lg text-black-500">من‌دنبالشونم</p>
           <p className="text-sm sm:text-base md:text-lg font-bold text-black-800">
             {convertToPersianDigits(formatFollowBarNumber(followingCount))}
