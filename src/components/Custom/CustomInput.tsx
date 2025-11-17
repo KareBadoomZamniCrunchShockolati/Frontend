@@ -57,41 +57,30 @@ export default function CustomInput({
         return (
           <div className={"flex flex-col " + width}>
             <div className="relative">
-              {as === "textarea" ? (
-                <textarea
-                  {...field}
-                  {...props}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                  dir={isRTL ? "rtl" : "ltr"}
-                  rows={rows}
-                  className={`border !border-[var(--borderDefault)] shadow-[0px_1px_0px_var(--borderDefault)] focus:!border-[var(--borderFoucus)] focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)] focus:!ring-0 focus-visible:!ring-0 p-2 rounded-xl w-full resize-none
-                    ${isRTL ? "text-right pr-4" : "text-left pl-4"}
-                    ${icon ? (isRTL ? "pl-12" : "pr-12") : ""}
-                    transition-all duration-200 ease-in-out
-                    ${hasError
-                      ? "!border-[var(--borderInvalid)] shadow-[0px_1px_0px_var(--borderInvalidShadow)]"
-                      : ""}
-                    ${props.className ?? ""}`}
-                />
-              ) : (
-                <Input
-                  {...field}
-                  {...props}
-                  type={inputType}
-                  onFocus={handleFocus}
-                  onBlur={handleBlur}
-                  dir={isRTL ? "rtl" : "ltr"}
-                  className={`border !border-[var(--borderDefault)] shadow-[0px_1px_0px_var(--borderDefault)] focus:!border-[var(--borderFoucus)] focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)] focus:!ring-0 focus-visible:!ring-0 p-0 rounded-xl h-10 w-full
-                    ${isRTL ? "text-right pr-4" : "text-left pl-4"}
-                    ${icon ? (isRTL ? "pl-12" : "pr-12") : ""}
-                    transition-all duration-200 ease-in-out
-                    ${hasError
-                      ? "!border-[var(--borderInvalid)] shadow-[0px_1px_0px_var(--borderInvalidShadow)]"
-                      : ""}
-                    ${props.className ?? ""}`}
-                />
-              )}
+              <Input
+                {...field}
+                {...props}
+                type={inputType}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                dir={isRTL ? "rtl" : "ltr"}
+                className={`
+                  border !border-[var(--borderDefault)]
+                  shadow-[0px_1px_0px_var(--borderDefault)]
+                  focus:!border-[var(--borderFoucus)]
+                  focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)]
+                  focus:!ring-0 focus-visible:!ring-0
+                  p-0 rounded-xl h-10 w-full
+                  ${isRTL ? "text-right pr-4" : "text-left pl-4 pr-3"}
+                  ${icon ? "pl-12" : ""} 
+                  transition-all duration-200 ease-in-out
+                  ${hasError
+                    ? "!border-[var(--borderInvalid)] shadow-[0px_1px_0px_var(--borderInvalidShadow)]"
+                    : ""}
+                  ${props.className ?? ""}
+                `}
+              />
+
 
               {icon && (
                 <div
