@@ -11,6 +11,7 @@ import Login from "@/pages/LogIn";
 import Test from "@/pages/test";
 import Edit from "@/pages/EditProfile";
 import PostCreation from "@/pages/PostCreation";
+import PostPage from "@/pages/PostPage";
 
 // import { LogIn } from "lucide-react";
 
@@ -55,6 +56,10 @@ export const router = createBrowserRouter([
 	      {
       path: "/create-post", 
       element: <PostCreation />,
+    },
+    {
+      path: "/post/:id",  
+      element: <PostPage />,
     },
     ],
   },
