@@ -123,6 +123,7 @@ const ProfileHeader: React.FC<Props> = ({
           />
         </div>
       </div>
+
       <FollowBar
         fullName={fullName}
         followersCount={followersCount}

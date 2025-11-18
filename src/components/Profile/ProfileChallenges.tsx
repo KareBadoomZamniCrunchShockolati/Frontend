@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { Form, Formik } from "formik";
 import { Search } from "lucide-react";
-import ChallengeCard from "../Custom/ChallangeCard"; // مسیر درست به ChallengeCard خودت
+import ChallengeCard from "../Custom/ChallangeCard";
 import CustomInput from "../Custom/CustomInput";
 import CustomDropdown from "../Custom/CustomDropdown";
 
 const ProfileChallenges = () => {
-  // داده نمونه چالش‌ها با تصاویر Unsplash
   const challenges = [
     {
       id: 1,
@@ -72,12 +71,30 @@ const ProfileChallenges = () => {
   }>({});
   const [search, setSearch] = useState("");
 
-  // دسته‌بندی انتخاب‌شده
+  const sampleAvatars = [
+    { name: "علی", avatar: "https://images.unsplash.com/photo-1502764613149-7f1d229e230f?auto=format&fit=crop&w=50&q=80" },
+    { name: "فاطمه", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=50&q=80" },
+    { name: "محمد", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=50&q=80" },
+    { name: "زهرا", avatar: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=50&q=80" },
+    { name: "حسن", avatar: "https://images.unsplash.com/photo-1544005313-2f8f0f2d8b0f?auto=format&fit=crop&w=50&q=80" },
+  ];
+
+  const getRandomAvatars = (challengeId: number) => {
+    // استفاده از challengeId برای ایجاد عدد ثابت
+    const seed = challengeId;
+    const count = (seed % 3) + 1; // 1 تا 3 آواتار
+    return sampleAvatars.slice(0, count).map((user, idx) => ({
+      id: idx,
+      name: user.name,
+      avatar: user.avatar,
+      image : ""
+    }));
+  };
+
   const selectedCategoryIds = Object.keys(checkedCategories)
     .filter((key) => checkedCategories[Number(key)])
     .map(Number);
 
-  // فیلتر جستجو
   const searchedChallenges = search
     ? challenges
         .filter((challenge) =>
@@ -96,32 +113,12 @@ const ProfileChallenges = () => {
         })
     : challenges;
 
-  // فیلتر بر اساس دسته‌بندی
   const filteredChallenges =
     selectedCategoryIds.length === 0
       ? searchedChallenges
       : searchedChallenges.filter((ch) =>
           selectedCategoryIds.includes(ch.categoryID)
         );
-
-  // نمونه تصاویر آواتار
-  const sampleAvatars = [
-    "https://images.unsplash.com/photo-1502764613149-7f1d229e230f?auto=format&fit=crop&w=50&q=80",
-    "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=50&q=80",
-    "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=50&q=80",
-    "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=50&q=80",
-    "https://images.unsplash.com/photo-1544005313-2f8f0f2d8b0f?auto=format&fit=crop&w=50&q=80",
-  ];
-
-  const getRandomAvatars = () => {
-    const count = Math.floor(Math.random() * 5) + 1; // 1 تا 5 آواتار
-    const shuffled = sampleAvatars.sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count).map((img, idx) => ({
-      id: idx + 1,
-      image: img,
-      fallback: String.fromCharCode(65 + idx), // A,B,C...
-    }));
-  };
 
   return (
     <>
@@ -165,18 +162,24 @@ const ProfileChallenges = () => {
 
       {/* نمایش چالش‌ها */}
       {!loading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1 m-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 m-2.5">
           {filteredChallenges.map((challenge) => (
             <ChallengeCard
               key={challenge.id}
               title={challenge.name}
-              description={`این توضیح نمونه برای چالش ${challenge.name} است.`}
+              description={`این توضیح نمونه برای چالش ${challenge.name} است. لطفا متن کامل خود را اینجا قرار دهید.`}
               startDate="1402/01/01"
-              endDate="1402/01/30"
-              profiles={getRandomAvatars()}
+              endDate="1402/01/30" 
+              profiles={getRandomAvatars(challenge.id)}
               initialLikes={Math.floor(Math.random() * 100)}
+              initialComments={Math.floor(Math.random() * 50)}
               coverImage={challenge.coverImage}
-              isPrivate={Math.random() < 0.3} // بعضی کارت‌ها خصوصی
+              isPrivate={Math.random() < 0.3}
+              isJoined={Math.random() < 0.5}
+              creator={{
+                name: "ایجادکننده چالش",
+                avatar: "https://images.unsplash.com/photo-1502764613149-7f1d229e230f?auto=format&fit=crop&w=50&q=80",
+              }}
             />
           ))}
         </div>
