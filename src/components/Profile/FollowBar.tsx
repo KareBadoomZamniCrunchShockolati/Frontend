@@ -1,32 +1,26 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import formatFollowBarNumber from "@/utils/formatFollowBarNumber";
+import type { Props } from "@/types/followbarTypes";
 
-interface Props {
-  fullName?: string;
-  bio?: string;
-  followersCount?: number;
-  followingCount?: number;
-  doneChallengesCount?: number;
-}
-
-const FollowBar = () => {
-  const location = useLocation();  // Retrieve state passed from the navigation
+const FollowBar: React.FC<Props> = (props) => {
+  const location = useLocation();
   const navigate = useNavigate();
+  const { userId } = useParams();  // Extract userId from the URL
 
-  // Destructure the state passed through navigation (using useLocation hook)
   const {
-    fullName = "saman khajeamiri",
-    bio = "سلااام صبحت بخیررر",
-    followersCount = 12520_000,
-    followingCount = 12_300,
-    doneChallengesCount = 1200
-  } = location.state || {};  // Use default values in case state is undefined
+    fullName = props.fullName || "saman khajeamiri",
+    bio = props.bio,
+    followersCount = props.followersCount ,
+    followingCount = props.followingCount ,
+    doneChallengesCount = props.doneChallengesCount || 0
+  } = location.state || {};
+
 
   const handleNavigateToFollowerFollowingPage = (tab: "followers" | "followings") => {
-    navigate(`/follow?tab=${tab}`, {
-      state: { fullName } // Passing fullName as part of the state
+    navigate(`/follow/${userId}?tab=${tab}`, {
+      state: { userId, fullName }, // Pass userId and fullName as part of the state
     });
   };
 
@@ -44,7 +38,7 @@ const FollowBar = () => {
       {/* Stats row */}
       <div className="flex justify-around text-center mr-5 ml-5">
         {/* Done challenges */}
-        <div onClick={() => console.log("done challenges")} tabIndex={0} className="cursor-pointer active:bg-[var(--color-gray-main)] transition-all duration-200">
+        <div onClick={() => console.log("done challenges")} tabIndex={0} className="cursor-pointer active:bg-neutral-500 transition-all duration-200">
           <p className="text-sm sm:text-base md:text-lg text-black-500">موفقیت‌ها</p>
           <p className="text-sm sm:text-base md:text-lg font-bold text-black-800">
             {convertToPersianDigits(formatFollowBarNumber(doneChallengesCount))}
@@ -55,7 +49,7 @@ const FollowBar = () => {
         <div className="w-px bg-gray-500"></div>
 
         {/* Followers */}
-        <div onClick={() => handleNavigateToFollowerFollowingPage("followers")} tabIndex={0} className="cursor-pointer active:bg-[var(--color-gray-main)] transition-all duration-200">
+        <div onClick={() => handleNavigateToFollowerFollowingPage("followers")} tabIndex={0} className="cursor-pointer active:bg-neutral-500 transition-all duration-200">
           <p className="text-sm sm:text-base md:text-lg text-black-500">دنبال‌کنیا</p>
           <p className="text-sm sm:text-base md:text-lg font-bold text-black-800">
             {convertToPersianDigits(formatFollowBarNumber(followersCount))}
@@ -66,7 +60,7 @@ const FollowBar = () => {
         <div className="w-px bg-gray-500"></div>
 
         {/* Following */}
-        <div onClick={() => handleNavigateToFollowerFollowingPage("followings")} tabIndex={0} className="cursor-pointer active:bg-[var(--color-gray-main)] transition-all duration-200">
+        <div onClick={() => handleNavigateToFollowerFollowingPage("followings")} tabIndex={0} className="cursor-pointer active:bg-neutral-500 transition-all duration-200">
           <p className="text-sm sm:text-base md:text-lg text-black-500">من‌دنبالشونم</p>
           <p className="text-sm sm:text-base md:text-lg font-bold text-black-800">
             {convertToPersianDigits(formatFollowBarNumber(followingCount))}

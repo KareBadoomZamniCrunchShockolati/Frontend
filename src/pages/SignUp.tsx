@@ -91,7 +91,7 @@ function SignUp() {
     try {
       const data = await signupService(values);
       console.log("Signup success! Token:", data.token);
-    } catch (err: any) {
+    } catch (err: any) {// eslint-disable-line @typescript-eslint/no-explicit-any
       console.log("Signup failed:", err.response?.data || err.message || err);
     }
   };

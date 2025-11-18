@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "../ui/spinner";
@@ -23,7 +23,7 @@ const CustomButton = ({
   backgroundColor = "bg-neutral-gray",
   pageAddress,
   width = "w-40 sm:w-50 md:w-60",
-  className= "",
+  className = "",
   onClick,
   height = "h-[40px]",
   type = "button",
@@ -31,16 +31,18 @@ const CustomButton = ({
   ...props
 }: Props) => {
   const navigate = useNavigate();
+
   const handleClick = () => {
     setTimeout(() => {
       if (onClick) {
         onClick();
       }
-      if (pageAddress){
-      navigate(pageAddress);
+      if (pageAddress) {
+        navigate(pageAddress);
       }
     }, 200);
   };
+
   return (
     <Button
     {...props}
