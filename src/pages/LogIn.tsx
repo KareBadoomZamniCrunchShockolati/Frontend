@@ -8,22 +8,56 @@ import loginFormSchemaConfig from "@/schemas/loginFormSchema";
 import { Eye, EyeClosed } from "lucide-react";
 import CustomCheckbox from "@/components/Custom/CustomCheckbox";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom"; // ← اضافه شد
+import useUserStore from "@/store/userStore/userStore";
+import { loginService } from "@/services/authService";
+
 export default function Login() {
+  const { setUsername, setToken, setUserId } = useUserStore();
+  const navigate = useNavigate(); // ← اضافه شد
   const [showPassword, setShowPassword] = useState(true);
+  const [loginStatus, setLoginStatus] = useState<string | null>(null); // وضعیت لاگین
+
   const onSubmit = async (
     values: FormValues,
     actions: FormikHelpers<FormValues>
   ): Promise<void> => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("Form submitted!");
+    try {
+      // Optional delay for UX
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      // تماس با سرویس لاگین
+      const response = await loginService(values);
+      console.log("Login response full:", response);
+
+      // بررسی موفقیت
+      if (response?.user_response?.token) {
+        setToken(response.user_response.token);
+        setUsername(response.user_response.username);
+        setUserId(response.user_response.id);
+
+        setLoginStatus("ورود با موفقیت انجام شد!");
+        setTimeout(() => {
+          navigate(`/dashboard/${response.user_response.id}`);
+        }, 2000);
+      } else {
+        setLoginStatus("ورود انجام نشد، دوباره تلاش کنید.");
+      }
+    } catch (error: any) {// eslint-disable-line @typescript-eslint/no-explicit-any
+      console.error("Login failed:", error);
+      setLoginStatus(error?.response?.data?.message || "ورود انجام نشد!");
+    } finally {
+      actions.setSubmitting(false);
+    }
   };
+
   const bg = useMobile();
+
   return (
     <div
       className={`w-screen h-screen flex justify-center items-center px-2 bg-cover bg-white ${
         !useMobile() && "bg-[url(@/assets/Img/Desktop-background-2.png)]"
       }`}
-      // style={{ backgroundImage: `url(${bg})` }}
     >
       <div
         className={`p-5 flex md:flex-row rounded-3xl ${
@@ -38,9 +72,21 @@ export default function Login() {
           />
         </div>
         <div className="flex flex-col w-full justify-around sm:w-(--login-from-w) h-(--login-form-h) p-[6px] py-[20px]  rounded-3xl">
-          <p className="text-center text-right font-bold text-title mb-10 text-[#ff7700]">
+          <p className="text-center text-right font-bold text-title mb-2 text-primary">
             !خوش اومدی
           </p>
+
+          {/* نمایش وضعیت لاگین */}
+          {loginStatus && (
+            <p
+              className={`text-right mb-4 font-bold ${
+                loginStatus.includes("موفق") ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {loginStatus}
+            </p>
+          )}
+
           <Formik {...loginFormSchemaConfig} onSubmit={onSubmit}>
             {({ isSubmitting }) => (
               <Form>
@@ -58,13 +104,17 @@ export default function Login() {
                   />
                   <CustomCheckbox
                     name="loginAcceptTerms"
-                    labelText="بیناموس نیستم"
+                    labelText="قوانین و مقررات را خوانده و می پذیرم"
                     textTransparentOnChecked={false}
+                    classNames={{
+                      label: "text-sm text-gray-600 font-extrabold",
+                      checkbox: "",
+                    }}
                   />
                   <CustomBtn
                     disabled={isSubmitting}
                     color="#fff"
-                    className="w-72 bg-[#ff7700] mt-auto"
+                    className="w-72 bg-primary mt-auto"
                     type="submit"
                     loading={isSubmitting}
                   >
@@ -75,10 +125,10 @@ export default function Login() {
             )}
           </Formik>
           <div className="flex justify-end items-center">
-            <a href="" className="text-secondry mr-1">
+            <Link to="/signup" className="text-secondary mr-1">
               ثبت نام
-            </a>
-            <p className="">حساب کاربری ندارید؟</p>
+            </Link>
+            <p>حساب کاربری ندارید؟</p>
           </div>
         </div>
       </div>
