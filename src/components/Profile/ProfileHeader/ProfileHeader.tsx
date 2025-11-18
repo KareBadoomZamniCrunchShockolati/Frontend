@@ -37,33 +37,47 @@ const ProfileHeader: React.FC<Props> = ({
   userId,
 }) => {
   const [fullName, setFullName] = useState("User");
+  const [bio, setBio] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
 
   const initials = getUserInitials(fullName);
-
   useEffect(() => {
     if (!userId) return;
 
     async function fetchUserData() {
+      // اطلاعات پروفایل
       try {
-        // const userData = await getUserProfileService(userId);
-        // if (userData?.fullName) setFullName(userData.fullName);
-        // else if (userData?.username) setFullName(userData.username);
+        const userRes = await getUserProfileService(userId);
+        if (userRes) {
+          setFullName(userRes.username || "User");
+          setProfilePicture(userRes.profile_picture || "");
+          setBio(userRes.bio || "null");
+        }
+      } catch (err) {
+        console.error("Error fetching user profile:", err);
+      }
 
+      // تعداد فالوورها
+      try {
         const followersRes = await getFollowersService(userId);
         if (followersRes?.count !== undefined)
           setFollowersCount(followersRes.count);
+          // console.log(followersCount)
+      } catch (err) {
+        console.error("Error fetching followers:", err);
+      }
 
+      // تعداد فالووینگ‌ها
+      try {
         const followingRes = await getFollowingService(userId);
         if (followingRes?.count !== undefined)
           setFollowingCount(followingRes.count);
       } catch (err) {
-        console.error("Error fetching user data:", err);
+        console.error("Error fetching following:", err);
       }
     }
-
-    console.log(followersCount);
 
     fetchUserData();
   }, [userId]);
@@ -80,15 +94,15 @@ const ProfileHeader: React.FC<Props> = ({
       >
         <div className="relative">
           <Avatar className="w-26 h-26 sm:w-34 sm:h-34 md:w-44 md:h-44 shadow-lg avatar">
-            <AvatarImage
-              alt={fullName}
-              src="https://samanskh.github.io/assets/images/bio-photo.jpg"
-            />
-            <AvatarFallback
-              className={`text-2xl font-semibold ${personalColor}`}
-            >
-              {initials}
-            </AvatarFallback>
+            {profilePicture ? (
+              <AvatarImage alt={fullName} src={profilePicture} />
+            ) : (
+              <AvatarFallback
+                className={`text-2xl font-semibold ${personalColor}`}
+              >
+                {initials}
+              </AvatarFallback>
+            )}
           </Avatar>
 
           {/* Badge decorations */}
@@ -113,11 +127,12 @@ const ProfileHeader: React.FC<Props> = ({
         fullName={fullName}
         followersCount={followersCount}
         followingCount={followingCount}
+        bio={bio}
       />
+
       {/* BUTTON */}
       {isOwner && <OwnerButton />}
       {!isOwner && <ViewButton />}
-      {/* button selector */}
     </>
   );
 };

@@ -4,17 +4,17 @@ import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import formatFollowBarNumber from "@/utils/formatFollowBarNumber";
 import type { Props } from "@/types/followbarTypes";
 
-const FollowBar = () => {
-  const location = useLocation();  // Retrieve state passed from the navigation
+const FollowBar: React.FC<Props> = (props) => {
+  const location = useLocation();
   const navigate = useNavigate();
   const { userId } = useParams();  // Extract userId from the URL
 
   const {
     fullName = props.fullName || "saman khajeamiri",
-    bio = props.bio || "سلااام صبحت بخیررر",
-    followersCount = props.followersCount || 12520000,
-    followingCount = props.followingCount || 12300,
-    doneChallengesCount = props.doneChallengesCount || 1200
+    bio = props.bio,
+    followersCount = props.followersCount ,
+    followingCount = props.followingCount ,
+    doneChallengesCount = props.doneChallengesCount || 0
   } = location.state || {};
 
 
