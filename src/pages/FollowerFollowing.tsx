@@ -18,9 +18,10 @@ import type { FollowerFollowingUser } from "@/types/followerFollowing";
 const FollowerFollowingPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { token, id: loggedInUserId } = useUserStore((state) => state);
+  const { token, userId: loggedInUserId } = useUserStore((state) => state);
   const { userId } = useParams();
-  const selectedUser = userId || "0";
+  const selectedUser = userId ? Number(userId) : 0;
+
 
   const [followers, setFollowers] = useState<FollowerFollowingUser[]>([]);
   const [followings, setFollowings] = useState<FollowerFollowingUser[]>([]);
