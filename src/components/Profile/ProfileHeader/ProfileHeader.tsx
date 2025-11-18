@@ -36,29 +36,45 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   userId,
 }) => {
   const [fullName, setFullName] = useState("User");
+  const [bio, setBio] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
 
   const initials = getUserInitials(fullName);
-
   useEffect(() => {
     if (!userId) return;
 
     async function fetchUserData() {
+      // اطلاعات پروفایل
       try {
-        const userData = await getUserProfileService(userId);
-        if (userData?.fullName) setFullName(userData.fullName);
-        else if (userData?.username) setFullName(userData.username);
+        const userRes = await getUserProfileService(userId);
+        if (userRes) {
+          setFullName(userRes.username || "User");
+          setProfilePicture(userRes.profile_picture || "");
+          setBio(userRes.bio || "null");
+        }
+      } catch (err) {
+        console.error("Error fetching user profile:", err);
+      }
 
+      // تعداد فالوورها
+      try {
         const followersRes = await getFollowersService(userId);
         if (followersRes?.count !== undefined)
           setFollowersCount(followersRes.count);
+          // console.log(followersCount)
+      } catch (err) {
+        console.error("Error fetching followers:", err);
+      }
 
+      // تعداد فالووینگ‌ها
+      try {
         const followingRes = await getFollowingService(userId);
         if (followingRes?.count !== undefined)
           setFollowingCount(followingRes.count);
       } catch (err) {
-        console.error("Error fetching user data:", err);
+        console.error("Error fetching following:", err);
       }
     }
 
@@ -87,15 +103,17 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           "ms-auto  pe-2 w-9/10 cursor-pointer flex justify-between items-start mb-10"
         )}
       >
-        <NameBio />
-        <div className="ml-7 relative">
-          <Avatar className="border-primary border-2 w-28 h-28 sm:w-34 sm:h-34 md:w-44 md:h-44 shadow-lg avatar">
-            <AvatarImage src="https://samanskh.github.io/assets/images/bio-p/hoto.jpg" />
-            <AvatarFallback
-              className={`text-2xl font-semibold ${personalColor}`}
-            >
-              {initials}
-            </AvatarFallback>
+        <div className="relative">
+          <Avatar className="w-26 h-26 sm:w-34 sm:h-34 md:w-44 md:h-44 shadow-lg avatar">
+            {profilePicture ? (
+              <AvatarImage alt={fullName} src={profilePicture} />
+            ) : (
+              <AvatarFallback
+                className={`text-2xl font-semibold ${personalColor}`}
+              >
+                {initials}
+              </AvatarFallback>
+            )}
           </Avatar>
           {badges.map((x) => (
             <Badge
@@ -106,12 +124,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           ))}
         </div>
       </div>
+      <FollowBar
+        fullName={fullName}
+        followersCount={followersCount}
+        followingCount={followingCount}
+        bio={bio}
+      />
 
-      <FollowBar fullName={fullName}></FollowBar>
-
-      <div className="mt-10">
-        {isOwner ? <OwnerButton /> : <ViewButton username={String(userId)} />}
-      </div>
+      {/* BUTTON */}
+      {isOwner && <OwnerButton />}
+      {!isOwner && <ViewButton />}
     </>
   );
 };

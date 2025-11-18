@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 
-//onClick={() => handleClickEdit()} className={`w-40 h-8.5 rounded-[12.5px] bg-[var(--color-blue-side)] text-white font-bold ${pressedEdit ? "shadow-none translate-y-[3px]" : "shadow-[0_3px_0px_0px_rgba(0,0,0,1)]"} transition-all duration-200 border-2 border-black `
-
+// Modify the Props interface to accept any React node as children
 interface Props {
-  children: string;
+  children: React.ReactNode; // Change from string to ReactNode to allow any children (text, icons, etc.)
   backgroundColor?: string;
   pageAddress?: string;
   width?: string;
@@ -22,6 +21,7 @@ const CustomButton = ({
   onClick,
 }: Props) => {
   const navigate = useNavigate();
+
   const handleClick = () => {
     setTimeout(() => {
       if (onClick) {
@@ -32,12 +32,13 @@ const CustomButton = ({
       }
     }, 200);
   };
+
   return (
     <Button
       onClick={handleClick}
-      className={`${width} hover:${backgroundColor} sm:text-sm md:text-base cursor-pointer h-12 sm:h-10 rounded-[12.5px] text-white font-bold ${backgroundColor} active:shadow-none active:translate-y-[3px] shadow-[0_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-25 border-2 border-black ${className} `}
+      className={`${width} hover:${backgroundColor} sm:text-sm md:text-base cursor-pointer h-8.5 sm:h-10 rounded-[12.5px] text-white font-bold ${backgroundColor} active:shadow-none active:translate-y-[3px] shadow-[0_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-25 border-2 border-black ${className}`}
     >
-      {children}
+      {children} {/* Render whatever is passed as children */}
     </Button>
   );
 };
