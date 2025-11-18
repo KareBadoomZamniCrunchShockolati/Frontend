@@ -217,7 +217,7 @@ const ProfilePosts = () => {
       <div className="columns-2 sm:columns-3 md:columns-4 gap-3 p-3">
         {postSkeleton.map((post) => (
           <div key={post.id} className="break-inside-avoid mb-3">
-            <Card className="overflow-hidden rounded-[12.5px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-black hover:shadow-2xl hover:opacity-90 transition cursor-pointer">
+            <Card className="overflow-hidden rounded-[12.5px] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] border-2 border-black hover:shadow-2xl hover:opacity-90 transition cursor-pointer">
               <AspectRatio ratio={post.ratio}>
                 <Skeleton className="h-full w-full rounded-[12.5px] rounded-b-none" />
               </AspectRatio>
@@ -250,7 +250,7 @@ const ProfilePosts = () => {
       {posts.map((post) => (
         <div key={post.id} className="break-inside-avoid mb-3">
           <Card
-            className="overflow-hidden rounded-[12.5px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-2 border-black hover:shadow-2xl hover:opacity-90 transition cursor-pointer"
+            className="overflow-hidden rounded-[12.5px] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] border-2 border-black hover:shadow-2xl hover:opacity-90 transition cursor-pointer"
             onClick={() => navigate(`/post/${post.id}`)}
           >
             {/* <AspectRatio ratio={post.ratio}> */}
