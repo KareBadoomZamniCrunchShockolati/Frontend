@@ -264,11 +264,11 @@ const ProfilePosts = () => {
                 className="object-cover w-full rounded-t-[10px]" //this should be 12.5 but with 12.5 does not fit on the border
               />
                   <div className="absolute bottom-0 left-0 right-0 bg-black/30 backdrop-blur-sm p-2 flex gap-4 items-center" dir="rtl">
-                    <div className="flex items-center gap-[5px] text-white">
+                    <div className="flex gap-[5px] text-white">
                       <Heart size={"20px"} />
                       <span>{convertToPersianDigits(formatFollowBarNumber(120))}</span>
                     </div>
-                    <div className="flex items-center gap-[5px] text-white">
+                    <div className="flex gap-[5px] text-white">
                       <MessageCircle size={"20px"} />
                       <span>{convertToPersianDigits(formatFollowBarNumber(120))}</span>
                     </div>
@@ -301,11 +301,11 @@ const ProfilePosts = () => {
                 </p>
                 {post.imageUrl && post.imageUrl.length === 0 && (
                   <div className="flex gap-4" dir="rtl">
-                    <div className="flex items-center gap-[5px]">
+                    <div className="flex gap-[5px]">
                       <Heart size={"20px"} />
                       <span>{convertToPersianDigits(formatFollowBarNumber(120_000_000))}</span>
                     </div>
-                    <div className="flex items-center gap-[5px]">
+                    <div className="flex gap-[5px]">
                       <MessageCircle size={"20px"} />
                       <span>{convertToPersianDigits(formatFollowBarNumber(120_000))}</span>
                     </div>
