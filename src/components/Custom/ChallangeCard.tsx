@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { useState, useCallback } from "react";
+import { Card } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
-  Lock,
   ThumbsUp,
-  Calendar,
   MessageCircle,
   Share,
   Bookmark,
+  Lock,
+  LockOpen,
 } from "lucide-react";
 import CustomBtn from "@/components/Custom/CustomBtn";
 import type { ChallengeCardProps } from "@/types/challengeCardTypes";
@@ -21,9 +21,9 @@ export default function ChallengeCard({
   initialLikes = 0,
   initialComments = 0,
   coverImage = "/images/sample-cover.jpg",
-  isPrivate = false,
   isJoined = true,
   creator,
+  isPrivate = false,
 }: ChallengeCardProps) {
   const [likes, setLikes] = useState(initialLikes);
   const [comments, setComments] = useState(initialComments);
@@ -31,228 +31,205 @@ export default function ChallengeCard({
   const [isSaved, setIsSaved] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const handleLike = () => {
+  const handleLike = useCallback(() => {
     setLikes((prev) => prev + (isLiked ? -1 : 1));
-    setIsLiked(!isLiked);
-  };
+    setIsLiked((prev) => !prev);
+  }, [isLiked]);
 
-  const handleShare = () => {
-    navigator.share?.({
-      title: title,
-      text: description,
-      url: window.location.href,
-    });
-  };
+  const handleShare = useCallback(() => {
+    if (navigator.share) {
+      navigator
+        .share({
+          title,
+          text: description,
+          url: window.location.href,
+        })
+        .catch((err) => console.error("خطا در اشتراک‌گذاری:", err));
+    }
+  }, [title, description]);
 
-  const handleSave = () => {
-    setIsSaved(!isSaved);
-  };
+  const handleSave = useCallback(() => {
+    setIsSaved((prev) => !prev);
+  }, []);
 
-  const shortDescription =
-    description.length > 120 ? description.slice(0, 120) + "..." : description;
+  const displayProfiles = profiles.slice(0, 3);
+  const remainingProfiles = profiles.length > 3 ? profiles.length - 3 : 0;
 
   return (
     <Card
-      className="w-full max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white mb-4"
+      className="w-full max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-xl transition-shadow duration-300 border-2 border-black bg-white"
       dir="rtl"
     >
-      {/* هدر کارت - اطلاعات سازنده */}
-      <div className="px-4 pt-4 pb-3 border-b border-gray-100 bg-white">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 border-2 border-primary">
-              <AvatarImage src={creator?.avatar} />
-              <AvatarFallback className="bg-gray-100 text-gray-600">
-                {creator?.name?.charAt(0) || "U"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              <span className="font-semibold text-gray-900 text-sm">
-                {creator?.name || "کاربر ناشناس"}
-              </span>
-              <span className="text-xs text-gray-500">ایجاد کننده چالش</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleSave}
-              className={`p-2 rounded-full transition-all duration-200 border  ${
-                isSaved
-                  ? "bg-amber-100 text-amber-600 border-primary "
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200 border-secondry"
-              }`}
-            >
-              <Bookmark
-                className={`h-4 w-4 ${
-                  isSaved
-                    ? "fill-amber-600 stroke-primary"
-                    : "stroke-secondry"
-                }
-                `}
-              />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* محتوای چالش */}
-      <CardContent className="p-0">
-        {/* تصویر چالش */}
-        <div className="relative h-72 bg-gray-100 overflow-hidden">
-          {/* اسکلت بارگذاری */}
+      <div className="flex flex-col md:flex-row">
+        {/* بخش تصویر */}
+        <div className="w-full md:w-2/5 relative flex-shrink-0 h-40 md:h-auto bg-">
           {!imageLoaded && (
-            <div className="absolute inset-0 bg-primary animate-pulse"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-100 animate-pulse" />
           )}
-
-          {/* تصویر اصلی */}
-          <div
-            className={`relative w-full h-full transition-opacity duration-300 ${
-              imageLoaded ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <img
-              src={coverImage}
-              alt="Challenge Cover"
-              className="w-full h-full object-cover"
-              onLoad={() => setImageLoaded(true)}
-            />
-
-            {/* Overlay تیره برای خوانایی بهتر متن */}
-            <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/50 to-transparent"></div>
-          </div>
-
-          {/* عنوان و توضیحات روی تصویر */}
-          <div className="absolute bottom-4 left-4 right-4">
-            <div className="bg-white/2 backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-lg">
-              <div className="text-white font-bold text-xl mb-2">{title}</div>
-
-              {shortDescription && (
-                <p className="text-white text-sm leading-relaxed">
-                  {shortDescription}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* وضعیت عضویت */}
-          <div className="absolute top-4 left-4 flex items-center gap-1">
-            {isJoined ? (
-              <span className="px-3 py-1.5 bg-green-100 text-green-700 text-xs font-medium rounded-full border border-green-200 flex items-center gap-1">
-                ✓ عضو شده‌اید
-                {isPrivate && <Lock className="h-3 w-3 text-green-700" />}
-              </span>
-            ) : (
-              <span className="px-3 py-1.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full border border-blue-200 flex items-center gap-1">
-                چالش جدید
-                {isPrivate && <Lock className="h-3 w-3 text-blue-700" />}
-              </span>
-            )}
-          </div>
+          <img
+            src={coverImage}
+            alt={`تصویر چالش ${title}`}
+            className="w-full h-full object-cover"
+            onLoad={() => setImageLoaded(true)}
+            loading="lazy"
+          />
 
           {/* آواتارهای شرکت‌کنندگان */}
-          <div className="absolute top-4 right-4 flex items-center gap-2">
-            <div className="flex -space-x-2" dir="rtl">
-              {profiles.slice(0, 3).map((profile, index) => (
-                <Avatar
-                  key={profile.id}
-                  className="relative h-8 w-8 border-1 border-secondry shadow-sm transition-transform hover:scale-110"
-                  style={{ zIndex: profiles.length - index }}
-                >
-                  <AvatarImage src={profile.image} />
-                  <AvatarFallback className="bg-gray-200 text-gray-700 text-xs">
-                    {profile.fallback}
-                  </AvatarFallback>
-                </Avatar>
-              ))}
-              {profiles.length > 3 && (
-                <Avatar className="relative h-8 w-8 border-1 border-secondry bg-gray-100 text-black text-xs flex items-center justify-center shadow-sm">
-                  +{profiles.length - 3}
-                </Avatar>
-              )}
-            </div>
+          {profiles.length > 0 && (
+            <div className="absolute top-4 right-4 flex items-center gap-2">
+              <div className="flex -space-x-2">
+                {displayProfiles.map((profile, index) => (
+                  <Avatar
+                    key={`${profile.id || index}`}
+                    className="relative h-8 w-8 border-2 border-primary shadow-md hover:scale-110 transition-transform"
+                    style={{ zIndex: displayProfiles.length - index }}
+                  >
+                    <AvatarImage
+                      src={profile.avatar || profile.image}
+                      alt={profile.name}
+                    />
+                    <AvatarFallback className="bg-white text-neutral-gray-bold text-xs">
+                      {profile.name?.charAt(0) || "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
+                {remainingProfiles > 0 && (
+                  <div className="relative h-8 w-8 border-2 border-white bg-neutral-gray text-neutral-gray-bold text-xs flex items-center justify-center rounded-full shadow-md font-semibold">
+                    +{remainingProfiles}
+                  </div>
+                )}
+              </div>
 
-            {/* تعداد کل نفرات فقط اگر 3 یا کمتر باشد */}
-            {profiles.length > 0 && (
-              <span className="text-xs text-white bg-secondry px-2 py-1 rounded-full border border-black">
+              <span className="text-xs text-white bg-secondary px-2 py-1 rounded-full whitespace-nowrap">
                 {profiles.length} نفر
               </span>
-            )}
+            </div>
+          )}
+
+          {/* وضعیت عضویت */}
+          <div className="absolute bottom-4 right-4">
+            <span
+              className={`text-xs font-bold px-3 py-1.5 rounded-full border-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)] ${
+                isJoined
+                  ? "bg-success text-white border-success "
+                  : "bg-white text-neutral-gray-bold border-neutral-gray"
+              }`}
+            >
+              {isJoined ? "عضو شده‌اید ✓" : "عضو نشده‌اید"}
+            </span>
           </div>
         </div>
 
-        {/* اطلاعات پایین */}
-        <div className="p-4" dir="rtl">
+        {/* بخش محتوا */}
+        <div className="md:w-3/5 flex flex-col justify-between p-4 md:p-5 w-full">
+          {/* هدر */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <Avatar className="h-11 w-11 border-2 border-primary shadow-md ring-2 ring-primary/10 flex-shrink-0">
+                <AvatarImage src={creator?.avatar} alt={creator?.name} />
+                <AvatarFallback>
+                  {creator?.name?.charAt(0) || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col min-w-0">
+                <span className="font-semibold text-black text-sm truncate">
+                  {creator?.name || "کاربر ناشناس"}
+                </span>
+                <span className="text-xs text-neutral-gray">ایجاد‌کننده</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div
+                className="text-neutral-gray-bold"
+                title={isPrivate ? "خصوصی" : "عمومی"}
+              >
+                {isPrivate ? (
+                  <Lock className="h-4 w-4" />
+                ) : (
+                  <LockOpen className="h-4 w-4" />
+                )}
+              </div>
+
+              <button
+                onClick={handleSave}
+                className={`p-2 rounded-full transition-all duration-200 border-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:scale-105 flex-shrink-0 ${
+                  isSaved
+                    ? "bg-amber-50 text-primary border-primary"
+                    : "bg-white text-neutral-gray-bold hover:bg-white border-black"
+                }`}
+                aria-label={isSaved ? "حذف از ذخیره شده‌ها" : "ذخیره"}
+              >
+                <Bookmark
+                  className={`h-4 w-4 transition-all ${
+                    isSaved
+                      ? "fill-primary stroke-primary"
+                      : "stroke-neutral-gray-bold"
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* عنوان و توضیحات */}
+          <div className="mb-4">
+            <h2 className="text-lg font-bold text-black mb-2 line-clamp-2">
+              {title}
+            </h2>
+            <p className="text-neutral-gray-bold text-sm leading-relaxed line-clamp-3">
+              {description || "بدون توضیحات"}
+            </p>
+          </div>
+
           {/* تاریخ‌ها */}
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex flex-col items-end" dir="ltr">
-                <span className="text-gray-500 text-xs">شروع</span>
-                <span className="text-gray-900 font-bold">{startDate}</span>
+          <div className="flex gap-6 text-sm mb-4 pb-4 border-b border-neutral-gray">
+            <div>
+              <span className="text-neutral-gray-bold text-xs font-medium block mb-1">
+                تاریخ شروع
+              </span>
+              <span className="text-black font-bold">{startDate}</span>
+            </div>
+            <div>
+              <span className="text-neutral-gray-bold text-xs font-medium block mb-1">
+                تاریخ پایان
+              </span>
+              <span className="text-black font-bold">{endDate}</span>
+            </div>
+            <div>
+              <span className="text-neutral-gray-bold text-xs font-medium block mb-1">
+                نظرات
+              </span>
+              <div className="flex items-center gap-1.5 text-black font-bold">
+                <MessageCircle className="h-4 w-4" />
+                <span>{comments}</span>
               </div>
-              <div className="w-px h-6 bg-gray-300"></div>
-              <div className="flex flex-col items-end" dir="ltr">
-                <span className="text-gray-500 text-xs">پایان</span>
-                <span className="text-gray-900 font-bold">{endDate}</span>
+            </div>
+          </div>
+
+          {/* فوتر */}
+          
+            {/* آمار و دکمه‌ها */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3 md-0">
+                <CustomBtn
+                  onClick={handleLike}
+                  className={`mb-0${isLiked ? "translate-y-3px" : ""}`}
+                  aria-label={isLiked ? "لغو پسندیدن" : "پسندیدن"}
+                >
+                  <ThumbsUp
+                    className={`h-4 w-4 ${isLiked ? "fill-white" : ""}`}
+                  />
+                  <span className="text-sm font-medium">{likes}</span>
+                </CustomBtn>
+
+                <CustomBtn onClick={handleShare} aria-label="اشتراک‌گذاری"
+                className="mb-0">
+                  <Share className="h-4 w-4" />
+                </CustomBtn>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <Calendar className="h-4 w-4 text-gray-500" />
-            </div>
-          </div>
+          
         </div>
-      </CardContent>
-
-      {/* فوتر - اقدامات تعاملی */}
-      <div className="px-4 py-3 border-t border-gray-100 bg-white" dir="ltr">
-        {/* آمار تعاملات */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-4 text-xs">
-            <div
-              className={`flex items-center gap-1 ${
-                isLiked ? "text-blue-600" : "text-gray-500"
-              }`}
-            >
-              <ThumbsUp className="h-3 w-3" />
-              <span>{likes} پسندیدند</span>
-            </div>
-
-            <div className="flex items-center gap-1 text-gray-500">
-              <MessageCircle className="h-3 w-3" />
-              <span>{comments} نظر</span>
-            </div>
-          </div>
-
-          {/* دکمه‌های اقدام سریع */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={handleLike}
-              className={`p-2 rounded-lg transition-all duration-200 ${
-                isLiked
-                  ? "bg-blue-100 text-blue-600"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-              }`}
-            >
-              <ThumbsUp
-                className={`h-4 w-4 ${isLiked ? "fill-secondry" : ""}`}
-              />
-            </button>
-
-            <button
-              onClick={handleShare}
-              className="p-2 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all"
-            >
-              <Share className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
-
-        {/* دکمه عضویت اصلی */}
-        <div>
-          <CustomBtn>
-            {isJoined ? "مشاهده پیشرفت" : "عضویت در چالش"}
-          </CustomBtn>
-        </div>  
       </div>
     </Card>
   );

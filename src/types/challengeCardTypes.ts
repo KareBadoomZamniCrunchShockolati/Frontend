@@ -1,7 +1,8 @@
 interface Profile {
   id: number;
+  name: string;
+  avatar: string;
   image: string;
-  fallback: string;
 }
 
 export interface ChallengeCardProps {
