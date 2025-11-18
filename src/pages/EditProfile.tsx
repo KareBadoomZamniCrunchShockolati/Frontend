@@ -7,6 +7,13 @@ import CustomBtn from "@/components/Custom/CustomBtn";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ProfileSchema, { ProfileInitialValues } from "@/schemas/EditPtofileSchema";
+import {
+  getUserProfileService,
+  putUserProfileService,
+} from "@/services/userService";
+import useUserStore from "@/store/userStore/userStore";
+import type { ProfileValues } from "@/types/editprofileTypes";
+
 
 
 export default function ProfileInfo() {
