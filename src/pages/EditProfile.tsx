@@ -6,15 +6,8 @@ import CustomTextArea from "@/components/Custom/CustomTextArea";
 import CustomBtn from "@/components/Custom/CustomBtn";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import ProfileSchema, {
-  ProfileInitialValues,
-} from "@/schemas/EditPtofileSchema";
-import {
-  getUserProfileService,
-  putUserProfileService,
-} from "@/services/userService";
-import useUserStore from "@/store/userStore/userStore";
-import type { ProfileValues } from "@/types/editprofileTypes";
+import ProfileSchema, { ProfileInitialValues } from "@/schemas/EditPtofileSchema";
+
 
 export default function ProfileInfo() {
   const [image, setImage] = useState<string | null>(null);
@@ -87,14 +80,14 @@ export default function ProfileInfo() {
         >
           <ArrowLeft className="w-6 h-6 text-primary" />
         </button>
-        <h1 className="text-2xl absolute left-1/2 -translate-x-1/2 font-extrabold text-primary text-center">
+        <h1 className="text-2xl absolute left-1/2 -translate-x-[50%] font-extrabold text-primary text-center">
           اطلاعات پروفایل
         </h1>
       </div>
 
       {/* Avatar */}
       <div className="flex justify-center relative mb-8">
-        <Avatar className="w-28 h-28 border border-gray-400">
+        <Avatar className="w-28 h-28 border border-neutral-gray">
           {image ? (
             <AvatarImage src={image} alt="Profile" />
           ) : (
