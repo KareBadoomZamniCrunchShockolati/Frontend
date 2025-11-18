@@ -24,6 +24,7 @@ export default function ChallengeCard({
   isJoined = true,
   creator,
   isPrivate = false,
+  daysOfWeek = ["شنبه", "یکشنبه"], // 🟢 آرایه روزهای هفته
 }: ChallengeCardProps) {
   const [likes, setLikes] = useState(initialLikes);
   const [comments, setComments] = useState(initialComments);
@@ -55,14 +56,17 @@ export default function ChallengeCard({
   const displayProfiles = profiles.slice(0, 3);
   const remainingProfiles = profiles.length > 3 ? profiles.length - 3 : 0;
 
+  const freqCount = daysOfWeek.length;
+  const freqLabel = freqCount === 7 ? "هر روز" : `${freqCount} روز در هفته`;
+
   return (
     <Card
       className="w-full max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-xl transition-shadow duration-300 border-2 border-black bg-white"
       dir="rtl"
     >
       <div className="flex flex-col md:flex-row">
-        {/* بخش تصویر */}
-        <div className="w-full md:w-2/5 relative flex-shrink-0 h-40 md:h-auto bg-">
+        {/* === تصویر === */}
+        <div className="w-full md:w-2/5 relative flex-shrink-0 h-40 md:h-auto bg-gray-100">
           {!imageLoaded && (
             <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-100 animate-pulse" />
           )}
@@ -74,7 +78,7 @@ export default function ChallengeCard({
             loading="lazy"
           />
 
-          {/* آواتارهای شرکت‌کنندگان */}
+          {/* آواتارها */}
           {profiles.length > 0 && (
             <div className="absolute top-4 right-4 flex items-center gap-2">
               <div className="flex -space-x-2">
@@ -111,7 +115,7 @@ export default function ChallengeCard({
             <span
               className={`text-xs font-bold px-3 py-1.5 rounded-full border-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)] ${
                 isJoined
-                  ? "bg-success text-white border-success "
+                  ? "bg-success text-white border-success"
                   : "bg-white text-neutral-gray-bold border-neutral-gray"
               }`}
             >
@@ -120,17 +124,18 @@ export default function ChallengeCard({
           </div>
         </div>
 
-        {/* بخش محتوا */}
+        {/* === محتوا === */}
         <div className="md:w-3/5 flex flex-col justify-between p-4 md:p-5 w-full">
           {/* هدر */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3 min-w-0">
-              <Avatar className="h-11 w-11 border-2 border-primary shadow-md ring-2 ring-primary/10 flex-shrink-0">
+              <Avatar className="h-11 w-11 border-2 border-primary shadow-md ring-2 ring-primary/10">
                 <AvatarImage src={creator?.avatar} alt={creator?.name} />
                 <AvatarFallback>
                   {creator?.name?.charAt(0) || "U"}
                 </AvatarFallback>
               </Avatar>
+
               <div className="flex flex-col min-w-0">
                 <span className="font-semibold text-black text-sm truncate">
                   {creator?.name || "کاربر ناشناس"}
@@ -140,28 +145,22 @@ export default function ChallengeCard({
             </div>
 
             <div className="flex items-center gap-2">
-              <div
-                className="text-neutral-gray-bold"
-                title={isPrivate ? "خصوصی" : "عمومی"}
-              >
-                {isPrivate ? (
-                  <Lock className="h-4 w-4" />
-                ) : (
-                  <LockOpen className="h-4 w-4" />
-                )}
-              </div>
+              {isPrivate ? (
+                <Lock className="h-4 w-4" />
+              ) : (
+                <LockOpen className="h-4 w-4" />
+              )}
 
               <button
                 onClick={handleSave}
-                className={`p-2 rounded-full transition-all duration-200 border-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:scale-105 flex-shrink-0 ${
+                className={`p-2 rounded-full transition-all duration-200 border-2 shadow-lg hover:scale-105 ${
                   isSaved
                     ? "bg-amber-50 text-primary border-primary"
-                    : "bg-white text-neutral-gray-bold hover:bg-white border-black"
+                    : "bg-white text-neutral-gray-bold border-black"
                 }`}
-                aria-label={isSaved ? "حذف از ذخیره شده‌ها" : "ذخیره"}
               >
                 <Bookmark
-                  className={`h-4 w-4 transition-all ${
+                  className={`h-4 w-4 ${
                     isSaved
                       ? "fill-primary stroke-primary"
                       : "stroke-neutral-gray-bold"
@@ -181,20 +180,22 @@ export default function ChallengeCard({
             </p>
           </div>
 
-          {/* تاریخ‌ها */}
-          <div className="flex gap-6 text-sm mb-4 pb-4 border-b border-neutral-gray">
+          {/* تاریخ‌ها + روزهای هفته */}
+          <div className="flex flex-wrap gap-6 text-sm mb-4 pb-4 border-b border-neutral-gray">
             <div>
               <span className="text-neutral-gray-bold text-xs font-medium block mb-1">
                 تاریخ شروع
               </span>
               <span className="text-black font-bold">{startDate}</span>
             </div>
+
             <div>
               <span className="text-neutral-gray-bold text-xs font-medium block mb-1">
                 تاریخ پایان
               </span>
               <span className="text-black font-bold">{endDate}</span>
             </div>
+
             <div>
               <span className="text-neutral-gray-bold text-xs font-medium block mb-1">
                 نظرات
@@ -204,31 +205,33 @@ export default function ChallengeCard({
                 <span>{comments}</span>
               </div>
             </div>
+
+            {/* 🟢 تعداد روزهای هفته */}
+            <div>
+              <span className="text-neutral-gray-bold text-xs font-medium block mb-1">
+                دفعات در هفته
+              </span>
+              <span className="text-black font-bold">{freqLabel}</span>
+
+              {daysOfWeek.length > 0 && (
+                <div className="text-xs text-neutral-gray mt-1">
+                  {daysOfWeek.join("، ")}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* فوتر */}
-          
-            {/* آمار و دکمه‌ها */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 md-0">
-                <CustomBtn
-                  onClick={handleLike}
-                  className={`mb-0${isLiked ? "translate-y-3px" : ""}`}
-                  aria-label={isLiked ? "لغو پسندیدن" : "پسندیدن"}
-                >
-                  <ThumbsUp
-                    className={`h-4 w-4 ${isLiked ? "fill-white" : ""}`}
-                  />
-                  <span className="text-sm font-medium">{likes}</span>
-                </CustomBtn>
+          {/* لایک و اشتراک گذاری */}
+          <div className="flex items-center gap-3">
+            <CustomBtn onClick={handleLike}>
+              <ThumbsUp className={`h-4 w-4 ${isLiked ? "fill-white" : ""}`} />
+              <span>{likes}</span>
+            </CustomBtn>
 
-                <CustomBtn onClick={handleShare} aria-label="اشتراک‌گذاری"
-                className="mb-0">
-                  <Share className="h-4 w-4" />
-                </CustomBtn>
-              </div>
-            </div>
-          
+            <CustomBtn onClick={handleShare}>
+              <Share className="h-4 w-4" />
+            </CustomBtn>
+          </div>
         </div>
       </div>
     </Card>

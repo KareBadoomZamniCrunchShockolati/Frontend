@@ -16,8 +16,12 @@ export interface ChallengeCardProps {
   coverImage?: string;
   isPrivate?: boolean;
   isJoined?: boolean;
+
   creator?: {
     name: string;
     avatar: string;
   };
+
+  // 🟢 روزهای انتخاب‌شده در هفته (مثلاً ["شنبه", "دوشنبه", "چهارشنبه"])
+  daysOfWeek?: string[];
 }
