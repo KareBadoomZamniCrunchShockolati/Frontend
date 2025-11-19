@@ -8,9 +8,14 @@ import loginFormSchemaConfig from "@/schemas/loginFormSchema";
 import { Eye, EyeClosed } from "lucide-react";
 import CustomCheckbox from "@/components/Custom/CustomCheckbox";
 import { useState } from "react";
+import { Label } from "@radix-ui/react-label";
+import { Checkbox } from "@radix-ui/react-checkbox";
+import type { LoginPayload } from "@/types/authTypes";
+import { loginService } from "@/services/authService";
+import CustomToast from "@/components/Custom/CustomToast";
 import { Link, useNavigate } from "react-router-dom"; // ← اضافه شد
 import useUserStore from "@/store/userStore/userStore";
-import { loginService } from "@/services/authService";
+
 
 export default function Login() {
   const { setUsername, setToken, setUserId } = useUserStore();
@@ -28,13 +33,16 @@ export default function Login() {
 
       // تماس با سرویس لاگین
       const response = await loginService(values);
-      console.log("Login response full:", response);
+      const user = response.user_response
+      // ✅ Example: assuming your backend returns { token, user }
+      if (user?.token) {
+        // localStorage.setItem("token", user.token); // interceptor will use it
+        setToken(user.token);
+        setUsername(user.username);
+        setUserId(user.id);
+      }
 
-      // بررسی موفقیت
-      if (response?.user_response?.token) {
-        setToken(response.user_response.token);
-        setUsername(response.user_response.username);
-        setUserId(response.user_response.id);
+      console.log("Login success:", response);
 
         setLoginStatus("ورود با موفقیت انجام شد!");
         setTimeout(() => {
