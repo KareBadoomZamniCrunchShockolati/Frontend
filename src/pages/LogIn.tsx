@@ -16,7 +16,6 @@ import CustomToast from "@/components/Custom/CustomToast";
 import { Link, useNavigate } from "react-router-dom"; // ← اضافه شد
 import useUserStore from "@/store/userStore/userStore";
 
-
 export default function Login() {
   const { setUsername, setToken, setUserId } = useUserStore();
   const navigate = useNavigate(); // ← اضافه شد
@@ -31,18 +30,15 @@ export default function Login() {
       // Optional delay for UX
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      // تماس با سرویس لاگین
       const response = await loginService(values);
-      const user = response.user_response
-      // ✅ Example: assuming your backend returns { token, user }
+      const user = response.user_response;
+
       if (user?.token) {
-        // localStorage.setItem("token", user.token); // interceptor will use it
         setToken(user.token);
         setUsername(user.username);
         setUserId(user.id);
-      }
 
-      console.log("Login success:", response);
+        console.log("Login success:", response);
 
         setLoginStatus("ورود با موفقیت انجام شد!");
         setTimeout(() => {
@@ -51,7 +47,7 @@ export default function Login() {
       } else {
         setLoginStatus("ورود انجام نشد، دوباره تلاش کنید.");
       }
-    } catch (error: any) {// eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error("Login failed:", error);
       setLoginStatus(error?.response?.data?.message || "ورود انجام نشد!");
     } finally {
