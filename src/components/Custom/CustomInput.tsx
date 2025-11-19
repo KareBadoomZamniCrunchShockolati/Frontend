@@ -120,7 +120,7 @@ export default function CustomInput({
                   ${
                     isFloating
                       ? "top-[-10px] text-xs bg-white px-1 text-black"
-                      : isTextarea
+                      : as === "textarea"
                         ? "top-2 text-sm text-gray-500"
                         : "top-1/2 -translate-y-1/2 text-sm text-gray-500"
                   }

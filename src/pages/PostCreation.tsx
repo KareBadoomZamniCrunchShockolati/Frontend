@@ -142,7 +142,7 @@ const PostCreation = () => {
                 label="توضیحات"
                 width="w-full"
                 className="h-32 rounded-xl"
-                isTextarea={true}
+                as="textarea"
               />
             </div>
             {/* challenge selector */}
