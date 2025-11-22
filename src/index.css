@@ -415,12 +415,53 @@
   animation: exit-to-right 200ms ease-in;
 }
 
-/* @import "@/styles/animations.css"; if you extracted it separately */
-
-/* @keyframes slide-in-from-right {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+@keyframes carousel-slide-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
 }
-[data-state="open"][data-side="right"] .sheet-content {
-  animation: slide-in-from-right 250ms ease-out;
-} */
+
+@keyframes carousel-slide-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes carousel-enter-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes carousel-enter-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@layer utilities {
+  .carousel-exit-left {
+    animation: carousel-slide-left 300ms ease forwards;
+  }
+  .carousel-exit-right {
+    animation: carousel-slide-right 300ms ease forwards;
+  }
+  .carousel-enter-left {
+    animation: carousel-enter-left 300ms ease forwards;
+  }
+  .carousel-enter-right {
+    animation: carousel-enter-right 300ms ease forwards;
+  }
+}
