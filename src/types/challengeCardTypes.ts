@@ -1,7 +1,8 @@
 interface Profile {
   id: number;
+  name: string;
+  avatar: string;
   image: string;
-  fallback: string;
 }
 
 export interface ChallengeCardProps {
@@ -15,8 +16,12 @@ export interface ChallengeCardProps {
   coverImage?: string;
   isPrivate?: boolean;
   isJoined?: boolean;
+
   creator?: {
     name: string;
     avatar: string;
   };
+
+  // 🟢 روزهای انتخاب‌شده در هفته (مثلاً ["شنبه", "دوشنبه", "چهارشنبه"])
+  daysOfWeek?: string[];
 }
