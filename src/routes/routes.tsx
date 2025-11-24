@@ -53,29 +53,29 @@ export const router = createBrowserRouter([
     element: <PrivateLayout />,
     children: [
       {
-        path: "/dashboard/:userId",  // Dynamic route for user profile
+        path: "/dashboard/:userId", // Dynamic route for user profile
         element: <DashBoard />,
       },
       {
-        path: "/follow/:userId",  // Route to the FollowBar or FollowerFollowing page
-        element: <FollowerFollowing />,  // Follower/Following page
+        path: "/follow/:userId", // Route to the FollowBar or FollowerFollowing page
+        element: <FollowerFollowing />, // Follower/Following page
       },
-	      {
-      path: "/create-post", 
-      element: <PostCreation />,
-    },
-    {
-      path: "/post/:id",  
-      element: <PostPage />,
-    },
+      {
+        path: "/create-post",
+        element: <PostCreation />,
+      },
+      {
+        path: "/post/:id",
+        element: <PostPage />,
+      },
       {
         path: "/editChallenge",
         element: <ChallengeEdit />,
       },
       {
         path: "/createChallenge",
-        element: <ChallengeCreate />
-      }
+        element: <ChallengeCreate />,
+      },
     ],
   },
 ]);
