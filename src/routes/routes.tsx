@@ -17,6 +17,7 @@ import PostPage from "@/pages/PostPage";
 import Challenge from "@/pages/ChallengeInfo";
 import ChallengeEdit from "@/pages/ChallengeEdit";
 import ChallengeCreate from "@/pages/ChallengeCreate";
+import ProgressCalendar from "@/components/ProgressCalendar";
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
       {
         path: "/test",
         element: <Test />,
+      },
+      {
+        path: "/x",
+        element: <ProgressCalendar />,
       },
       {
         path: "/editprofile",
