@@ -1,18 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X } from "lucide-react";
+import type { UserCardProps } from '@/types/userCardListType';
 
-interface UserCardProps {
-  id: string;
-  username: string;
-  imagePath: string;
-  bio: string;
-  followersCount: number;
-  followingCount: number;
-  doneChallengesCount: number;
-  onDelete: (id: string, username: string) => void;
-  isOwner: boolean;
-}
 
 const UserCard: React.FC<UserCardProps> = ({ 
   id, 
@@ -23,7 +13,8 @@ const UserCard: React.FC<UserCardProps> = ({
   followingCount, 
   doneChallengesCount, 
   onDelete, 
-  isOwner 
+  isOwner ,
+  className
 }) => {
   const navigate = useNavigate();
 
@@ -48,7 +39,7 @@ const UserCard: React.FC<UserCardProps> = ({
 
   return (
     <div
-      className="flex items-center justify-between mb-2 p-2 w-88 sm:w-100 md:w-110 h-24 border border-black rounded-[7px] cursor-pointer"
+      className={`flex items-center justify-between mb-2 p-2 w-88 sm:w-100 md:w-110 h-24 border border-black rounded-[7px] cursor-pointer ${className} `}
       onClick={handleCardClick}  // Trigger navigation on card click
     >
       <div className="flex items-center space-x-4">

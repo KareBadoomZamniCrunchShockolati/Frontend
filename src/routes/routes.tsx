@@ -10,10 +10,14 @@ import SignUp from "@/pages/SignUp";
 import Login from "@/pages/LogIn";
 import Test from "@/pages/test";
 import Edit from "@/pages/EditProfile";
-import Appp from "@/components/Custom/ProgressBar";
-import ProgressCalendar from "@/components/ProgressCalendar";
+import PostCreation from "@/pages/PostCreation";
+import PostPage from "@/pages/PostPage";
 
 // import { LogIn } from "lucide-react";
+import Challenge from "@/pages/ChallengeInfo";
+import ChallengeEdit from "@/pages/ChallengeEdit";
+import ChallengeCreate from "@/pages/ChallengeCreate";
+import ProgressCalendar from "@/components/ProgressCalendar";
 
 export const router = createBrowserRouter([
   {
@@ -42,7 +46,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/editprofile",
-        element: <Edit fullName="" />,
+        element: <Edit />,
+      },
+      {
+        path: "/challenge",
+        element: <Challenge />,
       },
     ],
   },
@@ -50,12 +58,28 @@ export const router = createBrowserRouter([
     element: <PrivateLayout />,
     children: [
       {
-        path: "/dashboard/:id", // Dynamic route for user profile
+        path: "/dashboard/:userId", // Dynamic route for user profile
         element: <DashBoard />,
       },
       {
-        path: "/follow", // Updated route for Follower/Following page
-        element: <FollowerFollowing />,
+        path: "/follow/:userId", // Route to the FollowBar or FollowerFollowing page
+        element: <FollowerFollowing />, // Follower/Following page
+      },
+      {
+        path: "/create-post",
+        element: <PostCreation />,
+      },
+      {
+        path: "/post/:id",
+        element: <PostPage />,
+      },
+      {
+        path: "/editChallenge",
+        element: <ChallengeEdit />,
+      },
+      {
+        path: "/createChallenge",
+        element: <ChallengeCreate />,
       },
     ],
   },

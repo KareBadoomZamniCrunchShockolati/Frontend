@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import { EllipsisIcon } from "lucide-react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import useUserStore from "@/store/userStore/userStore";
 
 import {
   Sheet,
@@ -18,6 +19,16 @@ import { Link } from "react-router-dom";
 import CustomButton from "../Custom/CustomButton";
 
 const ProfileSideSheet = () => {
+  const { userId, setToken, setUserId, setUsername } = useUserStore();
+
+  const handleLogout = () => {
+    setToken("");
+    setUserId(0);
+    setUsername("");
+    localStorage.removeItem("token");
+    // navigate("/login");
+  };
+
   return (
     <div className="relative w-full h-12">
       <Sheet>
@@ -47,14 +58,14 @@ const ProfileSideSheet = () => {
           <div className="grid flex-1 auto-rows-min gap-6 px-1 mt-6 justify-center">
             <CustomButton
               pageAddress="/temp"
-              backgroundColor="bg-gray-500 hover:bg-gray-500"
+              className="bg-gray-500 hover:bg-gray-500"
             >
               شخصی‌سازی
             </CustomButton>
 
             <CustomButton
               pageAddress="/temp"
-              backgroundColor="bg-gray-500 hover:bg-gray-500"
+              className="bg-gray-500 hover:bg-gray-500"
             >
               ذخیره شده‌ها
             </CustomButton>
@@ -63,14 +74,15 @@ const ProfileSideSheet = () => {
 
             <CustomButton
               pageAddress="/temp"
-              backgroundColor="bg-red-500 hover:bg-red-500"
+              className="bg-red-500 hover:bg-red-500"
+              onClick={handleLogout}
             >
               خروج از حساب
             </CustomButton>
 
             <CustomButton
               pageAddress="/temp"
-              backgroundColor="bg-red-500 hover:bg-red-500"
+              className="bg-red-500 hover:bg-red-500"
             >
               حذف حساب کاربری
             </CustomButton>
