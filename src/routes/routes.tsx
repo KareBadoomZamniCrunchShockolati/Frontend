@@ -11,6 +11,7 @@ import Login from "@/pages/LogIn";
 import Test from "@/pages/test";
 import Edit from "@/pages/EditProfile";
 import Appp from "@/components/Custom/ProgressBar";
+import ProgressCalendar from "@/components/ProgressCalendar";
 
 // import { LogIn } from "lucide-react";
 
@@ -37,7 +38,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/x",
-        element: <Appp />,
+        element: <ProgressCalendar />,
       },
       {
         path: "/editprofile",

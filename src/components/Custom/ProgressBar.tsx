@@ -11,7 +11,7 @@ const CircularProgress = ({
   onInputChange,
   onInputBlur,
   onInputKeyDown,
-}) => {
+}: any) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
@@ -71,58 +71,58 @@ const CircularProgress = ({
     </div>
   );
 };
+export default CircularProgress;
+// export default function Appp() {
+// const [percentage, setPercentage] = useState(15);
+// const [isEditing, setIsEditing] = useState(false);
+// const [inputValue, setInputValue] = useState("15");
 
-export default function Appp() {
-  const [percentage, setPercentage] = useState(15);
-  const [isEditing, setIsEditing] = useState(false);
-  const [inputValue, setInputValue] = useState("15");
+// const handlePercentageClick = () => {
+//   setIsEditing(true);
+//   setInputValue(percentage.toString());
+// };
 
-  const handlePercentageClick = () => {
-    setIsEditing(true);
-    setInputValue(percentage.toString());
-  };
+// const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//   setInputValue(e.target.value);
+// };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  };
+// const handleInputBlur = () => {
+//   const newValue = parseInt(inputValue);
+//   if (!isNaN(newValue) && newValue >= 0 && newValue <= 100) {
+//     setPercentage(newValue);
+//   } else {
+//     setInputValue(percentage.toString());
+//   }
+//   setIsEditing(false);
+// };
 
-  const handleInputBlur = () => {
-    const newValue = parseInt(inputValue);
-    if (!isNaN(newValue) && newValue >= 0 && newValue <= 100) {
-      setPercentage(newValue);
-    } else {
-      setInputValue(percentage.toString());
-    }
-    setIsEditing(false);
-  };
+// const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+//   if (e.key === "Enter") {
+//     handleInputBlur();
+//   } else if (e.key === "Escape") {
+//     setInputValue(percentage.toString());
+//     setIsEditing(false);
+//   }
+// };
 
-  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleInputBlur();
-    } else if (e.key === "Escape") {
-      setInputValue(percentage.toString());
-      setIsEditing(false);
-    }
-  };
-
-  return (
-    <>
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <CircularProgress
-          percentage={percentage}
-          size={200}
-          strokeWidth={16}
-          onPercentageClick={handlePercentageClick}
-          isEditing={isEditing}
-          inputValue={inputValue}
-          onInputChange={handleInputChange}
-          onInputBlur={handleInputBlur}
-          onInputKeyDown={handleInputKeyDown}
-        />
-      </div>
-      <CalendarContainer
-        arr2={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]}
-      />
-    </>
-  );
-}
+//   return (
+//     <>
+//       <div className="flex items-center justify-center min-h-screen bg-gray-50">
+// <CircularProgress
+//   percentage={percentage}
+//   size={200}
+//   strokeWidth={16}
+//   onPercentageClick={handlePercentageClick}
+//   isEditing={isEditing}
+//   inputValue={inputValue}
+//   onInputChange={handleInputChange}
+//   onInputBlur={handleInputBlur}
+//   onInputKeyDown={handleInputKeyDown}
+// />
+//       </div>
+//       <CalendarContainer
+//         arr2={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]}
+//       />
+//     </>
+//   );
+// }

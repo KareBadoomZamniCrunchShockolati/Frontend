@@ -3,20 +3,31 @@ import arrowLeft from "@/assets/Img/Icon/ArrLeft.svg";
 import arrowRight from "@/assets/Img/Icon/ArrRight.svg";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import type { CalendarDayProps } from "@/types/calendarDay";
 
 export interface CalendarContainerProps {
-  arr2: number[]; // or DateObject[] if you have your own type
+  arr2: CalendarDayProps[]; // or DateObject[] if you have your own type
 }
 
 const CalendarContainer = ({ arr2 }: CalendarContainerProps) => {
+  const [day, setDay] = useState<number | null>(null);
+  const [startDay, setStartDay] = useState(arr2[0].day);
+  const [currentDays, setCurrenctDays] = useState<CalendarDayProps[]>(() =>
+    generateDays(arr2[0].day)
+  );
+  const [nextDays, setNextDays] = useState<CalendarDayProps[]>([]);
+  const [direction, setDirection] = useState<"" | "left" | "right">("");
+  const [isAnimating, setIsAnimating] = useState(false);
   const DAYS_TO_SHOW = 7;
   console.log(arr2);
 
-  function generateDays(startDay2: number): number[] {
-    const res: number[] = [];
+  function generateDays(startDay2: number): CalendarDayProps[] {
+    const res: CalendarDayProps[] = [];
     for (let x = 0; x < arr2.length; x++) {
-      if (arr2[x] === startDay2) {
-        for (let y = 0; y < DAYS_TO_SHOW && x + y < arr2.length; y++) {
+      if (arr2[x].day === startDay2) {
+        console.log(arr2[x]);
+
+        for (let y = 0; y < 7 && x + y < arr2.length; y++) {
           res.push(arr2[x + y]);
         }
         return res;
@@ -25,20 +36,14 @@ const CalendarContainer = ({ arr2 }: CalendarContainerProps) => {
     return [];
   }
 
-  const [day, setDay] = useState<number | null>(null);
-  const [startDay, setStartDay] = useState(1);
-  const [currentDays, setCurrenctDays] = useState(() => generateDays(1));
-  const [nextDays, setNextDays] = useState<number[]>([]);
-  const [direction, setDirection] = useState<"" | "left" | "right">("");
-  const [isAnimating, setIsAnimating] = useState(false);
-
   const goNext = () => {
     if (isAnimating) return;
     setDirection("left");
     setIsAnimating(true);
 
-    const newStart = startDay + DAYS_TO_SHOW;
+    const newStart = startDay + 7;
     const generateDays2 = generateDays(newStart);
+    console.log("fuck", generateDays2);
 
     setNextDays(generateDays2);
     setDay(null);
@@ -56,7 +61,7 @@ const CalendarContainer = ({ arr2 }: CalendarContainerProps) => {
     setDirection("right");
     setIsAnimating(true);
 
-    const newStart = startDay - DAYS_TO_SHOW;
+    const newStart = startDay - 7;
     const generateDays2 = generateDays(newStart);
 
     setNextDays(generateDays2);
@@ -90,14 +95,14 @@ const CalendarContainer = ({ arr2 }: CalendarContainerProps) => {
               : ""
         )}
       >
-        <div className="w-full  flex items-center justify-between pointer-events-auto px-6">
+        <div className="w-full  flex items-center justify-start pointer-events-auto px-6">
           {currentDays.map((x) => (
             <CalendarDay
-              key={x}
-              num={x}
+              key={x.day}
+              num={x.day}
               cDay={day}
               setDay={setDay}
-              highlight={x === day}
+              highlight={x.day === day}
             />
           ))}
         </div>
@@ -113,14 +118,14 @@ const CalendarContainer = ({ arr2 }: CalendarContainerProps) => {
               : "carousel-enter-left"
           )}
         >
-          <div className="w-full flex items-center justify-between pointer-events-auto px-6">
+          <div className="w-full flex items-center justify-start pointer-events-auto px-6">
             {nextDays.map((x) => (
               <CalendarDay
-                key={x}
-                num={x}
+                key={x.day}
+                num={x.day}
                 cDay={day}
                 setDay={setDay}
-                highlight={x === day}
+                highlight={x.day === day}
               />
             ))}
           </div>
