@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import FollowBar from "../FollowBar";
 import OwnerButton from "../OwnerButton";
 import ViewButton from "../ViewButton";
-import ProfileSideSheet from "../ProfileSideSheet";
-
 import {
   getFollowersService,
   getFollowingService,
   getUserProfileService,
 } from "@/services/userService";
-
 import styles from "./ProfileHeader.module.css";
 import Badge from "@/components/Custom/Badge";
 import type { ProfileHeaderProps } from "@/types/profile";

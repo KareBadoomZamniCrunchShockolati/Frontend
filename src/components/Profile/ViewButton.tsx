@@ -85,19 +85,15 @@ const ViewButton = ({ loggedInUserId, isFollowing = false, token }: Props) => {
     <div className="px-2 mt-5 flex w-full justify-center">
       {isUserFollowing ? (
         <CustomButton
-          backgroundColor="bg-red-500"
-          width="w-full"
           onClick={handleUnfollowClick}
-          className="font-bold !text-white text-profile-title-size"
+          className="bg-red-500 w-full font-bold !text-white text-profile-title-size"
         >
           لغو دنبال
         </CustomButton>
       ) : (
         <CustomButton
-          backgroundColor="bg-secondary"
-          width="w-60"
           onClick={handleFollowClick}
-          className="font-bold !text-white text-profile-title-size"
+          className="w-60 font-bold bg-secondary !text-white text-profile-title-size"
         >
           دنبال کن
         </CustomButton>
