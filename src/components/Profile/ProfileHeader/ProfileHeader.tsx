@@ -45,12 +45,26 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     async function fetchUserData() {
       // اطلاعات پروفایل
       try {
-        const userRes = await getUserProfileService(userId);
-        if (userRes) {
-          setFullName(userRes.username || "User");
-          setProfilePicture(userRes.profile_picture || "");
-          setBio(userRes.bio || "null");
-        }
+        // <<<<<<< HEAD
+        const userData = await getUserProfileService(userId);
+        if (userData?.fullName) setFullName(userData.fullName);
+        else if (userData?.username) setFullName(userData.username);
+
+        const followersRes = await getFollowersService(userId);
+        if (followersRes?.count !== undefined)
+          setFollowersCount(followersRes.count);
+
+        const followingRes = await getFollowingService(userId);
+        if (followingRes?.count !== undefined)
+          setFollowingCount(followingRes.count);
+        // =======
+        //         const userRes = await getUserProfileService(userId);
+        //         if (userRes) {
+        //           setFullName(userRes.username || "User");
+        //           setProfilePicture(userRes.profile_picture || "");
+        //           setBio(userRes.bio || "null");
+        //         }
+        // >>>>>>> develop
       } catch (err) {
         console.error("Error fetching user profile:", err);
       }
@@ -119,17 +133,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           ))}
         </div>
       </div>
+
       <FollowBar
         fullName={fullName}
         followersCount={followersCount}
         followingCount={followingCount}
         bio={bio}
       />
-
-      {/* BUTTON */}
-      {isOwner && <OwnerButton />}
-
-      {!isOwner && <ViewButton />}
+      <div className="mt-10">{isOwner ? <OwnerButton /> : <ViewButton />}</div>
     </>
   );
 };
