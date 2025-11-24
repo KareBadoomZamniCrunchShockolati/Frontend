@@ -55,6 +55,8 @@ const ViewButton = ({ loggedInUserId, isFollowing = false, token }: Props) => {
     }
     try {
       await followUser(loggedInUserId, userId, userToken);
+      console.log(userId);
+
       setIsUserFollowing(true); // Update the button to 'Unfollow' after following
     } catch (error) {
       console.error("Failed to follow the user:", error);

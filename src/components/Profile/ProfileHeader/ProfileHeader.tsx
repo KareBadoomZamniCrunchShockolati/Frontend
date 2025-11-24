@@ -3,8 +3,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import FollowBar from "../FollowBar";
 import OwnerButton from "../OwnerButton";
-// import ViewButton from "../ViewButton";
-// import ProfileSideSheet from "../ProfileSideSheet";
+import ViewButton from "../ViewButton";
+import ProfileSideSheet from "../ProfileSideSheet";
 
 import {
   getFollowersService,
@@ -107,7 +107,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <NameBio />
         <div className="ml-7 relative">
           <Avatar className="border-primary border-2 w-28 h-28 sm:w-34 sm:h-34 md:w-44 md:h-44 shadow-lg avatar">
-            <AvatarImage src="https://samanskh.github.io/assets/images/bio-p/hoto.jpg" />
+            <AvatarImage src="https://samanskh.github.io/assets/images/bio-photo.jpg" />
             <AvatarFallback
               className={`text-2xl font-semibold ${personalColor}`}
             >
@@ -133,6 +133,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
       {/* BUTTON */}
       {isOwner && <OwnerButton />}
+
       {!isOwner && <ViewButton />}
     </>
   );
