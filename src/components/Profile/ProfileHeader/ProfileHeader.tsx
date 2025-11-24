@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import FollowBar from "../FollowBar";
 import OwnerButton from "../OwnerButton";
 import ViewButton from "../ViewButton";
-import ProfileSideSheet from "../ProfileSideSheet";
-
 import {
   getFollowersService,
   getFollowingService,
   getUserProfileService,
 } from "@/services/userService";
-
 import styles from "./ProfileHeader.module.css";
+import Badge from "@/components/Custom/Badge";
+import type { ProfileHeaderProps } from "@/types/profile";
+import NameBio from "../NameBio";
+import TopProfile from "@/components/topProfile";
+import { cn } from "@/lib/utils";
+import defaultBadges from "@/data/mockBadges";
 
 export function getUserInitials(fullName: string): string {
   if (!fullName) return "";
@@ -25,13 +27,7 @@ export function getUserInitials(fullName: string): string {
   return first + last;
 }
 
-interface Props {
-  personalColor?: string;
-  isOwner?: boolean;
-  userId: number;
-}
-
-const ProfileHeader: React.FC<Props> = ({
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   personalColor = "bg-blue-500 text-white",
   isOwner = false,
   userId,
@@ -64,7 +60,7 @@ const ProfileHeader: React.FC<Props> = ({
         const followersRes = await getFollowersService(userId);
         if (followersRes?.count !== undefined)
           setFollowersCount(followersRes.count);
-          // console.log(followersCount)
+        // console.log(followersCount)
       } catch (err) {
         console.error("Error fetching followers:", err);
       }
@@ -81,49 +77,48 @@ const ProfileHeader: React.FC<Props> = ({
 
     fetchUserData();
   }, [userId]);
-
+  const [badges, setBadges] = useState([
+    {
+      ...defaultBadges[0],
+      style: styles.badgeCenter,
+    },
+    {
+      ...defaultBadges[1],
+      style: styles.badgeLeft,
+    },
+    {
+      ...defaultBadges[2],
+      style: styles.badgeRight,
+    },
+  ]);
   return (
     <>
-      {isOwner && <ProfileSideSheet />}
-
+      <TopProfile hideMenue={!isOwner} />
       <div
         onClick={() => console.log("show the badges!")}
-        className={`cursor-pointer flex justify-center ${
-          isOwner ? "mt-2.5" : "mt-14.5"
-        }`}
+        className={cn(
+          "ms-auto  pe-2 w-9/10 cursor-pointer flex justify-between items-start mb-10"
+        )}
       >
-        <div className="relative">
-          <Avatar className="w-26 h-26 sm:w-34 sm:h-34 md:w-44 md:h-44 shadow-lg avatar">
-            {profilePicture ? (
-              <AvatarImage alt={fullName} src={profilePicture} />
-            ) : (
-              <AvatarFallback
-                className={`text-2xl font-semibold ${personalColor}`}
-              >
-                {initials}
-              </AvatarFallback>
-            )}
+        <NameBio />
+        <div className="ml-7 relative">
+          <Avatar className="border-primary border-2 w-28 h-28 sm:w-34 sm:h-34 md:w-44 md:h-44 shadow-lg avatar">
+            <AvatarImage src="https://samanskh.github.io/assets/images/bio-photo.jpg" />
+            <AvatarFallback
+              className={`text-2xl font-semibold ${personalColor}`}
+            >
+              {initials}
+            </AvatarFallback>
           </Avatar>
-
-          {/* Badge decorations */}
-          <img
-            src="/badge.png"
-            alt="badge"
-            className={`${styles.badge} ${styles.badgeCenter}`}
-          />
-          <img
-            src="/badge.png"
-            alt="badge"
-            className={`${styles.badge} ${styles.badgeRight}`}
-          />
-          <img
-            src="/badge.png"
-            alt="badge"
-            className={`${styles.badge} ${styles.badgeLeft}`}
-          />
+          {badges.map((x) => (
+            <Badge
+              imageUrl={x.imageUrl}
+              className={cn(styles.badge, x.style)}
+              borderWidth={3}
+            />
+          ))}
         </div>
       </div>
-
       <FollowBar
         fullName={fullName}
         followersCount={followersCount}
@@ -133,6 +128,7 @@ const ProfileHeader: React.FC<Props> = ({
 
       {/* BUTTON */}
       {isOwner && <OwnerButton />}
+
       {!isOwner && <ViewButton />}
     </>
   );
