@@ -1,6 +1,15 @@
 import { getData, putData, postData } from "./services";
 import type { FollowStats, UserSummary } from "@/types/userTypes";
 import type { PutUserProfileParams } from "@/types/putUserProfileTypes";
+import type { Challenge } from "@/types/challengeTypes";
+
+
+// گرفتن لیست چلنج‌هایی که کاربر در آنها شرکت کرده
+export const getParticipatingChallengesService = async (): Promise<Challenge[]> => {
+  return await getData({
+    endPoint: `/api/v1/challenges/participating`,
+  });
+};
 
 // آپدیت پروفایل
 export const putUserProfileService = async ({

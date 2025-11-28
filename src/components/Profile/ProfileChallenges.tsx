@@ -1,63 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Formik } from "formik";
 import { Search } from "lucide-react";
 import ChallengeCard from "../Custom/ChallangeCard";
 import CustomInput from "../Custom/CustomInput";
 import CustomDropdown from "../Custom/CustomDropdown";
+import { getParticipatingChallengesService } from "@/services/userService";
+import type { Challenge } from "@/types/challengeTypes";
 
 const ProfileChallenges = () => {
-  const challenges = [
-    {
-      id: 1,
-      name: "چالش یک",
-      categoryID: 1,
-      category: "ورزشی",
-      coverImage:
-        "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: 5,
-      name: "چالش دو",
-      categoryID: 1,
-      category: "ورزشی",
-      coverImage:
-        "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: 6,
-      name: "چالش سه",
-      categoryID: 1,
-      category: "ورزشی",
-      coverImage:
-        "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: 2,
-      name: "چالش چهار",
-      categoryID: 3,
-      category: "علمی",
-      coverImage:
-        "https://images.unsplash.com/photo-1581091215366-5df51b1b48fa?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: 3,
-      name: "چالش پنج",
-      categoryID: 2,
-      category: "هنری",
-      coverImage:
-        "https://images.unsplash.com/photo-1511765224389-37f0e77cf0eb?auto=format&fit=crop&w=800&q=80",
-    },
-    {
-      id: 4,
-      name: "چالش شش",
-      categoryID: 4,
-      category: "تفریحی",
-      coverImage:
-        "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80",
-    },
-  ];
-
-  const loading = false;
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const categories = [
     { id: 1, name: "ورزشی" },
@@ -79,15 +32,62 @@ const ProfileChallenges = () => {
     { name: "حسن", avatar: "https://images.unsplash.com/photo-1544005313-2f8f0f2d8b0f?auto=format&fit=crop&w=50&q=80" },
   ];
 
+  // تابع برای گرفتن داده‌ها از API
+  const fetchChallenges = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await getParticipatingChallengesService();
+      setChallenges(response.data || response);
+    } catch (err) {
+      setError("خطا در دریافت چالش‌ها");
+      console.error("Error fetching challenges:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchChallenges();
+  }, []);
+
+  // تابع تبدیل تاریخ از فرمت ISO به شمسی (می‌توانید منطق واقعی جایگزین کنید)
+  const convertToJalali = (isoDate: string): string => {
+    // اینجا می‌توانید از کتابخانه‌ای مثل moment-jalaali استفاده کنید
+    // برای نمونه یک تبدیل ساده:
+    try {
+      const date = new Date(isoDate);
+      return `${date.getFullYear()}/${(date.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}/${date.getDate().toString().padStart(2, "0")}`;
+    } catch {
+      return "1402/01/01";
+    }
+  };
+
+  // تابع برای استخراج نام دسته‌بندی از داده‌های API
+  const getCategoryId = (categoryName: string): number => {
+    const categoryMap: { [key: string]: number } = {
+      "Fitness": 1,
+      "Art": 2,
+      "Science": 3,
+      "Entertainment": 4,
+      "ورزشی": 1,
+      "هنری": 2,
+      "علمی": 3,
+      "تفریحی": 4,
+    };
+    return categoryMap[categoryName] || 1;
+  };
+
   const getRandomAvatars = (challengeId: number) => {
-    // استفاده از challengeId برای ایجاد عدد ثابت
     const seed = challengeId;
-    const count = (seed % 3) + 1; // 1 تا 3 آواتار
+    const count = (seed % 3) + 1;
     return sampleAvatars.slice(0, count).map((user, idx) => ({
       id: idx,
       name: user.name,
       avatar: user.avatar,
-      image : ""
+      image: ""
     }));
   };
 
@@ -95,30 +95,48 @@ const ProfileChallenges = () => {
     .filter((key) => checkedCategories[Number(key)])
     .map(Number);
 
+  // فیلتر کردن چالش‌ها بر اساس جستجو
   const searchedChallenges = search
     ? challenges
         .filter((challenge) =>
-          challenge.name.toLowerCase().includes(search.toLowerCase())
+          challenge.title.toLowerCase().includes(search.toLowerCase())
         )
         .sort((a, b) => {
-          const aName = a.name.toLowerCase();
-          const bName = b.name.toLowerCase();
+          const aTitle = a.title.toLowerCase();
+          const bTitle = b.title.toLowerCase();
           const s = search.toLowerCase();
-          const score = (name: string) => {
-            if (name === s) return 3;
-            if (name.startsWith(s)) return 2;
+          const score = (title: string) => {
+            if (title === s) return 3;
+            if (title.startsWith(s)) return 2;
             return 1;
           };
-          return score(bName) - score(aName);
+          return score(bTitle) - score(aTitle);
         })
     : challenges;
 
+  // فیلتر کردن بر اساس دسته‌بندی
   const filteredChallenges =
     selectedCategoryIds.length === 0
       ? searchedChallenges
-      : searchedChallenges.filter((ch) =>
-          selectedCategoryIds.includes(ch.categoryID)
+      : searchedChallenges.filter((challenge) =>
+          selectedCategoryIds.includes(getCategoryId(challenge.category_name))
         );
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <div className="text-red-500 text-center">
+          <p>{error}</p>
+          <button 
+            onClick={fetchChallenges}
+            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            تلاش مجدد
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -161,23 +179,23 @@ const ProfileChallenges = () => {
       </div>
 
       {/* نمایش چالش‌ها */}
-      {!loading && (
+      {!loading && filteredChallenges.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 m-2.5">
           {filteredChallenges.map((challenge) => (
             <ChallengeCard
               key={challenge.id}
-              title={challenge.name}
-              description={`این توضیح نمونه برای چالش ${challenge.name} است. لطفا متن کامل خود را اینجا قرار دهید.`}
-              startDate="1402/01/01"
-              endDate="1402/01/30" 
+              title={challenge.title}
+              description={challenge.description}
+              startDate={convertToJalali(challenge.start_time)}
+              endDate={convertToJalali(challenge.end_time)}
               profiles={getRandomAvatars(challenge.id)}
-              initialLikes={Math.floor(Math.random() * 100)}
-              initialComments={Math.floor(Math.random() * 50)}
-              coverImage={challenge.coverImage}
-              isPrivate={Math.random() < 0.3}
-              isJoined={Math.random() < 0.5}
+              initialLikes={challenge.like_count}
+              initialComments={challenge.comment_count}
+              coverImage={challenge.image_url || "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=800&q=80"}
+              isPrivate={challenge.visibility === "private"}
+              isJoined={challenge.is_user_participating}
               creator={{
-                name: "ایجادکننده چالش",
+                name: challenge.creator_username,
                 avatar: "https://images.unsplash.com/photo-1502764613149-7f1d229e230f?auto=format&fit=crop&w=50&q=80",
               }}
             />
@@ -185,14 +203,29 @@ const ProfileChallenges = () => {
         </div>
       )}
 
+      {!loading && filteredChallenges.length === 0 && (
+        <div className="flex justify-center items-center h-40">
+          <p className="text-gray-500">
+            {search || selectedCategoryIds.length > 0 
+              ? "چالشی با این فیلترها یافت نشد" 
+              : "شما در هیچ چالشی شرکت نکرده‌اید"}
+          </p>
+        </div>
+      )}
+
       {loading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1 m-2.5">
-          {[...Array(10)].map((_, idx) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 m-2.5">
+          {[...Array(6)].map((_, idx) => (
             <div
               key={idx}
-              className="cursor-pointer m-1 hover:shadow-2xl transition"
+              className="animate-pulse bg-gray-200 rounded-lg h-80"
             >
-              <p>Loading...</p>
+              <div className="h-40 bg-gray-300 rounded-t-lg"></div>
+              <div className="p-4 space-y-3">
+                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                <div className="h-3 bg-gray-300 rounded w-full"></div>
+                <div className="h-3 bg-gray-300 rounded w-2/3"></div>
+              </div>
             </div>
           ))}
         </div>
