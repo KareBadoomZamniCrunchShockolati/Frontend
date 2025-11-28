@@ -7,8 +7,6 @@ import { Field } from "formik";
 import type { FieldProps } from "formik";
 import type { StepTwoProps } from "@/types/challengeCreateTypes";
 
-
-
 const Step2Details: React.FC<StepTwoProps> = ({
   selectedCategories,
   setSelectedCategories,
@@ -19,9 +17,9 @@ const Step2Details: React.FC<StepTwoProps> = ({
   setFieldValue,
 }) => {
   return (
-    <div className="w-full max-w-xl mt-7 mb-5">
-      {/* ── Category selector ── */}
-      <div className="mt-4">
+    <div className="w-full max-w-xl mt-7 mb-5 space-y-8">
+      {/* Category selector */}
+      <div>
         <div className="relative">
           <CustomInput
             name="category"
@@ -31,7 +29,7 @@ const Step2Details: React.FC<StepTwoProps> = ({
             onChange={(e) => setCategorySearch(e.target.value)}
             className="w-full p-3 pr-10 border rounded-md focus:ring-2 outline-none text-right"
           />
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+          <Search className="absolute right-3 top-10 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
         </div>
 
         {categorySearch && filteredCategories.length > 0 && (
@@ -60,23 +58,11 @@ const Step2Details: React.FC<StepTwoProps> = ({
               {cat}
               <button
                 type="button"
-                onClick={() =>
-                  setSelectedCategories((p) => p.filter((c) => c !== cat))
-                }
+                onClick={() => setSelectedCategories((p) => p.filter((c) => c !== cat))}
                 className="hover:bg-orange-200 rounded-full p-0.5"
               >
-                <svg
-                  className="w-3 h-3"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </span>
@@ -84,32 +70,39 @@ const Step2Details: React.FC<StepTwoProps> = ({
         </div>
       </div>
 
-      {/* ── Date & Location ── */}
-      <div className="flex flex-col space-y-4 mt-10">
-        <Field name="challengeDate">
+      {/* تاریخ و ساعت شروع و پایان */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Field name="startDate">
           {({ field }: FieldProps) => (
-            <CustomInput
-              {...field}
-              label="تاریخ"
-              type="date"
-              className="w-full p-3 border rounded-md"
-            />
+            <CustomInput {...field} label="تاریخ شروع" type="date" />
           )}
         </Field>
-
-        <Field name="challengeLocation">
+        <Field name="startTime">
           {({ field }: FieldProps) => (
-            <CustomInput
-              {...field}
-              label="مکان"
-              className="w-full p-3 border rounded-md"
-            />
+            <CustomInput {...field} label="ساعت شروع" type="time" />
+          )}
+        </Field>
+        <Field name="endDate">
+          {({ field }: FieldProps) => (
+            <CustomInput {...field} label="تاریخ پایان" type="date" />
+          )}
+        </Field>
+        <Field name="endTime">
+          {({ field }: FieldProps) => (
+            <CustomInput {...field} label="ساعت پایان" type="time" />
           )}
         </Field>
       </div>
 
-      {/* ── Challenge type ── */}
-      <div className="mt-10">
+      {/* مکان */}
+      <Field name="challengeLocation">
+        {({ field }: FieldProps) => (
+          <CustomInput {...field} label="مکان (اختیاری)" placeholder="مثلاً: پارک ملت" />
+        )}
+      </Field>
+
+      {/* نوع چالش */}
+      <div className="mt-6">
         <CustomSelect
           name="challengeType"
           label="نوع چالش"
@@ -117,19 +110,16 @@ const Step2Details: React.FC<StepTwoProps> = ({
             { value: "عمومی", label: "عمومی" },
             { value: "شخصی", label: "شخصی" },
           ]}
-          width="mt-10"
         />
       </div>
 
-      {/* ── Comments toggle ── */}
-      <div className="mt-10">
+      {/* کامنت‌ها */}
+      <div className="mt-6">
         <CustomCheckbox
           name="isCommentsEnabled"
-          labelText="فعال بودن کامنت ها"
+          labelText="اجازه دادن به کامنت‌ها"
           checked={values.isCommentsEnabled}
-          onChange={() =>
-            setFieldValue("isCommentsEnabled", !values.isCommentsEnabled)
-          }
+          onChange={() => setFieldValue("isCommentsEnabled", !values.isCommentsEnabled)}
         />
       </div>
     </div>
