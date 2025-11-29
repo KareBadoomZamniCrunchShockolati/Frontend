@@ -1,4 +1,3 @@
-// ChallengeEdit.tsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomButton from "@/components/Custom/CustomButton";
@@ -64,16 +63,18 @@ const ChallengeEdit: React.FC = () => {
       }
 
       try {
-        const res = await fetch(`http://localhost:8080/api/v1/challenges/${challengeId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          `http://localhost:8080/api/v1/challenges/${challengeId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         if (!res.ok) throw new Error("چالش یافت نشد");
 
         const result = await res.json();
         const data: ChallengeData = result.data;
 
-        // فقط سازنده اجازه ویرایش داره
         if (data.creator_id !== Number(userId)) {
           CustomToast("شما اجازه ویرایش این چالش را ندارید", "error");
           navigate(`/challenge/${challengeId}`);
@@ -93,13 +94,10 @@ const ChallengeEdit: React.FC = () => {
         setEndDate(data.end_time.split("T")[0]);
         setEndTime(data.end_time.split("T")[1]?.slice(0, 5) || "18:00");
 
-        // خط طلایی — دقیقاً همون چیزی که مشکل رو حل کرد!
         const filtered = data.participants.filter(
-          (p) => String(p.user_id) !== String(userId)
+          (p) => p.user_id !== Number(userId)
         );
-
         setParticipants(filtered);
-
       } catch (err) {
         CustomToast("خطا در بارگذاری چالش", "error");
         navigate(-1);
@@ -111,7 +109,8 @@ const ChallengeEdit: React.FC = () => {
     fetchChallenge();
   }, [challengeId, token, userId, navigate]);
 
-  if (loading) return <div className="text-center py-20">در حال بارگذاری...</div>;
+  if (loading)
+    return <div className="text-center py-20">در حال بارگذاری...</div>;
   if (!challenge || !isCreator) return null;
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,9 +122,44 @@ const ChallengeEdit: React.FC = () => {
     }
   };
 
-  const handleDeleteParticipant = (id: string | number) => {
-    setParticipants((prev) => prev.filter((u) => String(u.user_id) !== String(id)));
-    CustomToast("کاربر حذف شد", "info");
+  const handleDeleteParticipant = async (
+    participantId: string | number,
+    username?: string
+  ) => {
+    if (!challengeId || !token || !participantId) {
+      CustomToast("شناسه کاربر نامعتبر است", "error");
+      return;
+    }
+
+    const participantIdStr = String(participantId);
+
+    try {
+      const res = await fetch(
+        `http://localhost:8080/api/v1/challenges/${challengeId}/participants/${participantIdStr}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        const errData = await res.text();
+        const message = errData
+          ? JSON.parse(errData)?.message
+          : "خطا در حذف کاربر";
+        throw new Error(message);
+      }
+
+      // حذف از فرانت‌اند
+      setParticipants((prev) =>
+        prev.filter((u) => u.user_id !== Number(participantId))
+      );
+      CustomToast("کاربر با موفقیت از چالش حذف شد", "success");
+    } catch (err: any) {
+      CustomToast(err.message || "حذف ناموفق بود", "error");
+    }
   };
 
   const handleSave = async () => {
@@ -151,14 +185,17 @@ const ChallengeEdit: React.FC = () => {
     };
 
     try {
-      const res = await fetch(`http://localhost:8080/api/v1/challenges/${challengeId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        `http://localhost:8080/api/v1/challenges/${challengeId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (!res.ok) {
         const err = await res.text();
@@ -188,7 +225,10 @@ const ChallengeEdit: React.FC = () => {
           <h1 className="text-2xl font-bold text-primary">ویرایش چالش</h1>
         </div>
 
-        <ImageAndBadgeContainerEdit onImageChange={handleImageChange} imageUrl={image} />
+        <ImageAndBadgeContainerEdit
+          onImageChange={handleImageChange}
+          imageUrl={image}
+        />
 
         <div className="w-full max-w-xl space-y-6 mt-6">
           <TitleAndDescriptionInput
@@ -217,8 +257,15 @@ const ChallengeEdit: React.FC = () => {
             </h2>
             {participants.length > 0 ? (
               <>
-                <SearchBar searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
-                <UserCardList users={filteredParticipants} onDelete={handleDeleteParticipant} isOwner={true} />
+                <SearchBar
+                  searchTerm={searchTerm}
+                  onSearchTermChange={setSearchTerm}
+                />
+                <UserCardList
+                  users={filteredParticipants}
+                  onDelete={handleDeleteParticipant}
+                  isOwner={true}
+                />
               </>
             ) : (
               <p className="text-center text-primary py-8 rounded-xl">

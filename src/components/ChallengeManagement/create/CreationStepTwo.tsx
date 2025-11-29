@@ -97,7 +97,7 @@ const Step2Details: React.FC<StepTwoProps> = ({
       {/* مکان */}
       <Field name="challengeLocation">
         {({ field }: FieldProps) => (
-          <CustomInput {...field} label="مکان (اختیاری)" placeholder="مثلاً: پارک ملت" />
+          <CustomInput {...field} label="مکان "/>
         )}
       </Field>
 

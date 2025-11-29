@@ -1,4 +1,5 @@
-// ChallengeCreate.tsx — حالا فالوئرهای واقعی رو نشون می‌ده (به جای mockUsers)
+// src/pages/ChallengeCreate.tsx (یا هر مسیر دیگه‌ای که داری)
+
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form } from "formik";
@@ -11,6 +12,7 @@ import CustomToast from "@/components/Custom/CustomToast";
 import useUserStore from "@/store/userStore/userStore";
 import type { UserProfile } from "@/types/userTypes";
 import { fetchUsers } from "@/services/followerFollowingService";
+import { createChallenge , inviteMultipleUsersToChallenge } from "@/services/challengeCreateService";
 
 const ChallengeCreate: React.FC = () => {
   const navigate = useNavigate();
@@ -25,11 +27,11 @@ const ChallengeCreate: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [categorySearch, setCategorySearch] = useState("");
 
-  // Step 3 — واقعی
+  // Step 3
   const [userSearch, setUserSearch] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<UserProfile[]>([]);
 
-  // داده‌های واقعی فالوئرها
+  // فالوئرها
   const [fetchedUsers, setFetchedUsers] = useState<UserProfile[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [usersError, setUsersError] = useState<string | null>(null);
@@ -39,7 +41,17 @@ const ChallengeCreate: React.FC = () => {
   const token = useUserStore((state) => state.token);
   const userId = useUserStore((state) => state.userId);
 
-  const mockCategories = ["ورزش", "سلامت", "آموزش", "محیط زیست", "فرهنگ", "تکنولوژی", "هنر", "غذا"];
+  // دسته‌بندی‌ها
+  const mockCategories = [
+    "ورزش",
+    "سلامت",
+    "آموزش",
+    "محیط زیست",
+    "فرهنگ",
+    "تکنولوژی",
+    "هنر",
+    "غذا",
+  ];
   const categoryNameToId: Record<string, number> = {
     ورزش: 1,
     سلامت: 2,
@@ -56,7 +68,7 @@ const ChallengeCreate: React.FC = () => {
     (c) => c.includes(categorySearch) && !selectedCategories.includes(c)
   );
 
-  // بارگذاری فالوئرها (فقط یک بار یا وقتی userId تغییر کرد)
+  // بارگذاری فالوئرها
   useEffect(() => {
     const loadFollowers = async () => {
       if (!userId || !token) return;
@@ -68,7 +80,6 @@ const ChallengeCreate: React.FC = () => {
         const users = await fetchUsers(userId.toString(), "followers");
         setFetchedUsers(users || []);
       } catch (error: any) {
-        console.error("Failed to fetch followers:", error);
         setUsersError("خطا در بارگذاری فالوئرها");
         CustomToast("خطا در بارگذاری فالوئرها", "error");
       } finally {
@@ -79,17 +90,18 @@ const ChallengeCreate: React.FC = () => {
     loadFollowers();
   }, [userId, token]);
 
-  // لیست کاربران قابل انتخاب (فیلتر شده بر اساس سرچ و حذف انتخاب‌شده‌ها)
   const availableUsers = useMemo(() => {
     return fetchedUsers
       .filter((u) => !selectedUsers.some((s) => s.id === u.id))
-      .filter((u) =>
-        u.username.toLowerCase().includes(userSearch.toLowerCase()) ||
-        (u.full_name?.toLowerCase()?.includes(userSearch.toLowerCase()) ?? false)
+      .filter(
+        (u) =>
+          u.username.toLowerCase().includes(userSearch.toLowerCase()) ||
+          (u.full_name?.toLowerCase()?.includes(userSearch.toLowerCase()) ?? false)
       );
   }, [fetchedUsers, selectedUsers, userSearch]);
 
-  const handleBack = () => (currentStep === 1 ? navigate(-1) : setCurrentStep((s) => s - 1));
+  const handleBack = () =>
+    currentStep === 1 ? navigate(-1) : setCurrentStep((s) => s - 1);
   const handleNext = () => currentStep < 3 && setCurrentStep((s) => s + 1);
 
   const addUser = (user: UserProfile, memberCount: string) => {
@@ -103,8 +115,10 @@ const ChallengeCreate: React.FC = () => {
     setUserSearch("");
   };
 
-  const removeUser = (id: string) => setSelectedUsers((p) => p.filter((u) => u.id !== id));
+  const removeUser = (id: string) =>
+    setSelectedUsers((p) => p.filter((u) => u.id !== id));
 
+  // ثبت نهایی چالش
   const handleFinish = async (values: any) => {
     if (isSubmitting || !token) {
       CustomToast("لطفاً وارد حساب کاربری شوید", "error");
@@ -113,75 +127,63 @@ const ChallengeCreate: React.FC = () => {
 
     setIsSubmitting(true);
 
-    let start_time = new Date().toISOString();
-    let end_time = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-
-    if (values.startDate && values.startTime) start_time = `${values.startDate}T${values.startTime}:00Z`;
-    if (values.endDate && values.endTime) end_time = `${values.endDate}T${values.endTime}:59Z`;
-
-    const visibility = values.challengeType === "شخصی" ? "private" : "public";
-
-    const payload = {
-      title: challengeTitle.trim(),
-      description: challengeDescription.trim(),
-      category_id: selectedCategories.length > 0 ? getCategoryId(selectedCategories[0]) : 1,
-      max_participants: values.memberCount ? parseInt(values.memberCount) : null,
-      visibility,
-      rule: values.challengeRule?.trim() || "none",
-      comments_enabled: values.isCommentsEnabled,
-      start_time,
-      end_time,
-      timezone: "UTC",
-      image_url: image || null,
-    };
-
     try {
-      // 1. ساخت چالش
-      const createRes = await fetch("http://localhost:8080/api/v1/challenges", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(payload),
-      });
+      // تاریخ شروع و پایان
+      const start_time =
+        values.startDate && values.startTime
+          ? `${values.startDate}T${values.startTime}:00Z`
+          : new Date().toISOString();
 
-      const text = await createRes.text();
-      if (!createRes.ok) throw new Error(JSON.parse(text)?.message || "خطا در ساخت چالش");
+      const end_time =
+        values.endDate && values.endTime
+          ? `${values.endDate}T${values.endTime}:59Z`
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-      const result = JSON.parse(text);
-      const challengeId = result.data?.ID;
-      if (!challengeId) throw new Error("challengeId دریافت نشد");
+      const payload = {
+        title: challengeTitle.trim(),
+        description: challengeDescription.trim(),
+        category_id:
+          selectedCategories.length > 0 ? getCategoryId(selectedCategories[0]) : 1,
+        max_participants: values.memberCount ? parseInt(values.memberCount) : null,
+        visibility: values.challengeType === "شخصی" ? "private" : "public",
+        rule: values.challengeRule?.trim() || "none",
+        comments_enabled: values.isCommentsEnabled,
+        start_time,
+        end_time,
+        timezone: "UTC",
+        image_url: image || null,
+      };
+
+      // ۱. ساخت چالش
+      const createResponse = await createChallenge(payload);
+      const challengeId = createResponse.data?.ID;
+
+      if (!challengeId) throw new Error("شناسه چالش دریافت نشد");
 
       CustomToast("چالش با موفقیت ساخته شد!", "success");
 
-      // 2. دعوت کاربران
+      // ۲. دعوت کاربران
       if (selectedUsers.length > 0) {
-        for (const user of selectedUsers) {
-          const inviteUrl = `http://localhost:8080/api/v1/challenges/${challengeId}/invite`;
-          const userIdAsNumber = Number(user.id);
+        const userIds = selectedUsers.map((u) => u.id);
+        const inviteResults = await inviteMultipleUsersToChallenge(challengeId, userIds);
 
-          try {
-            const res = await fetch(inviteUrl, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ invitee_id: userIdAsNumber }),
-            });
+        const failedCount = inviteResults.filter((r) => !r.success).length;
 
-            if (!res.ok) {
-              const errText = await res.text();
-              console.error(`دعوت ${user.username} ناموفق:`, errText);
-            }
-          } catch (err: any) {
-            console.error(`خطای شبکه برای ${user.username}:`, err.message);
-          }
+        if (failedCount === 0) {
+          CustomToast(`دعوت به ${selectedUsers.length} نفر با موفقیت ارسال شد!`, "success");
+        } else {
+          CustomToast(
+            `${failedCount} دعوت ناموفق بود، بقیه ارسال شدند.`,
+            "warning"
+          );
         }
-        CustomToast(`دعوت به ${selectedUsers.length} نفر ارسال شد!`, "success");
       }
 
+      // هدایت به صفحه چالش
       navigate(`/challenge/${challengeId}`, { replace: true });
     } catch (err: any) {
-      CustomToast(err.message || "خطایی رخ داد", "error");
+      console.error("خطا در ساخت چالش:", err);
+      CustomToast(err.message || "خطایی در ثبت چالش رخ داد", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -202,7 +204,6 @@ const ChallengeCreate: React.FC = () => {
           startTime: "",
           endDate: "",
           endTime: "",
-          challengeLocation: "",
           challengeRule: "",
           isCommentsEnabled: true,
           challengeType: "عمومی",
@@ -212,7 +213,8 @@ const ChallengeCreate: React.FC = () => {
         onSubmit={(values) => currentStep === 3 && handleFinish(values)}
       >
         {({ values }) => {
-          const canAddMore = !values.memberCount || selectedUsers.length < parseInt(values.memberCount);
+          const canAddMore =
+            !values.memberCount || selectedUsers.length < parseInt(values.memberCount);
 
           return (
             <Form className="flex-1 flex flex-col mt-10 justify-start items-center w-full">
@@ -249,8 +251,8 @@ const ChallengeCreate: React.FC = () => {
                   availableUsers={availableUsers}
                   addUser={(u: UserProfile) => addUser(u, values.memberCount)}
                   canAddMore={canAddMore}
-                  loadingUsers={loadingUsers}   // اضافه شد
-                  usersError={usersError}       // اضافه شد
+                  loadingUsers={loadingUsers}
+                  usersError={usersError}
                 />
               )}
 
@@ -267,8 +269,20 @@ const ChallengeCreate: React.FC = () => {
                   {isSubmitting ? (
                     <span className="flex items-center justify-center gap-3">
                       <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
                       </svg>
                       در حال ثبت...
                     </span>
@@ -287,4 +301,4 @@ const ChallengeCreate: React.FC = () => {
   );
 };
 
-export default ChallengeCreate; 
+export default ChallengeCreate;
