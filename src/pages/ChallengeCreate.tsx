@@ -12,7 +12,10 @@ import CustomToast from "@/components/Custom/CustomToast";
 import useUserStore from "@/store/userStore/userStore";
 import type { UserProfile } from "@/types/userTypes";
 import { fetchUsers } from "@/services/followerFollowingService";
-import { createChallenge , inviteMultipleUsersToChallenge } from "@/services/challengeCreateService";
+import {
+  createChallenge,
+  inviteMultipleUsersToChallenge,
+} from "@/services/challengeService";
 
 const ChallengeCreate: React.FC = () => {
   const navigate = useNavigate();
@@ -31,7 +34,6 @@ const ChallengeCreate: React.FC = () => {
   const [userSearch, setUserSearch] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<UserProfile[]>([]);
 
-  // فالوئرها
   const [fetchedUsers, setFetchedUsers] = useState<UserProfile[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [usersError, setUsersError] = useState<string | null>(null);
@@ -96,7 +98,8 @@ const ChallengeCreate: React.FC = () => {
       .filter(
         (u) =>
           u.username.toLowerCase().includes(userSearch.toLowerCase()) ||
-          (u.full_name?.toLowerCase()?.includes(userSearch.toLowerCase()) ?? false)
+          (u.full_name?.toLowerCase()?.includes(userSearch.toLowerCase()) ??
+            false)
       );
   }, [fetchedUsers, selectedUsers, userSearch]);
 
@@ -143,8 +146,12 @@ const ChallengeCreate: React.FC = () => {
         title: challengeTitle.trim(),
         description: challengeDescription.trim(),
         category_id:
-          selectedCategories.length > 0 ? getCategoryId(selectedCategories[0]) : 1,
-        max_participants: values.memberCount ? parseInt(values.memberCount) : null,
+          selectedCategories.length > 0
+            ? getCategoryId(selectedCategories[0])
+            : 1,
+        max_participants: values.memberCount
+          ? parseInt(values.memberCount)
+          : null,
         visibility: values.challengeType === "شخصی" ? "private" : "public",
         rule: values.challengeRule?.trim() || "none",
         comments_enabled: values.isCommentsEnabled,
@@ -165,12 +172,18 @@ const ChallengeCreate: React.FC = () => {
       // ۲. دعوت کاربران
       if (selectedUsers.length > 0) {
         const userIds = selectedUsers.map((u) => u.id);
-        const inviteResults = await inviteMultipleUsersToChallenge(challengeId, userIds);
+        const inviteResults = await inviteMultipleUsersToChallenge(
+          challengeId,
+          userIds
+        );
 
         const failedCount = inviteResults.filter((r) => !r.success).length;
 
         if (failedCount === 0) {
-          CustomToast(`دعوت به ${selectedUsers.length} نفر با موفقیت ارسال شد!`, "success");
+          CustomToast(
+            `دعوت به ${selectedUsers.length} نفر با موفقیت ارسال شد!`,
+            "success"
+          );
         } else {
           CustomToast(
             `${failedCount} دعوت ناموفق بود، بقیه ارسال شدند.`,
@@ -214,7 +227,8 @@ const ChallengeCreate: React.FC = () => {
       >
         {({ values }) => {
           const canAddMore =
-            !values.memberCount || selectedUsers.length < parseInt(values.memberCount);
+            !values.memberCount ||
+            selectedUsers.length < parseInt(values.memberCount);
 
           return (
             <Form className="flex-1 flex flex-col mt-10 justify-start items-center w-full">

@@ -1,11 +1,8 @@
 // src/services/challengeService.ts
 
-import { postData } from "./services";
+import { getData, postData, putData, deleteData } from "./services";
 import type { UserProfile } from "@/types/userTypes";
 
-// -------------------------------------------------------------------
-// ساخت چالش جدید
-// -------------------------------------------------------------------
 export const createChallenge = async (payload: {
   title: string;
   description: string;
@@ -24,8 +21,6 @@ export const createChallenge = async (payload: {
       endPoint: "/api/v1/challenges",
       data: payload,
     });
-
-    // فرض: بک‌اند { data: { ID: 123, ... } } برمی‌گردونه
     return response;
   } catch (error) {
     console.error("Failed to create challenge:", error);
@@ -33,9 +28,61 @@ export const createChallenge = async (payload: {
   }
 };
 
-// -------------------------------------------------------------------
-// دعوت یک کاربر به چالش
-// -------------------------------------------------------------------
+export const fetchChallengeById = async (challengeId: string | number) => {
+  try {
+    const response = await getData({
+      endPoint: `/api/v1/challenges/${challengeId}`,
+    });
+    return response.data; // اطلاعات کامل چالش
+  } catch (error) {
+    console.error("Failed to fetch challenge:", error);
+    throw error;
+  }
+};
+
+export const updateChallenge = async (
+  challengeId: string | number,
+  payload: {
+    title: string;
+    description: string;
+    image_url?: string | null;
+    location?: string | null;
+    start_time: string;
+    end_time: string;
+    timezone?: string;
+  }
+) => {
+  try {
+    const response = await putData({
+      endPoint: `/api/v1/challenges/${challengeId}`,
+      data: payload,
+    });
+    return response;
+  } catch (error) {
+    console.error("Failed to update challenge:", error);
+    throw error;
+  }
+};
+
+export const removeParticipantFromChallenge = async (
+  challengeId: string | number,
+  participantId: string | number
+) => {
+  try {
+    const response = await deleteData({
+      endPoint: `/api/v1/challenges/${challengeId}/participants/${participantId}`,
+    });
+    return response;
+  } catch (error: any) {
+    console.error("Failed to remove participant:", error);
+    const message =
+      error?.message ||
+      (error?.body ? JSON.parse(error.body)?.message : null) ||
+      "حذف کاربر ناموفق بود";
+    throw new Error(message);
+  }
+};
+
 export const inviteUserToChallenge = async (
   challengeId: number | string,
   inviteeId: number | string
@@ -50,7 +97,6 @@ export const inviteUserToChallenge = async (
       endPoint: `/api/v1/challenges/${challengeId}/invite`,
       data: { invitee_id: inviteeIdInt },
     });
-
     return response;
   } catch (error) {
     console.error(`Failed to invite user ${inviteeId} to challenge ${challengeId}:`, error);
@@ -58,9 +104,6 @@ export const inviteUserToChallenge = async (
   }
 };
 
-// -------------------------------------------------------------------
-// دعوت همزمان چند کاربر (بهینه و تمیز)
-// -------------------------------------------------------------------
 export const inviteMultipleUsersToChallenge = async (
   challengeId: number | string,
   userIds: (number | string)[]
@@ -69,7 +112,7 @@ export const inviteMultipleUsersToChallenge = async (
     inviteUserToChallenge(challengeId, userId).catch((err) => ({
       userId,
       success: false,
-      error: err.message || "Invite failed",
+      error: err instanceof Error ? err.message : "Invite failed",
     }))
   );
 
@@ -80,10 +123,18 @@ export const inviteMultipleUsersToChallenge = async (
       return { userId: userIds[index], success: true };
     } else {
       const rejected = result as PromiseRejectedResult;
+      const reason = rejected.reason as { error?: string } | string;
+      const errorMsg =
+        typeof reason === "object" && reason?.error
+          ? reason.error
+          : typeof reason === "string"
+          ? reason
+          : "Unknown error";
+
       return {
         userId: userIds[index],
         success: false,
-        error: rejected.reason?.error || rejected.reason?.message || "Unknown error",
+        error: errorMsg,
       };
     }
   });
