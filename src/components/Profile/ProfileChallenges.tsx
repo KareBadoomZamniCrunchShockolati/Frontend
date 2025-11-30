@@ -4,11 +4,13 @@ import { Search } from "lucide-react";
 import ChallengeCard from "../Custom/ChallangeCard";
 import CustomInput from "../Custom/CustomInput";
 import CustomDropdown from "../Custom/CustomDropdown";
-import { getParticipatingChallengesService } from "@/services/userService";
+import { getParticipatingChallengesService, getCreatedChallengesService } from "@/services/userService";
 import type { Challenge } from "@/types/challengeTypes";
+import { convertToJalali } from "../Custom/ConvertToJalali";
 
 const ProfileChallenges = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [allChallenges, setAllChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,6 +19,7 @@ const ProfileChallenges = () => {
     { id: 2, name: "هنری" },
     { id: 3, name: "علمی" },
     { id: 4, name: "تفریحی" },
+    { id: 0, name: "چالش‌های من" }, // گزینه جدید برای چالش‌های ساخته شده توسط کاربر
   ];
 
   const [checkedCategories, setCheckedCategories] = useState<{
@@ -25,11 +28,31 @@ const ProfileChallenges = () => {
   const [search, setSearch] = useState("");
 
   const sampleAvatars = [
-    { name: "علی", avatar: "https://images.unsplash.com/photo-1502764613149-7f1d229e230f?auto=format&fit=crop&w=50&q=80" },
-    { name: "فاطمه", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=50&q=80" },
-    { name: "محمد", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=50&q=80" },
-    { name: "زهرا", avatar: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=50&q=80" },
-    { name: "حسن", avatar: "https://images.unsplash.com/photo-1544005313-2f8f0f2d8b0f?auto=format&fit=crop&w=50&q=80" },
+    {
+      name: "علی",
+      avatar:
+        "https://images.unsplash.com/photo-1502764613149-7f1d229e230f?auto=format&fit=crop&w=50&q=80",
+    },
+    {
+      name: "فاطمه",
+      avatar:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=50&q=80",
+    },
+    {
+      name: "محمد",
+      avatar:
+        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=50&q=80",
+    },
+    {
+      name: "زهرا",
+      avatar:
+        "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=50&q=80",
+    },
+    {
+      name: "حسن",
+      avatar:
+        "https://images.unsplash.com/photo-1544005313-2f8f0f2d8b0f?auto=format&fit=crop&w=50&q=80",
+    },
   ];
 
   // تابع برای گرفتن داده‌ها از API
@@ -38,10 +61,31 @@ const ProfileChallenges = () => {
       setLoading(true);
       setError(null);
       const response = await getParticipatingChallengesService();
-      setChallenges(response.data || response);
+      console.log("Participating Challenges Response:", response);
+      const challengesData = response.data || response;
+      setChallenges(challengesData);
+      setAllChallenges(challengesData);
     } catch (err) {
       setError("خطا در دریافت چالش‌ها");
       console.error("Error fetching challenges:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // تابع برای گرفتن چالش‌های ساخته شده توسط کاربر
+  const fetchMyChallenges = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const currentUserId = 2; // این را از context یا localStorage بگیرید
+      const response = await getCreatedChallengesService(currentUserId);
+      const myChallengesData = response.data || response;
+      setChallenges(myChallengesData);
+      setAllChallenges(myChallengesData);
+    } catch (err) {
+      setError("خطا در دریافت چالش‌های شما");
+      console.error("Error fetching my challenges:", err);
     } finally {
       setLoading(false);
     }
@@ -51,31 +95,17 @@ const ProfileChallenges = () => {
     fetchChallenges();
   }, []);
 
-  // تابع تبدیل تاریخ از فرمت ISO به شمسی (می‌توانید منطق واقعی جایگزین کنید)
-  const convertToJalali = (isoDate: string): string => {
-    // اینجا می‌توانید از کتابخانه‌ای مثل moment-jalaali استفاده کنید
-    // برای نمونه یک تبدیل ساده:
-    try {
-      const date = new Date(isoDate);
-      return `${date.getFullYear()}/${(date.getMonth() + 1)
-        .toString()
-        .padStart(2, "0")}/${date.getDate().toString().padStart(2, "0")}`;
-    } catch {
-      return "1402/01/01";
-    }
-  };
-
   // تابع برای استخراج نام دسته‌بندی از داده‌های API
   const getCategoryId = (categoryName: string): number => {
     const categoryMap: { [key: string]: number } = {
-      "Fitness": 1,
-      "Art": 2,
-      "Science": 3,
-      "Entertainment": 4,
-      "ورزشی": 1,
-      "هنری": 2,
-      "علمی": 3,
-      "تفریحی": 4,
+      Fitness: 1,
+      Art: 2,
+      Science: 3,
+      Entertainment: 4,
+      ورزشی: 1,
+      هنری: 2,
+      علمی: 3,
+      تفریحی: 4,
     };
     return categoryMap[categoryName] || 1;
   };
@@ -87,7 +117,7 @@ const ProfileChallenges = () => {
       id: idx,
       name: user.name,
       avatar: user.avatar,
-      image: ""
+      image: "",
     }));
   };
 
@@ -95,9 +125,40 @@ const ProfileChallenges = () => {
     .filter((key) => checkedCategories[Number(key)])
     .map(Number);
 
+  // بررسی آیا گزینه "چالش‌های من" انتخاب شده است
+  const isMyChallengesSelected = checkedCategories[0];
+
+  // وقتی گزینه "چالش‌های من" تغییر می‌کند
+  useEffect(() => {
+    if (isMyChallengesSelected) {
+      fetchMyChallenges();
+    } else {
+      // اگر گزینه "چالش‌های من" انتخاب نشده، تمام چالش‌ها را نشان بده
+      fetchChallenges();
+    }
+  }, [isMyChallengesSelected]);
+
+  const handleCategoryChange = (newCheckedCategories: { [key: number]: boolean }) => {
+    // اگر گزینه "چالش‌های من" انتخاب شده، سایر گزینه‌ها را غیرفعال کن
+    if (newCheckedCategories[0] && !checkedCategories[0]) {
+      const onlyMyChallenges = { 0: true };
+      setCheckedCategories(onlyMyChallenges);
+    } 
+    // اگر یکی از دسته‌بندی‌های دیگر انتخاب شده، گزینه "چالش‌های من" را غیرفعال کن
+    else if (!newCheckedCategories[0] && Object.keys(newCheckedCategories).some(key => Number(key) !== 0 && newCheckedCategories[Number(key)])) {
+      const withoutMyChallenges = { ...newCheckedCategories };
+      delete withoutMyChallenges[0];
+      setCheckedCategories(withoutMyChallenges);
+    } 
+    // در غیر این صورت حالت عادی
+    else {
+      setCheckedCategories(newCheckedCategories);
+    }
+  };
+
   // فیلتر کردن چالش‌ها بر اساس جستجو
   const searchedChallenges = search
-    ? challenges
+    ? allChallenges
         .filter((challenge) =>
           challenge.title.toLowerCase().includes(search.toLowerCase())
         )
@@ -112,23 +173,26 @@ const ProfileChallenges = () => {
           };
           return score(bTitle) - score(aTitle);
         })
-    : challenges;
+    : allChallenges;
 
-  // فیلتر کردن بر اساس دسته‌بندی
-  const filteredChallenges =
-    selectedCategoryIds.length === 0
+  // فیلتر کردن بر اساس دسته‌بندی (به جز گزینه "چالش‌های من")
+  const categoryFilteredChallenges =
+    selectedCategoryIds.length === 0 || isMyChallengesSelected
       ? searchedChallenges
       : searchedChallenges.filter((challenge) =>
           selectedCategoryIds.includes(getCategoryId(challenge.category_name))
         );
+
+  // نهایی‌ترین فیلتر
+  const filteredChallenges = categoryFilteredChallenges;
 
   if (error) {
     return (
       <div className="flex justify-center items-center h-40">
         <div className="text-red-500 text-center">
           <p>{error}</p>
-          <button 
-            onClick={fetchChallenges}
+          <button
+            onClick={isMyChallengesSelected ? fetchMyChallenges : fetchChallenges}
             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             تلاش مجدد
@@ -173,7 +237,7 @@ const ProfileChallenges = () => {
           <CustomDropdown
             items={categories}
             checkedCategories={checkedCategories}
-            setCheckedCategories={setCheckedCategories}
+            setCheckedCategories={handleCategoryChange}
           />
         </div>
       </div>
@@ -191,12 +255,16 @@ const ProfileChallenges = () => {
               profiles={getRandomAvatars(challenge.id)}
               initialLikes={challenge.like_count}
               initialComments={challenge.comment_count}
-              coverImage={challenge.image_url || "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=800&q=80"}
+              coverImage={
+                challenge.image_url ||
+                "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=800&q=80"
+              }
               isPrivate={challenge.visibility === "private"}
               isJoined={challenge.is_user_participating}
               creator={{
                 name: challenge.creator_username,
-                avatar: "https://images.unsplash.com/photo-1502764613149-7f1d229e230f?auto=format&fit=crop&w=50&q=80",
+                avatar:
+                  "https://images.unsplash.com/photo-1502764613149-7f1d229e230f?auto=format&fit=crop&w=50&q=80",
               }}
             />
           ))}
@@ -206,9 +274,11 @@ const ProfileChallenges = () => {
       {!loading && filteredChallenges.length === 0 && (
         <div className="flex justify-center items-center h-40">
           <p className="text-gray-500">
-            {search || selectedCategoryIds.length > 0 
-              ? "چالشی با این فیلترها یافت نشد" 
-              : "شما در هیچ چالشی شرکت نکرده‌اید"}
+            {search || selectedCategoryIds.length > 0
+              ? "چالشی با این فیلترها یافت نشد"
+              : isMyChallengesSelected 
+                ? "شما هیچ چالشی نساخته‌اید"
+                : "شما در هیچ چالشی شرکت نکرده‌اید"}
           </p>
         </div>
       )}

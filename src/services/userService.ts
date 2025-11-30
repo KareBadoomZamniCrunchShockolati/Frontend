@@ -4,10 +4,30 @@ import type { PutUserProfileParams } from "@/types/putUserProfileTypes";
 import type { Challenge } from "@/types/challengeTypes";
 
 
-// گرفتن لیست چلنج‌هایی که کاربر در آنها شرکت کرده
+// services/userService.ts
+
+// گرفتن لیست چالش‌هایی که کاربر در آنها شرکت کرده
 export const getParticipatingChallengesService = async (): Promise<Challenge[]> => {
   return await getData({
     endPoint: `/api/v1/challenges/participating`,
+  });
+};
+
+// گرفتن چالش‌های ساخته شده توسط کاربر
+export const getCreatedChallengesService = async (creatorId: number): Promise<Challenge[]> => {
+  if (!creatorId) throw new Error("Creator ID is required");
+  
+  return await getData({
+    endPoint: `/api/v1/challenges/creator/${creatorId}`,
+  });
+};
+
+// جستجوی چالش‌ها
+export const searchChallengesService = async (query: string): Promise<Challenge[]> => {
+  if (!query.trim()) throw new Error("Search query is required");
+  
+  return await getData({
+    endPoint: `/api/v1/challenges/search?query=${encodeURIComponent(query)}`,
   });
 };
 
