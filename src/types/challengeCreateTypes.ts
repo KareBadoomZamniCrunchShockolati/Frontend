@@ -30,3 +30,34 @@ export interface StepThreeProps {
   canAddMore: boolean;
   memberLimitError: boolean;
 }
+
+
+export interface DateAndLocationInputProps {
+  startDate: string;
+  startTime: string;
+  endDate: string;
+  endTime: string;
+  location: string;
+  onStartDateChange: (value: string) => void;
+  onStartTimeChange: (value: string) => void;
+  onEndDateChange: (value: string) => void;
+  onEndTimeChange: (value: string) => void;
+  onLocationChange: (value: string) => void;
+}
+
+export interface ChallengeData {
+  ID: number;
+  title: string;
+  description: string;
+  image_url?: string | null;
+  start_time: string;
+  end_time: string;
+  location?: string;
+  participants: UserProfile[];
+  visibility: "public" | "private";
+  comments_enabled: boolean;
+  category_id?: number;
+  rule?: string;
+  max_participants?: number | null;
+  creator_id: number;
+}

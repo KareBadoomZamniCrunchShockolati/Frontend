@@ -1,3 +1,5 @@
+// src/pages/ChallengeEdit.tsx
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomButton from "@/components/Custom/CustomButton";
@@ -11,25 +13,16 @@ import CustomToast from "@/components/Custom/CustomToast";
 import useUserStore from "@/store/userStore/userStore";
 import type { UserProfile } from "@/types/userTypes";
 
-const DEFAULT_IMG =
-  "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
+import {
+  fetchChallengeById,
+  updateChallenge,
+  removeParticipantFromChallenge,
+} from "@/services/challengeService";
+import type { ChallengeData } from "@/types/challengeCreateTypes";
 
-interface ChallengeData {
-  ID: number;
-  title: string;
-  description: string;
-  image_url?: string | null;
-  start_time: string;
-  end_time: string;
-  location?: string;
-  participants: UserProfile[];
-  visibility: "public" | "private";
-  comments_enabled: boolean;
-  category_id?: number;
-  rule?: string;
-  max_participants?: number | null;
-  creator_id: number;
-}
+import { DEFAULT_IMG } from "@/data/mockImages";
+
+
 
 const ChallengeEdit: React.FC = () => {
   const { challengeId } = useParams<{ challengeId: string }>();
@@ -38,42 +31,30 @@ const ChallengeEdit: React.FC = () => {
 
   const [challenge, setChallenge] = useState<ChallengeData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isCreator, setIsCreator] = useState<boolean>(false);
+  const [isCreator, setIsCreator] = useState(false);
 
   const [image, setImage] = useState<string>(DEFAULT_IMG);
   const [challengeTitle, setChallengeTitle] = useState("");
   const [challengeDescription, setChallengeDescription] = useState("");
-
   const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
   const [challengeLocation, setChallengeLocation] = useState("");
-
   const [participants, setParticipants] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const fetchChallenge = async () => {
-      if (!challengeId || !token || userId == null) {
+    const loadChallenge = async () => {
+      if (!challengeId || !token || !userId) {
         CustomToast("لطفاً وارد حساب کاربری شوید", "error");
         navigate(-1);
         return;
       }
 
       try {
-        const res = await fetch(
-          `http://localhost:8080/api/v1/challenges/${challengeId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (!res.ok) throw new Error("چالش یافت نشد");
-
-        const result = await res.json();
-        const data: ChallengeData = result.data;
+        const data: ChallengeData = await fetchChallengeById(challengeId);
 
         if (data.creator_id !== Number(userId)) {
           CustomToast("شما اجازه ویرایش این چالش را ندارید", "error");
@@ -84,6 +65,7 @@ const ChallengeEdit: React.FC = () => {
         setIsCreator(true);
         setChallenge(data);
 
+        // پر کردن فرم
         setChallengeTitle(data.title);
         setChallengeDescription(data.description || "");
         setImage(data.image_url || DEFAULT_IMG);
@@ -94,10 +76,9 @@ const ChallengeEdit: React.FC = () => {
         setEndDate(data.end_time.split("T")[0]);
         setEndTime(data.end_time.split("T")[1]?.slice(0, 5) || "18:00");
 
-        const filtered = data.participants.filter(
-          (p) => p.user_id !== Number(userId)
-        );
-        setParticipants(filtered);
+        // حذف خود کاربر از لیست شرکت‌کنندگان
+        const others = data.participants.filter(p => p.user_id !== Number(userId));
+        setParticipants(others);
       } catch (err) {
         CustomToast("خطا در بارگذاری چالش", "error");
         navigate(-1);
@@ -106,12 +87,8 @@ const ChallengeEdit: React.FC = () => {
       }
     };
 
-    fetchChallenge();
+    loadChallenge();
   }, [challengeId, token, userId, navigate]);
-
-  if (loading)
-    return <div className="text-center py-20">در حال بارگذاری...</div>;
-  if (!challenge || !isCreator) return null;
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -122,41 +99,13 @@ const ChallengeEdit: React.FC = () => {
     }
   };
 
-  const handleDeleteParticipant = async (
-    participantId: string | number,
-    username?: string
-  ) => {
-    if (!challengeId || !token || !participantId) {
-      CustomToast("شناسه کاربر نامعتبر است", "error");
-      return;
-    }
-
-    const participantIdStr = String(participantId);
+  const handleDeleteParticipant = async (participantId: string | number) => {
+    if (!challengeId) return;
 
     try {
-      const res = await fetch(
-        `http://localhost:8080/api/v1/challenges/${challengeId}/participants/${participantIdStr}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!res.ok) {
-        const errData = await res.text();
-        const message = errData
-          ? JSON.parse(errData)?.message
-          : "خطا در حذف کاربر";
-        throw new Error(message);
-      }
-
-      // حذف از فرانت‌اند
-      setParticipants((prev) =>
-        prev.filter((u) => u.user_id !== Number(participantId))
-      );
-      CustomToast("کاربر با موفقیت از چالش حذف شد", "success");
+      await removeParticipantFromChallenge(challengeId, participantId);
+      setParticipants(prev => prev.filter(u => u.user_id !== Number(participantId)));
+      CustomToast("کاربر با موفقیت حذف شد", "success");
     } catch (err: any) {
       CustomToast(err.message || "حذف ناموفق بود", "error");
     }
@@ -168,7 +117,7 @@ const ChallengeEdit: React.FC = () => {
       return;
     }
     if (!startDate || !startTime || !endDate || !endTime) {
-      CustomToast("لطفاً تاریخ و زمان شروع و پایان را وارد کنید", "error");
+      CustomToast("تاریخ و زمان شروع و پایان الزامی است", "error");
       return;
     }
 
@@ -185,37 +134,24 @@ const ChallengeEdit: React.FC = () => {
     };
 
     try {
-      const res = await fetch(
-        `http://localhost:8080/api/v1/challenges/${challengeId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!res.ok) {
-        const err = await res.text();
-        throw new Error(JSON.parse(err)?.message || "خطا در ذخیره تغییرات");
-      }
-
-      CustomToast("چالش با موفقیت بروز شد!", "success");
+      await updateChallenge(challengeId!, payload);
+      CustomToast("چالش با موفقیت بروزرسانی شد!", "success");
       navigate(`/challenge/${challengeId}`, { replace: true });
     } catch (err: any) {
-      CustomToast(err.message || "ذخیره ناموفق بود", "error");
+      CustomToast(err.message || "ذخیره تغییرات ناموفق بود", "error");
     } finally {
       setIsSaving(false);
     }
   };
 
   const filteredParticipants = participants.filter(
-    (user) =>
+    user =>
       user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) return <div className="text-center py-20">در حال بارگذاری...</div>;
+  if (!challenge || !isCreator) return null;
 
   return (
     <div className="min-h-screen flex flex-col p-4">
@@ -225,10 +161,7 @@ const ChallengeEdit: React.FC = () => {
           <h1 className="text-2xl font-bold text-primary">ویرایش چالش</h1>
         </div>
 
-        <ImageAndBadgeContainerEdit
-          onImageChange={handleImageChange}
-          imageUrl={image}
-        />
+        <ImageAndBadgeContainerEdit onImageChange={handleImageChange} imageUrl={image} />
 
         <div className="w-full max-w-xl space-y-6 mt-6">
           <TitleAndDescriptionInput
@@ -257,10 +190,7 @@ const ChallengeEdit: React.FC = () => {
             </h2>
             {participants.length > 0 ? (
               <>
-                <SearchBar
-                  searchTerm={searchTerm}
-                  onSearchTermChange={setSearchTerm}
-                />
+                <SearchBar searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
                 <UserCardList
                   users={filteredParticipants}
                   onDelete={handleDeleteParticipant}
