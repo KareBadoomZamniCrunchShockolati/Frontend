@@ -1,4 +1,4 @@
-import type { CreatePostPayload, UpdatePostPayload } from "@/types/postTypes";
+import type { CreatePostPayload, LikeRequest, UpdatePostPayload } from "@/types/postTypes";
 import { deleteData, getData, postData, PROTECTED_BASE, putData } from "./services";
 
 export const createPostService = async ({
@@ -52,3 +52,23 @@ export const getChallengesWithIdService = async (id: number) => {
   return res.data;
 };
 
+export const LikeService = async ({
+  entity_type,
+  entity_id
+}: LikeRequest) => {
+  const data = await postData({
+    endPoint: `${PROTECTED_BASE}/likes`,
+    data: { entity_type, entity_id },
+  });
+  return data;
+};
+
+export const UnlikeService = async ({
+  entity_type,
+  entity_id
+}: LikeRequest) => {
+  return await deleteData({
+    endPoint: `${PROTECTED_BASE}/likes`,
+    data: { entity_type, entity_id },
+  });
+};

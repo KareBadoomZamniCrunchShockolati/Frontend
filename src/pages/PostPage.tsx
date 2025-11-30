@@ -16,7 +16,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { getChallengesWithIdService, getParticipatingChallengesService, getPostService } from "@/services/postService";
+import {
+  getChallengesWithIdService,
+  getParticipatingChallengesService,
+  getPostService,
+  LikeService,
+  UnlikeService,
+} from "@/services/postService";
 import { set } from "react-hook-form";
 import type { ChallengePreview, PostResponse } from "@/types/postTypes";
 import { timeAgo } from "@/utils/timeAgoDiff";
@@ -29,11 +35,14 @@ const PostPage = () => {
     return <div>No post found with this id!</div>;
   }
   const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const [isExpanded, setExpanded] = useState(false);
   const [loading, setLoading] = useState(false); //put skeleton -----------------------------------------------
   const [postData, setPostData] = useState<PostResponse>();
   const maxChars = post.imageUrl.length > 0 ? 75 : 500;
-  const text = isExpanded ? postData?.description : postData?.description?.substring(0, maxChars);
+  const text = isExpanded
+    ? postData?.description
+    : postData?.description?.substring(0, maxChars);
   //hard code meow
   const { username } = useUserStore.getState();
   const initials = getUserInitials(username);
@@ -45,21 +54,45 @@ const PostPage = () => {
       try {
         const post = await getPostService(postId);
         setPostData(post);
+
+        setIsLiked(post.is_liked);
+        setLikeCount(post.like_count);
       } catch (err) {
         console.error(err);
       } finally {
-        setLoading(false); // always runs
+        setLoading(false);
       }
     };
-
     fetchPost();
   }, [postId]);
+
+  const handleLikeToggle = async () => {
+    if (!postData) return;
+    try {
+      if (isLiked) {
+        // Unlike
+        await UnlikeService({ entity_type: "post", entity_id: postData.id });
+        setIsLiked(false);
+        setLikeCount((prev) => prev - 1);
+      } else {
+        // Like
+        await LikeService({ entity_type: "post", entity_id: postData.id });
+        setIsLiked(true);
+        setLikeCount((prev) => prev + 1);
+      }
+    } catch (err) {
+      console.error("Error toggling like:", err);
+    }
+  };
+
   const [challenge, setChallenge] = useState<ChallengePreview | null>(null);
   useEffect(() => {
     const fetchChallenge = async () => {
       try {
         if (postData?.challenge_id) {
-          const challenge = await getChallengesWithIdService(postData.challenge_id);
+          const challenge = await getChallengesWithIdService(
+            postData.challenge_id
+          );
           setChallenge(challenge);
         }
       } catch (err) {
@@ -119,8 +152,6 @@ const PostPage = () => {
   const activeProfiles = isLikeMode ? mutualLikers : mutualCommenters;
 
   const textLabel = isLikeMode ? "پسندیده شده توسط" : "نظر داده شده توسط";
-
-
 
   if (post.imageUrl && post.imageUrl.length > 0) {
     return (
@@ -218,7 +249,7 @@ const PostPage = () => {
                 <div className="gap-[4px] flex items-center" dir="rtl">
                   <TertiaryCustomButton
                     isGray={isLiked}
-                    onClick={() => setIsLiked(!isLiked)}
+                    onClick={handleLikeToggle}
                   >
                     <span
                       dir="rtl"
@@ -231,7 +262,9 @@ const PostPage = () => {
                       fill={isLiked ? "red" : "white"}
                     />
                   </TertiaryCustomButton>
-                  <p>{convertToPersianDigits(formatFollowBarNumber(postData?.like_count || 0))}</p>
+                  <p>
+                    {convertToPersianDigits(formatFollowBarNumber(likeCount))}
+                  </p>
                 </div>
                 <div className="gap-[4px] flex items-center" dir="rtl">
                   <TertiaryCustomButton>
@@ -240,7 +273,11 @@ const PostPage = () => {
                     </span>
                     <MessageCircle className="w-5 h-5 text-primary" />
                   </TertiaryCustomButton>
-                  <p>{convertToPersianDigits(formatFollowBarNumber(postData?.comment_count || 0))}</p>
+                  <p>
+                    {convertToPersianDigits(
+                      formatFollowBarNumber(postData?.comment_count || 0)
+                    )}
+                  </p>
                 </div>
               </div>
               {/* the gray line */}
@@ -279,7 +316,8 @@ const PostPage = () => {
                 </div>
               </div>
 
-              {postData?.description && postData.description.length > maxChars ? (
+              {postData?.description &&
+              postData.description.length > maxChars ? (
                 <p
                   dir="rtl"
                   className="whitespace-pre-wrap break-words leading-relaxed"
@@ -343,7 +381,8 @@ const PostPage = () => {
           <div className="w-full"></div>
           <CardContent className="pt-4 pb-4 relative">
             <div className="min-h-[100px]">
-              {postData?.description && postData.description.length > maxChars ? (
+              {postData?.description &&
+              postData.description.length > maxChars ? (
                 <p
                   dir="rtl"
                   className="whitespace-pre-wrap break-words leading-relaxed"
@@ -389,7 +428,7 @@ const PostPage = () => {
               <div className="gap-[4px] flex items-center" dir="rtl">
                 <TertiaryCustomButton
                   isGray={isLiked}
-                  onClick={() => setIsLiked(!isLiked)}
+                  onClick={handleLikeToggle}
                 >
                   <span
                     dir="rtl"
@@ -402,7 +441,9 @@ const PostPage = () => {
                     fill={isLiked ? "red" : "white"}
                   />
                 </TertiaryCustomButton>
-                <p>{convertToPersianDigits(formatFollowBarNumber(postData?.like_count || 0))}</p>
+                <p>
+                  {convertToPersianDigits(formatFollowBarNumber(likeCount))}
+                </p>
               </div>
               <div className="gap-[4px] flex items-center" dir="rtl">
                 <TertiaryCustomButton>
@@ -411,7 +452,11 @@ const PostPage = () => {
                   </span>
                   <MessageCircle className="w-5 h-5 text-primary" />
                 </TertiaryCustomButton>
-                <p>{convertToPersianDigits(formatFollowBarNumber(postData?.comment_count || 0))}</p>
+                <p>
+                  {convertToPersianDigits(
+                    formatFollowBarNumber(postData?.comment_count || 0)
+                  )}
+                </p>
               </div>
             </div>
             {/* Caption */}

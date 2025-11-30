@@ -52,3 +52,8 @@ export interface ChallengePreview {
   isUserLiked: boolean;
   mutualParticipants: UserPreview[];
 }
+
+export interface LikeRequest {
+  entity_type: string;
+  entity_id: number;
+}
