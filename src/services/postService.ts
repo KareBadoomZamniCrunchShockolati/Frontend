@@ -38,8 +38,9 @@ export const deletePostService = async (id: number) => {
 };
 
 export const getParticipatingChallengesService = async () => {
-  return await getData({
+  const res = await getData({
     endPoint: `${PROTECTED_BASE}/challenges/participating`,
   });
+  return res.data.data;
 };
 

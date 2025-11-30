@@ -77,6 +77,7 @@ const PostCreation = () => {
     };
 
     fetchChallenges();
+    // console.log("challenges state:", challenges);
   }, []);
 
   const handleSubmit = async (values: CreatePostFormValues) => {
