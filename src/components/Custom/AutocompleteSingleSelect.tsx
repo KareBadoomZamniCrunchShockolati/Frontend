@@ -3,7 +3,7 @@ import { useState } from "react";
 interface AutocompleteProps {
   items: { id: number; name: string }[];
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: { id: number; name: string }) => void;
   placeHolder?: string;
 }
 
@@ -27,9 +27,9 @@ const AutocompleteSingleSelect = ({
     setShowDropdown(true);
   };
 
-  const handleSelect = (name: string) => {
-    setInputValue(name);
-    onChange(name);
+  const handleSelect = (item: { id: number; name: string }) => {
+    setInputValue(item.name);
+    onChange(item);
     setShowDropdown(false);
   };
 
@@ -68,7 +68,7 @@ const AutocompleteSingleSelect = ({
               dir="rtl"
               key={item.id}
               className="p-2 hover:bg-gray-200 cursor-pointer"
-              onClick={() => handleSelect(item.name)}
+              onClick={() => handleSelect(item)}
             >
               {item.name}
             </div>

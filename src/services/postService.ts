@@ -36,3 +36,10 @@ export const deletePostService = async (id: number) => {
     endPoint: `${PROTECTED_BASE}/posts/${id}`,
   });
 };
+
+export const getParticipatingChallengesService = async () => {
+  return await getData({
+    endPoint: `${PROTECTED_BASE}/challenges/participating`,
+  });
+};
+
