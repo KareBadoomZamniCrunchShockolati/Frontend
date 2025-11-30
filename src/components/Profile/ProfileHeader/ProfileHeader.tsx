@@ -93,7 +93,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     async function fetchUserData() {
       // اطلاعات پروفایل
       try {
+        console.log("iddd", userId);
+
         const userRes = await getUserProfileService(userId);
+        console.log("resss", userRes);
+
         if (userRes) {
           setFullName(userRes.username || "User");
           setProfilePicture(userRes.profile_picture || "");

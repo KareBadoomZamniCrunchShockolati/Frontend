@@ -17,7 +17,7 @@ const CircularProgress = ({
   const offset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="relative inline-flex items-center justify-center">
+    <div className="relative inline-flex items-center justify-center ">
       <svg width={size} height={size} className="transform -rotate-90">
         {/* Background circle */}
         <circle
@@ -36,7 +36,7 @@ const CircularProgress = ({
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#3b82f6"
+          stroke="#FF7700"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -57,12 +57,12 @@ const CircularProgress = ({
             min="0"
             max="100"
             autoFocus
-            className="w-24 text-4xl font-bold text-blue-600 text-center border-2 border-blue-600 rounded-lg outline-none bg-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
+            className="w-24 text-4xl font-bold text-[#FF7700] text-center border-2 border-[#FF7700] rounded-lg outline-none bg-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
           />
         ) : (
           <span
             onClick={onPercentageClick}
-            className="text-4xl font-bold text-blue-600 cursor-pointer hover:text-blue-700 select-none"
+            className="text-4xl font-bold text-[#FF7700] cursor-pointer hover:text-[#FF7700] select-none"
           >
             {percentage}%
           </span>
