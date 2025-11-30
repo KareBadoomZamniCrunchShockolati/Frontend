@@ -72,3 +72,9 @@ export const UnlikeService = async ({
     data: { entity_type, entity_id },
   });
 };
+
+export const getUserPostsService = async (id: number) => {
+  return await getData({
+    endPoint: `${PROTECTED_BASE}/posts/user/${id}`,
+  });
+};

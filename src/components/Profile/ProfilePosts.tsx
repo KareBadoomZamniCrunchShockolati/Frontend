@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Skeleton } from "../ui/skeleton";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Heart, MessageCircle } from "lucide-react";
 import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import formatFollowBarNumber from "@/utils/formatFollowBarNumber";
-interface Post {
+import { getUserPostsService } from "@/services/postService";
+import { mapBackendPostsToUI } from "@/utils/mapBackendPostsToUI";
+import useUserStore from "@/store/userStore/userStore";
+interface MockPost {
   id: number;
   imageUrl: string[]; //=======> string []
   text: string;
@@ -16,7 +19,14 @@ interface Post {
     challengeTitle: string;
   };
 }
-export const posts: Post[] = [
+export interface simplePost {
+  id: number;
+  imageUrl?: string[];
+  text: string;
+  like_count: number;
+  comment_count: number;
+}
+export const mockposts: MockPost[] = [
   {
     id: 1,
     imageUrl: ["https://picsum.photos/id/1011/600/800"],
@@ -212,7 +222,25 @@ const postSkeleton = [
   { id: 8, ratio: 3 / 4 },
 ];
 const ProfilePosts = () => {
-  const loading = false;
+  const {userId} = useUserStore();
+  const [posts, setPosts] = useState<simplePost[]>([]);
+  const [loading, setLoading] = useState(true);
+    useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const backendPosts = await getUserPostsService(userId);
+        const mappedPosts = mapBackendPostsToUI(backendPosts);
+        setPosts(mappedPosts);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, [userId]);
+  
   const navigate = useNavigate();
   if (loading) {
     return (
@@ -266,11 +294,11 @@ const ProfilePosts = () => {
                   <div className="absolute bottom-0 left-0 right-0 bg-black/30 backdrop-blur-sm p-2 flex gap-4 items-center" dir="rtl">
                     <div className="flex gap-[5px] text-white">
                       <Heart size={"20px"} />
-                      <span>{convertToPersianDigits(formatFollowBarNumber(120))}</span>
+                      <span>{convertToPersianDigits(formatFollowBarNumber(post.like_count))}</span>
                     </div>
                     <div className="flex gap-[5px] text-white">
                       <MessageCircle size={"20px"} />
-                      <span>{convertToPersianDigits(formatFollowBarNumber(120))}</span>
+                      <span>{convertToPersianDigits(formatFollowBarNumber(post.comment_count))}</span>
                     </div>
                   </div>
               </div>
@@ -303,11 +331,11 @@ const ProfilePosts = () => {
                   <div className="flex gap-4" dir="rtl">
                     <div className="flex gap-[5px]">
                       <Heart size={"20px"} />
-                      <span>{convertToPersianDigits(formatFollowBarNumber(120_000_000))}</span>
+                      <span>{convertToPersianDigits(formatFollowBarNumber(post.like_count))}</span>
                     </div>
                     <div className="flex gap-[5px]">
                       <MessageCircle size={"20px"} />
-                      <span>{convertToPersianDigits(formatFollowBarNumber(120_000))}</span>
+                      <span>{convertToPersianDigits(formatFollowBarNumber(post.comment_count))}</span>
                     </div>
                   </div>
                 )}

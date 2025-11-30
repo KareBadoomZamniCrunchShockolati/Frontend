@@ -1,5 +1,5 @@
 import TertiaryCustomButton from "@/components/Custom/TertiaryCustomButton";
-import { posts } from "@/components/Profile/ProfilePosts";
+import { mockposts } from "@/components/Profile/ProfilePosts";
 import { Card, CardContent } from "@/components/ui/card";
 import useUserStore from "@/store/userStore/userStore";
 import convertToPersianDigits from "@/utils/convertToPersianDigits";
@@ -30,8 +30,8 @@ import { timeAgo } from "@/utils/timeAgoDiff";
 const PostPage = () => {
   const { id } = useParams();
   const postId = Number(id);
-  const post = posts.find((p) => p.id === postId);
-  if (!post) {
+  const postmock = mockposts.find((p) => p.id === postId);
+  if (!postmock) {
     return <div>No post found with this id!</div>;
   }
   const [isLiked, setIsLiked] = useState(false);
@@ -39,7 +39,7 @@ const PostPage = () => {
   const [isExpanded, setExpanded] = useState(false);
   const [loading, setLoading] = useState(false); //put skeleton -----------------------------------------------
   const [postData, setPostData] = useState<PostResponse>();
-  const maxChars = post.imageUrl.length > 0 ? 75 : 500;
+  const maxChars = postmock.imageUrl.length > 0 ? 75 : 500;
   const text = isExpanded
     ? postData?.description
     : postData?.description?.substring(0, maxChars);
@@ -153,7 +153,7 @@ const PostPage = () => {
 
   const textLabel = isLikeMode ? "پسندیده شده توسط" : "نظر داده شده توسط";
 
-  if (post.imageUrl && post.imageUrl.length > 0) {
+  if (postmock.imageUrl && postmock.imageUrl.length > 0) {
     return (
       <div className="w-full flex justify-center p-4">
         <div className="w-full max-w-md relative">
@@ -195,13 +195,13 @@ const PostPage = () => {
             />} */}
               <Carousel className="w-full h-full relative">
                 <CarouselContent className="h-full">
-                  {post.imageUrl.map((img, index) => (
+                  {postmock.imageUrl.map((img, index) => (
                     <CarouselItem
                       key={index}
                       className="w-full h-full flex items-center justify-center relative"
                     >
                       <img
-                        src={post.imageUrl[index]}
+                        src={postmock.imageUrl[index]}
                         alt={`Preview ${index}`}
                         className="w-full h-full object-contain"
                       />
@@ -210,13 +210,13 @@ const PostPage = () => {
                 </CarouselContent>
 
                 {/* Absolute buttons on the edges of the label */}
-                {post.imageUrl.length > 1 && (
+                {postmock.imageUrl.length > 1 && (
                   <CarouselPrevious
                     type="button"
                     className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20"
                   />
                 )}
-                {post.imageUrl.length > 1 && (
+                {postmock.imageUrl.length > 1 && (
                   <CarouselNext
                     type="button"
                     className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20"
@@ -231,7 +231,7 @@ const PostPage = () => {
                   className="gap-[4px] flex items-center mb-[16px]"
                   dir="rtl"
                   onClick={() =>
-                    console.log("Go to challenge:", post.challenge?.id)
+                    console.log("Go to challenge:", postmock.challenge?.id)
                   }
                 >
                   <ClipboardCheck className="w-5 h-5 text-secondary" />
