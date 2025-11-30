@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface AutocompleteProps {
   items: { id: number; name: string }[];
@@ -17,6 +17,9 @@ const AutocompleteSingleSelect = ({
   const [filteredItems, setFilteredItems] = useState(items);
   const [showDropdown, setShowDropdown] = useState(false);
 
+    useEffect(() => {
+    setInputValue(value);
+  }, [value]);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setInputValue(val);

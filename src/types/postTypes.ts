@@ -1,6 +1,6 @@
 export interface CreatePostPayload {
 	description: string;
-	challengeID?: number|null;
+	challenge_id?: number|null;
 	pictures?: string[];
 }
 

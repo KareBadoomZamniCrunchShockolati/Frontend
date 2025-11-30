@@ -6,7 +6,7 @@ import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import formatFollowBarNumber from "@/utils/formatFollowBarNumber";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { ClipboardCheck, Heart, MessageCircle } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getUserInitials } from "@/components/Profile/ProfileHeader/ProfileHeader";
 import {
@@ -16,6 +16,10 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { getChallengesWithIdService, getParticipatingChallengesService, getPostService } from "@/services/postService";
+import { set } from "react-hook-form";
+import type { ChallengePreview, PostResponse } from "@/types/postTypes";
+import { timeAgo } from "@/utils/timeAgoDiff";
 
 const PostPage = () => {
   const { id } = useParams();
@@ -26,12 +30,45 @@ const PostPage = () => {
   }
   const [isLiked, setIsLiked] = useState(false);
   const [isExpanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(false); //put skeleton -----------------------------------------------
+  const [postData, setPostData] = useState<PostResponse>();
   const maxChars = post.imageUrl.length > 0 ? 75 : 500;
-  const text = isExpanded ? post.text : post.text.substring(0, maxChars);
+  const text = isExpanded ? postDatatext : post.text.substring(0, maxChars);
   //hard code meow
   const { username } = useUserStore.getState();
   const initials = getUserInitials(username);
   const personalColor = "bg-blue-500 text-white";
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      setLoading(true);
+      try {
+        const post = await getPostService(postId);
+        setPostData(post);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false); // always runs
+      }
+    };
+
+    fetchPost();
+  }, [postId]);
+  const [challenge, setChallenge] = useState<ChallengePreview | null>(null);
+  useEffect(() => {
+    const fetchChallenge = async () => {
+      try {
+        if (postData?.challenge_id) {
+          const challenge = await getChallengesWithIdService(postData.challenge_id);
+          setChallenge(challenge);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchChallenge();
+  }, [postData?.challenge_id]);
 
   const mutualLikers = [
     {
@@ -82,6 +119,9 @@ const PostPage = () => {
   const activeProfiles = isLikeMode ? mutualLikers : mutualCommenters;
 
   const textLabel = isLikeMode ? "پسندیده شده توسط" : "نظر داده شده توسط";
+
+
+
   if (post.imageUrl && post.imageUrl.length > 0) {
     return (
       <div className="w-full flex justify-center p-4">
@@ -110,7 +150,7 @@ const PostPage = () => {
                 dir="rtl"
                 className="text-xs text-neutral-gray-bold font-semibold"
               >
-                {convertToPersianDigits("2 ساعت پیش")}
+                {convertToPersianDigits(timeAgo(postData?.created_at || ""))}
               </p>
             </div>
           </div>
@@ -155,7 +195,7 @@ const PostPage = () => {
             </div>
 
             <CardContent className="pt-4 pb-4 relative">
-              {post.challenge && (
+              {postData?.challenge_id && (
                 <div
                   className="gap-[4px] flex items-center mb-[16px]"
                   dir="rtl"
@@ -168,7 +208,7 @@ const PostPage = () => {
                     className="font-medium hover:underline cursor-pointer text-right w-full truncate"
                     dir="rtl"
                   >
-                    {post.challenge.challengeTitle}
+                    {challenge?.title}
                   </p>
                 </div>
               )}
@@ -191,7 +231,7 @@ const PostPage = () => {
                       fill={isLiked ? "red" : "white"}
                     />
                   </TertiaryCustomButton>
-                  <p>{convertToPersianDigits(formatFollowBarNumber(12300))}</p>
+                  <p>{convertToPersianDigits(formatFollowBarNumber(postData?.like_count || 0))}</p>
                 </div>
                 <div className="gap-[4px] flex items-center" dir="rtl">
                   <TertiaryCustomButton>
@@ -200,7 +240,7 @@ const PostPage = () => {
                     </span>
                     <MessageCircle className="w-5 h-5 text-primary" />
                   </TertiaryCustomButton>
-                  <p>{convertToPersianDigits(formatFollowBarNumber(12300))}</p>
+                  <p>{convertToPersianDigits(formatFollowBarNumber(postData?.comment_count || 0))}</p>
                 </div>
               </div>
               {/* the gray line */}
@@ -239,7 +279,7 @@ const PostPage = () => {
                 </div>
               </div>
 
-              {post.text.length > maxChars ? (
+              {postData?.description && postData.description.length > maxChars ? (
                 <p
                   dir="rtl"
                   className="whitespace-pre-wrap break-words leading-relaxed"

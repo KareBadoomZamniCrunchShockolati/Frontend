@@ -3,12 +3,13 @@ import { deleteData, getData, postData, PROTECTED_BASE, putData } from "./servic
 
 export const createPostService = async ({
   description,
-  challengeID,
+  challenge_id,
   pictures,
 }: CreatePostPayload) => {
+    console.log("createPostService called with:", { description, challenge_id, pictures });
   const data = await postData({
     endPoint: `${PROTECTED_BASE}/posts`,
-    data: { description, challengeID, pictures },
+    data: { description, challenge_id, pictures },
   });
   return data;
 };
@@ -41,6 +42,13 @@ export const getParticipatingChallengesService = async () => {
   const res = await getData({
     endPoint: `${PROTECTED_BASE}/challenges/participating`,
   });
-  return res.data.data;
+  return res.data;
+};
+
+export const getChallengesWithIdService = async (id: number) => {
+  const res = await getData({
+    endPoint: `${PROTECTED_BASE}/challenges/${id}`,
+  });
+  return res.data;
 };
 

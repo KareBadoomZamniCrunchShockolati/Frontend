@@ -85,9 +85,10 @@ const PostCreation = () => {
     //   CustomToast("لطفا تصویر را بارگذاری کنید", "error");
     //   return;
     // }
+    console.log("Submitting post with values:", values);
     const response: PostResponse = await createPostService({
       description: values.description,
-      challengeID: values.challengeID,
+      challenge_id: values.challengeID,
       // pictures: images,
       pictures: ["images_placeholder"], // Placeholder since actual file upload isn't implemented :( ----------------------------------------------------
     });
@@ -205,6 +206,7 @@ const PostCreation = () => {
                 }
                 onChange={(item) => {
                   setFieldValue("challengeID", item.id);
+                  console.log("Selected challenge ID:", values.challengeID);
                 }}
                 placeHolder="انتخاب چالش"
               />
