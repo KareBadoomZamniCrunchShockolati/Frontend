@@ -33,7 +33,7 @@ const PostPage = () => {
   const [loading, setLoading] = useState(false); //put skeleton -----------------------------------------------
   const [postData, setPostData] = useState<PostResponse>();
   const maxChars = post.imageUrl.length > 0 ? 75 : 500;
-  const text = isExpanded ? postDatatext : post.text.substring(0, maxChars);
+  const text = isExpanded ? postData?.description : postData?.description?.substring(0, maxChars);
   //hard code meow
   const { username } = useUserStore.getState();
   const initials = getUserInitials(username);
@@ -298,7 +298,7 @@ const PostPage = () => {
                   dir="rtl"
                   className="whitespace-pre-wrap break-words leading-relaxed"
                 >
-                  {post.text}
+                  {postData?.description}
                 </p>
               )}
             </CardContent>
@@ -334,7 +334,7 @@ const PostPage = () => {
               dir="rtl"
               className="text-xs text-neutral-gray-bold font-semibold"
             >
-              {convertToPersianDigits("2 ساعت پیش")}
+              {convertToPersianDigits(timeAgo(postData?.created_at || ""))}
             </p>
           </div>
         </div>
@@ -343,7 +343,7 @@ const PostPage = () => {
           <div className="w-full"></div>
           <CardContent className="pt-4 pb-4 relative">
             <div className="min-h-[100px]">
-              {post.text.length > maxChars ? (
+              {postData?.description && postData.description.length > maxChars ? (
                 <p
                   dir="rtl"
                   className="whitespace-pre-wrap break-words leading-relaxed"
@@ -362,16 +362,16 @@ const PostPage = () => {
                   dir="rtl"
                   className="whitespace-pre-wrap break-words leading-relaxed"
                 >
-                  {post.text}
+                  {postData?.description}
                 </p>
               )}
             </div>
-            {post.challenge && (
+            {postData?.challenge_id && (
               <div
                 className="gap-[4px] flex items-center mt-[16px] mb-[16px]"
                 dir="rtl"
                 onClick={() =>
-                  console.log("Go to challenge:", post.challenge?.id)
+                  console.log("Go to challenge:", postData?.challenge_id)
                 }
               >
                 <ClipboardCheck className="w-5 h-5 text-secondary" />
@@ -379,7 +379,7 @@ const PostPage = () => {
                   className="font-medium hover:underline cursor-pointer text-right w-full truncate"
                   dir="rtl"
                 >
-                  {post.challenge.challengeTitle}
+                  {challenge?.title}
                 </p>
               </div>
             )}
@@ -402,7 +402,7 @@ const PostPage = () => {
                     fill={isLiked ? "red" : "white"}
                   />
                 </TertiaryCustomButton>
-                <p>{convertToPersianDigits(formatFollowBarNumber(12300))}</p>
+                <p>{convertToPersianDigits(formatFollowBarNumber(postData?.like_count || 0))}</p>
               </div>
               <div className="gap-[4px] flex items-center" dir="rtl">
                 <TertiaryCustomButton>
@@ -411,7 +411,7 @@ const PostPage = () => {
                   </span>
                   <MessageCircle className="w-5 h-5 text-primary" />
                 </TertiaryCustomButton>
-                <p>{convertToPersianDigits(formatFollowBarNumber(12300))}</p>
+                <p>{convertToPersianDigits(formatFollowBarNumber(postData?.comment_count || 0))}</p>
               </div>
             </div>
             {/* Caption */}
