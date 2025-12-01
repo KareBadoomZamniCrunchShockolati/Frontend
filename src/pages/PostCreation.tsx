@@ -130,7 +130,7 @@ const PostCreation = () => {
           <Form>
             {/* Image preview + Upload */}
             <div className="flex flex-col items-center gap-2 mr-[24px] ml-[24px] mt-[20px]">
-              <label className="w-full h-64 border-2 border-gray-400 rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden">
+              <label className="w-full h-64 border-2 border-neutral-gray rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden">
                 {images.length > 0 ? (
                   <Carousel className="w-full h-full relative">
                     <CarouselContent className="h-full">

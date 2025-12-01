@@ -1,5 +1,5 @@
 import TertiaryCustomButton from "@/components/Custom/TertiaryCustomButton";
-import { mockposts } from "@/components/Profile/ProfilePosts";
+import { mockposts, mutualCommenters, mutualLikers } from "@/data/mockPosts";
 import { Card, CardContent } from "@/components/ui/card";
 import useUserStore from "@/store/userStore/userStore";
 import convertToPersianDigits from "@/utils/convertToPersianDigits";
@@ -47,7 +47,7 @@ const PostPage = () => {
   //hard code meow
   const { username } = useUserStore.getState();
   const initials = getUserInitials(username);
-  const personalColor = "bg-blue-500 text-white";
+  const personalColor = "bg-secondary text-white";
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -104,51 +104,7 @@ const PostPage = () => {
     fetchChallenge();
   }, [postData?.challenge_id]);
 
-  const mutualLikers = [
-    {
-      id: 1,
-      image: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
-      fallback: "سامان",
-    }, // man portrait
-    {
-      id: 2,
-      image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
-      fallback: "مهدی",
-    }, // woman portrait
-    {
-      id: 3,
-      image: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
-      fallback: "سینا",
-    }, // smiling woman
-    {
-      id: 4,
-      image: "https://images.unsplash.com/photo-1607746882042-944635dfe10e",
-      fallback: "سروش",
-    }, // man with glasses
-  ];
-  // const mutualLikers: { id: number; image: string; fallback: string }[] = [];
-  const mutualCommenters = [
-    {
-      id: 1,
-      image: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
-      fallback: "سامان",
-    }, // man portrait
-    {
-      id: 2,
-      image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e",
-      fallback: "مهدی",
-    }, // woman portrait
-    {
-      id: 3,
-      image: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
-      fallback: "سینا",
-    }, // smiling woman
-    {
-      id: 4,
-      image: "https://images.unsplash.com/photo-1607746882042-944635dfe10e",
-      fallback: "سروش",
-    }, // man with glasses
-  ];
+  
   const isLikeMode = mutualLikers.length > 0;
   const activeProfiles = isLikeMode ? mutualLikers : mutualCommenters;
 
@@ -380,7 +336,7 @@ const PostPage = () => {
                     ))}
 
                     {activeProfiles.length > 3 && (
-                      <Avatar className="relative h-8 w-8 border border-secondry bg-gray-100 text-black text-xs flex items-center justify-center shadow-sm rounded-full">
+                      <Avatar className="relative h-8 w-8 border border-secondry bg-muted text-black text-xs flex items-center justify-center shadow-sm rounded-full">
                         +{activeProfiles.length - 3}
                       </Avatar>
                     )}
@@ -518,7 +474,7 @@ const PostPage = () => {
                     {isLiked ? "پسندیدم" : "پسندیدن"}
                   </span>
                   <Heart
-                    className={`w-5 h-5 ${isLiked ? "text-red-500" : "text-primary"} transition-all duration-200`}
+                    className={`w-5 h-5 ${isLiked ? "text-heart" : "text-primary"} transition-all duration-200`}
                     fill={isLiked ? "red" : "white"}
                   />
                 </TertiaryCustomButton>
@@ -557,7 +513,7 @@ const PostPage = () => {
                   ))}
 
                   {activeProfiles.length > 3 && (
-                    <Avatar className="relative h-8 w-8 border border-secondry bg-gray-100 text-black text-xs flex items-center justify-center shadow-sm rounded-full">
+                    <Avatar className="relative h-8 w-8 border border-secondry bg-muted text-black text-xs flex items-center justify-center shadow-sm rounded-full">
                       +{activeProfiles.length - 3}
                     </Avatar>
                   )}
