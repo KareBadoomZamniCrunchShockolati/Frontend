@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Form, Formik } from "formik";
 import { Search } from "lucide-react";
 import ChallengeCard from "../Custom/ChallangeCard";
 import CustomInput from "../Custom/CustomInput";
 import CustomDropdown from "../Custom/CustomDropdown";
-import { getParticipatingChallengesService, getCreatedChallengesService } from "@/services/userService";
+import { useNavigate } from "react-router-dom";
+
+import {
+  getParticipatingChallengesService,
+  getCreatedChallengesService,
+  getMutualFollowersService,
+} from "@/services/userService";
+
 import type { Challenge } from "@/types/challengeTypes";
 import { convertToJalali } from "../Custom/ConvertToJalali";
 
@@ -13,13 +20,14 @@ const ProfileChallenges = () => {
   const [allChallenges, setAllChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const categories = [
     { id: 1, name: "ورزشی" },
     { id: 2, name: "هنری" },
     { id: 3, name: "علمی" },
     { id: 4, name: "تفریحی" },
-    { id: 0, name: "چالش‌های من" }, // گزینه جدید برای چالش‌های ساخته شده توسط کاربر
+    { id: 0, name: "چالش‌های من" },
   ];
 
   const [checkedCategories, setCheckedCategories] = useState<{
@@ -27,42 +35,33 @@ const ProfileChallenges = () => {
   }>({});
   const [search, setSearch] = useState("");
 
-  const sampleAvatars = [
-    {
-      name: "علی",
-      avatar:
-        "https://images.unsplash.com/photo-1502764613149-7f1d229e230f?auto=format&fit=crop&w=50&q=80",
-    },
-    {
-      name: "فاطمه",
-      avatar:
-        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=50&q=80",
-    },
-    {
-      name: "محمد",
-      avatar:
-        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=50&q=80",
-    },
-    {
-      name: "زهرا",
-      avatar:
-        "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?auto=format&fit=crop&w=50&q=80",
-    },
-    {
-      name: "حسن",
-      avatar:
-        "https://images.unsplash.com/photo-1544005313-2f8f0f2d8b0f?auto=format&fit=crop&w=50&q=80",
-    },
-  ];
+  // ----- تابع گرفتن mutual followers برای یک چالش -----
+  const fetchMutualFollowers = async (challengeId: number) => {
+    try {
+      const response = await getMutualFollowersService(challengeId);
+      return response.data || response;
+    } catch (error) {
+      console.error("Error fetching mutual followers:", error);
+      return [];
+    }
+  };
 
-  // تابع برای گرفتن داده‌ها از API
+  // ----- گرفتن چالش‌هایی که کاربر در آن شرکت کرده -----
   const fetchChallenges = async () => {
     try {
       setLoading(true);
       setError(null);
+
       const response = await getParticipatingChallengesService();
-      console.log("Participating Challenges Response:", response);
-      const challengesData = response.data || response;
+      let challengesData = response;
+
+      challengesData = await Promise.all(
+        challengesData.map(async (ch) => {
+          const mutualFollowers = await fetchMutualFollowers(ch.id);
+          return { ...ch, mutualFollowers };
+        })
+      );
+
       setChallenges(challengesData);
       setAllChallenges(challengesData);
     } catch (err) {
@@ -73,14 +72,24 @@ const ProfileChallenges = () => {
     }
   };
 
-  // تابع برای گرفتن چالش‌های ساخته شده توسط کاربر
+  // ----- گرفتن چالش‌هایی که کاربر خودش ساخته -----
   const fetchMyChallenges = async () => {
     try {
       setLoading(true);
       setError(null);
-      const currentUserId = 2; // این را از context یا localStorage بگیرید
+
+      const currentUserId = 2;
+
       const response = await getCreatedChallengesService(currentUserId);
-      const myChallengesData = response.data || response;
+      let myChallengesData = response;
+
+      myChallengesData = await Promise.all(
+        myChallengesData.map(async (ch) => {
+          const mutualFollowers = await fetchMutualFollowers(ch.id);
+          return { ...ch, mutualFollowers };
+        })
+      );
+
       setChallenges(myChallengesData);
       setAllChallenges(myChallengesData);
     } catch (err) {
@@ -95,9 +104,8 @@ const ProfileChallenges = () => {
     fetchChallenges();
   }, []);
 
-  // تابع برای استخراج نام دسته‌بندی از داده‌های API
   const getCategoryId = (categoryName: string): number => {
-    const categoryMap: { [key: string]: number } = {
+    const map: { [key: string]: number } = {
       Fitness: 1,
       Art: 2,
       Science: 3,
@@ -107,83 +115,52 @@ const ProfileChallenges = () => {
       علمی: 3,
       تفریحی: 4,
     };
-    return categoryMap[categoryName] || 1;
-  };
-
-  const getRandomAvatars = (challengeId: number) => {
-    const seed = challengeId;
-    const count = (seed % 3) + 1;
-    return sampleAvatars.slice(0, count).map((user, idx) => ({
-      id: idx,
-      name: user.name,
-      avatar: user.avatar,
-      image: "",
-    }));
+    return map[categoryName] || 1;
   };
 
   const selectedCategoryIds = Object.keys(checkedCategories)
     .filter((key) => checkedCategories[Number(key)])
     .map(Number);
 
-  // بررسی آیا گزینه "چالش‌های من" انتخاب شده است
   const isMyChallengesSelected = checkedCategories[0];
 
-  // وقتی گزینه "چالش‌های من" تغییر می‌کند
   useEffect(() => {
-    if (isMyChallengesSelected) {
-      fetchMyChallenges();
-    } else {
-      // اگر گزینه "چالش‌های من" انتخاب نشده، تمام چالش‌ها را نشان بده
-      fetchChallenges();
-    }
+    if (isMyChallengesSelected) fetchMyChallenges();
+    else fetchChallenges();
   }, [isMyChallengesSelected]);
 
-  const handleCategoryChange = (newCheckedCategories: { [key: number]: boolean }) => {
-    // اگر گزینه "چالش‌های من" انتخاب شده، سایر گزینه‌ها را غیرفعال کن
-    if (newCheckedCategories[0] && !checkedCategories[0]) {
-      const onlyMyChallenges = { 0: true };
-      setCheckedCategories(onlyMyChallenges);
-    } 
-    // اگر یکی از دسته‌بندی‌های دیگر انتخاب شده، گزینه "چالش‌های من" را غیرفعال کن
-    else if (!newCheckedCategories[0] && Object.keys(newCheckedCategories).some(key => Number(key) !== 0 && newCheckedCategories[Number(key)])) {
-      const withoutMyChallenges = { ...newCheckedCategories };
-      delete withoutMyChallenges[0];
-      setCheckedCategories(withoutMyChallenges);
-    } 
-    // در غیر این صورت حالت عادی
-    else {
-      setCheckedCategories(newCheckedCategories);
-    }
+  const handleCategoryChange = (newChecked: { [key: number]: boolean }) => {
+    if (newChecked[0] && !checkedCategories[0]) {
+      setCheckedCategories({ 0: true });
+    } else if (
+      !newChecked[0] &&
+      Object.keys(newChecked).some(
+        (k) => Number(k) !== 0 && newChecked[Number(k)]
+      )
+    ) {
+      const updated = { ...newChecked };
+      delete updated[0];
+      setCheckedCategories(updated);
+    } else setCheckedCategories(newChecked);
   };
 
-  // فیلتر کردن چالش‌ها بر اساس جستجو
   const searchedChallenges = search
     ? allChallenges
-        .filter((challenge) =>
-          challenge.title.toLowerCase().includes(search.toLowerCase())
-        )
+        .filter((c) => c.title.toLowerCase().includes(search.toLowerCase()))
         .sort((a, b) => {
-          const aTitle = a.title.toLowerCase();
-          const bTitle = b.title.toLowerCase();
           const s = search.toLowerCase();
-          const score = (title: string) => {
-            if (title === s) return 3;
-            if (title.startsWith(s)) return 2;
-            return 1;
-          };
-          return score(bTitle) - score(aTitle);
+          const score = (t: string) => (t === s ? 3 : t.startsWith(s) ? 2 : 1);
+          return score(b.title.toLowerCase()) - score(a.title.toLowerCase());
         })
     : allChallenges;
 
-  // فیلتر کردن بر اساس دسته‌بندی (به جز گزینه "چالش‌های من")
   const categoryFilteredChallenges =
     selectedCategoryIds.length === 0 || isMyChallengesSelected
       ? searchedChallenges
-      : searchedChallenges.filter((challenge) =>
-          selectedCategoryIds.includes(getCategoryId(challenge.category_name))
+      : searchedChallenges.filter((c) =>
+          selectedCategoryIds.includes(getCategoryId(c.category_name))
         );
 
-  // نهایی‌ترین فیلتر
   const filteredChallenges = categoryFilteredChallenges;
 
   if (error) {
@@ -192,7 +169,9 @@ const ProfileChallenges = () => {
         <div className="text-red-500 text-center">
           <p>{error}</p>
           <button
-            onClick={isMyChallengesSelected ? fetchMyChallenges : fetchChallenges}
+            onClick={
+              isMyChallengesSelected ? fetchMyChallenges : fetchChallenges
+            }
             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             تلاش مجدد
@@ -204,12 +183,12 @@ const ProfileChallenges = () => {
 
   return (
     <>
-      {/* جستجو و فیلتر دسته‌بندی */}
+      {/* جستجو + فیلتر */}
       <div className="flex justify-start items-center w-full sm:w-126 md:w-139 m-2.5 gap-1">
         <div className="w-2/3">
           <Formik
             initialValues={{ challengeSearch: "" }}
-            onSubmit={(values) => setSearch(values.challengeSearch)}
+            onSubmit={(v) => setSearch(v.challengeSearch)}
           >
             {({ handleSubmit }) => (
               <Form
@@ -233,6 +212,7 @@ const ProfileChallenges = () => {
             )}
           </Formik>
         </div>
+
         <div className="w-1/3">
           <CustomDropdown
             items={categories}
@@ -248,11 +228,19 @@ const ProfileChallenges = () => {
           {filteredChallenges.map((challenge) => (
             <ChallengeCard
               key={challenge.id}
+              id={challenge.id}
+              onClick={() => navigate(`/challenge/${challenge.id}`)}
               title={challenge.title}
               description={challenge.description}
               startDate={convertToJalali(challenge.start_time)}
               endDate={convertToJalali(challenge.end_time)}
-              profiles={getRandomAvatars(challenge.id)}
+              profiles={
+                challenge.mutualFollowers?.map((user: any) => ({
+                  id: user.id,
+                  name: user.username,
+                  avatar: user.avatar_url,
+                })) || []
+              }
               initialLikes={challenge.like_count}
               initialComments={challenge.comment_count}
               coverImage={
@@ -260,7 +248,7 @@ const ProfileChallenges = () => {
                 "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=800&q=80"
               }
               isPrivate={challenge.visibility === "private"}
-              isJoined={challenge.is_user_participating}
+              isJoined={challenge?.is_user_participating || true}
               creator={{
                 name: challenge.creator_username,
                 avatar:
@@ -276,7 +264,7 @@ const ProfileChallenges = () => {
           <p className="text-gray-500">
             {search || selectedCategoryIds.length > 0
               ? "چالشی با این فیلترها یافت نشد"
-              : isMyChallengesSelected 
+              : isMyChallengesSelected
                 ? "شما هیچ چالشی نساخته‌اید"
                 : "شما در هیچ چالشی شرکت نکرده‌اید"}
           </p>
@@ -285,11 +273,8 @@ const ProfileChallenges = () => {
 
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 m-2.5">
-          {[...Array(6)].map((_, idx) => (
-            <div
-              key={idx}
-              className="animate-pulse bg-gray-200 rounded-lg h-80"
-            >
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="animate-pulse bg-gray-200 rounded-lg h-80">
               <div className="h-40 bg-gray-300 rounded-t-lg"></div>
               <div className="p-4 space-y-3">
                 <div className="h-4 bg-gray-300 rounded w-3/4"></div>

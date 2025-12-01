@@ -1,26 +1,59 @@
-import { getData, putData, postData } from "./services";
+import { getData, putData, postData, deleteData } from "./services";
 import type { FollowStats, UserSummary } from "@/types/userTypes";
 import type { PutUserProfileParams } from "@/types/putUserProfileTypes";
-import type { Challenge } from "@/types/challengeTypes";
+import type { Challenge, LikeRequest } from "@/types/challengeTypes";
 
 
 // services/userService.ts
 
-// گرفتن لیست چالش‌هایی که کاربر در آنها شرکت کرده
-export const getParticipatingChallengesService = async (): Promise<Challenge[]> => {
+
+export const getMutualFollowersService = async (challengeId: number) => {
   return await getData({
-    endPoint: `/api/v1/challenges/participating`,
+    endPoint: `/api/v1/challenges/${challengeId}/mutual-followers`,
   });
 };
+
+export const LikeService = async ({
+  entity_type,
+  entity_id
+}: LikeRequest) => {
+  const data = await postData({
+    endPoint: `/api/v1/likes`,
+    data: { entity_type, entity_id },
+  });
+  return data;
+};
+
+export const UnlikeService = async ({
+  entity_type,
+  entity_id
+}: LikeRequest) => {
+  return await deleteData({
+    endPoint: `/api/v1/likes`,
+    data: { entity_type, entity_id },
+  });
+};
+
+
+
+// گرفتن لیست چالش‌هایی که کاربر در آنها شرکت کرده
+export const getParticipatingChallengesService = async (): Promise<Challenge[]> => {
+  const response = await getData({ endPoint: `/api/v1/challenges/participating` });
+  return response.data; // فقط آرایه
+};
+
 
 // گرفتن چالش‌های ساخته شده توسط کاربر
 export const getCreatedChallengesService = async (creatorId: number): Promise<Challenge[]> => {
   if (!creatorId) throw new Error("Creator ID is required");
-  
-  return await getData({
+
+  const response = await getData({
     endPoint: `/api/v1/challenges/creator/${creatorId}`,
   });
+
+  return response.data; // فقط آرایه را برمی‌گرداند
 };
+
 
 // جستجوی چالش‌ها
 export const searchChallengesService = async (query: string): Promise<Challenge[]> => {

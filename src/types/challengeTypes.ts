@@ -18,5 +18,10 @@ export interface Challenge {
   created_at: string;
   is_user_participating: boolean;
   is_user_liked: boolean;
-  mutual_participants: any; // یا می‌توانید نوع دقیق‌تری تعریف کنید
+  mutualFollowers: any[]; // 
+  mutual_participants: any; 
+}
+export interface LikeRequest {
+  entity_type: string;
+  entity_id: number;
 }
