@@ -13,7 +13,7 @@ const Step1BasicInfo: React.FC<StepOneProps> = ({
   onTitleChange,
   onDescriptionChange,
   onImageChange,
-  errors, // این مهمه!
+  errors,
 }) => {
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -37,7 +37,7 @@ const Step1BasicInfo: React.FC<StepOneProps> = ({
       {/* آپلود تصویر */}
       <div className="mt-6">
         <div
-          className="flex justify-center items-center bg-[#FFF1E5] p-10 cursor-pointer rounded-primary-radius border-2 border-black border-dotted transition-all hover:bg-orange-50"
+          className="flex justify-center items-center bg-primary-picture-background p-10 cursor-pointer rounded-primary-radius border-2 border-black border-dotted transition-all"
           onClick={() => document.getElementById("imgUpload")?.click()}
         >
           <input id="imgUpload" type="file" accept="image/*" onChange={handleFile} className="hidden" />
@@ -48,7 +48,7 @@ const Step1BasicInfo: React.FC<StepOneProps> = ({
               <p className="text-sm text-gray-text mt-2">می‌تونی بعداً هم اضافه کنی</p>
             </div>
           ) : (
-            <img src={image} alt="پیش‌نمایش" className="max-h-64 rounded-lg shadow-lg" />
+            <img src={image} alt="پیش‌نمایش" className="max-h-64 rounded-primary-radius shadow-lg" />
           )}
         </div>
       </div>

@@ -8,12 +8,12 @@ const AllSelectedCategoryTag: React.FC<SelectedCategoryTagProps> = ({
   onRemove,
 }) => {
   return (
-    <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">
+    <span className="inline-flex items-center gap-1 bg-orange-100 text-primary px-3 py-1 rounded-full text-sm">
       {category}
       <button
         type="button"
         onClick={() => onRemove(category)}
-        className="hover:bg-orange-200 rounded-full p-0.5 transition-colors"
+        className="hover:bg-primary-hover rounded-primary-radius p-0.5 transition-colors"
         aria-label={`حذف ${category}`}
       >
         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

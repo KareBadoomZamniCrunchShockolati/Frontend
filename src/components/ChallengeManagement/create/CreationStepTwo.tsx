@@ -55,7 +55,7 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
             label="دسته"
             value={categorySearch}
             onChange={(e) => setCategorySearch(e.target.value)}
-            className="w-full p-3 pr-10 border rounded-md focus:ring-2 outline-none text-right"
+            className="w-full p-3 pr-10 border rounded-primary-radius focus:ring-2 outline-none text-right"
           />
           <Search className="absolute right-3 top-10 -translate-y-1/2 text-gray-text w-5 h-5 pointer-events-none" />
         </div>
@@ -69,7 +69,7 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
                   onCategoriesChange([...selectedCategories, cat]);
                   setCategorySearch("");
                 }}
-                className="px-4 py-2 hover:bg-orange-50 cursor-pointer text-sm text-right"
+                className="px-4 py-2 cursor-pointer text-sm text-right"
               >
                 {cat}
               </div>
