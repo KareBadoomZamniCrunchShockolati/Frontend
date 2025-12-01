@@ -1,5 +1,5 @@
 import type { PostResponse } from "@/types/postTypes"; // your API type
-import type { simplePost } from "@/components/Profile/ProfilePosts";
+import type { simplePost } from "@/types/profilePostsTypes"; // your UI type
 
 export const mapBackendPostsToUI = (backendPosts: PostResponse[]): simplePost[] => {
   return backendPosts.map((p) => ({
