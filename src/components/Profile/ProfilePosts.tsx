@@ -212,15 +212,16 @@ export const mockposts: MockPost[] = [
 ];
 
 const postSkeleton = [
-  { id: 1, ratio: 1 },
-  { id: 2, ratio: 3 / 4 },
-  { id: 3, ratio: 9 / 16 },
-  { id: 4, ratio: 4 / 5 },
-  { id: 5, ratio: 1 },
-  { id: 6, ratio: 3 / 4 },
-  { id: 7, ratio: 9 / 16 },
-  { id: 8, ratio: 3 / 4 },
+  { id: 1, ratio: 1 },        
+  { id: 2, ratio: 3 / 4 },    
+  { id: 3, ratio: 9 / 16 },   
+  { id: 4, ratio: 4 / 5 },    
+  { id: 5, ratio: 2 / 3 },    
+  { id: 6, ratio: 5 / 7 },    
+  { id: 7, ratio: 6 / 5 },    
+  { id: 8, ratio: 16 / 9 },   
 ];
+
 const ProfilePosts = () => {
   const {userId} = useUserStore();
   const [posts, setPosts] = useState<simplePost[]>([]);

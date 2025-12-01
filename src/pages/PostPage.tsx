@@ -26,6 +26,7 @@ import {
 import { set } from "react-hook-form";
 import type { ChallengePreview, PostResponse } from "@/types/postTypes";
 import { timeAgo } from "@/utils/timeAgoDiff";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const PostPage = () => {
   const { id } = useParams();
@@ -154,6 +155,86 @@ const PostPage = () => {
   const textLabel = isLikeMode ? "پسندیده شده توسط" : "نظر داده شده توسط";
 
   if (postmock.imageUrl && postmock.imageUrl.length > 0) {
+    //skeleton loading
+    if (loading) {
+      return (
+        <div className="w-full flex justify-center p-4">
+          <div className="w-full max-w-md relative">
+            {/* Top User Info */}
+            <div className="w-full flex items-center gap-3 mb-[10px]" dir="rtl">
+              {/* Avatar */}
+              <Skeleton className="w-[85px] h-[85px] sm:w-[100px] sm:h-[100px] md:w-[115px] md:h-[115px] rounded-full" />
+
+              <div className="flex flex-col gap-2 translate-y-[2px] w-1/2">
+                <Skeleton className="h-4 w-1/2" /> {/* username */}
+                <Skeleton className="h-3 w-2/3" /> {/* time */}
+              </div>
+            </div>
+
+            {/* Card Skeleton */}
+            <Card className="w-full max-w-md rounded-[12.5px] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] border-2 border-black overflow-hidden">
+              {/* Image Carousel Skeleton */}
+              <div className="w-full">
+                <Skeleton className="w-full h-[350px] sm:h-[400px] md:h-[450px]" />
+              </div>
+
+              <CardContent className="pt-4 pb-6 relative">
+                {/* Challenge Tag */}
+                <div
+                  className="gap-[4px] flex items-center mb-[16px]"
+                  dir="rtl"
+                >
+                  <Skeleton className="w-5 h-5 rounded" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+
+                {/* Like + Comment */}
+                <div
+                  className="flex items-center gap-[16px] mb-[25px]"
+                  dir="rtl"
+                >
+                  <div className="gap-[4px] flex items-center">
+                    <Skeleton className="h-8 w-20 rounded-md" />{" "}
+                    {/* Like Button */}
+                    <Skeleton className="h-4 w-6" /> {/* Like Count */}
+                  </div>
+
+                  <div className="gap-[4px] flex items-center">
+                    <Skeleton className="h-8 w-20 rounded-md" />{" "}
+                    {/* Comment Button */}
+                    <Skeleton className="h-4 w-6" /> {/* Comment Count */}
+                  </div>
+                </div>
+
+                {/* Divider Line */}
+                <Skeleton className="w-full h-[1px] mb-3" />
+
+                {/* Caption */}
+                <div className="flex justify-end mt-3 mb-[5px]">
+                  <div className="flex items-center gap-2" dir="rtl">
+                    {/* Overlapping avatars */}
+                    <div className="flex -space-x-2">
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                    </div>
+
+                    <Skeleton className="h-4 w-28" />
+                  </div>
+                </div>
+
+                {/* Description text */}
+                <div dir="rtl" className="flex flex-col gap-2 mt-3">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  {/* <Skeleton className="h-4 w-2/3" /> */}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="w-full flex justify-center p-4">
         <div className="w-full max-w-md relative">
