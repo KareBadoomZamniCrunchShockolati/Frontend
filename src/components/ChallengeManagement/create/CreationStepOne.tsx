@@ -46,9 +46,6 @@ const Step1BasicInfo: React.FC<Step1BasicInfoProps> = ({
 
       {/* آپلود تصویر */}
       <div className="mt-6">
-        <label className="block text-sm font-medium text-gray-700 text-right mb-3">
-          تصویر چالش (اختیاری)
-        </label>
         <div
           className="flex justify-center items-center bg-[#FFF1E5] p-10 cursor-pointer rounded-[8px] border-2 border-black border-dotted transition-all hover:bg-orange-50"
           onClick={() => document.getElementById("imgUpload")?.click()}

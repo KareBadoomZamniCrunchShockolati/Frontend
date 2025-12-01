@@ -59,7 +59,6 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
           <Form className="space-y-10"> {/* فاصله اصلی بین بخش‌ها */}
             {/* شروع چالش */}
             <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900">شروع چالش</h3>
               <div className="grid grid-cols-2 gap-6"> {/* gap منظم */}
                 <Field name="startDate">
                   {({ field }: any) => (
@@ -87,7 +86,6 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
 
             {/* پایان چالش */}
             <div className="space-y-6">
-              <h3 className="text-lg font-medium text-gray-900">پایان چالش</h3>
               <div className="grid grid-cols-2 gap-6">
                 <Field name="endDate">
                   {({ field }: any) => (
