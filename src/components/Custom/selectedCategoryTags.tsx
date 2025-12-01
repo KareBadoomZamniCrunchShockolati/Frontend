@@ -1,10 +1,7 @@
 // components/Custom/SelectedCategoryTag.tsx
 import React from "react";
+import type { SelectedCategoryTagProps } from "@/types/challengeCreateTypes";
 
-interface SelectedCategoryTagProps {
-  category: string;
-  onRemove: (category: string) => void;
-}
 
 const AllSelectedCategoryTag: React.FC<SelectedCategoryTagProps> = ({
   category,

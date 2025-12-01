@@ -150,7 +150,16 @@ const ChallengeEdit: React.FC = () => {
       user.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <div className="text-center py-20">در حال بارگذاری...</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-lg font-medium text-gray-700">در حال بارگذاری چالش...</p>
+        </div>
+      </div>
+    );
+  }
   if (!challenge || !isCreator) return null;
 
   return (

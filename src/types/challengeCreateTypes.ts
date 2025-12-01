@@ -7,6 +7,10 @@ export interface StepOneProps {
   onTitleChange: (v: string) => void;
   onDescriptionChange: (v: string) => void;
   onImageChange: (v: string | null) => void;
+  errors?: {
+    title?: string;
+    description?: string;
+  };
 }
 
 export interface StepTwoProps {
@@ -60,4 +64,9 @@ export interface ChallengeData {
   rule?: string;
   max_participants?: number | null;
   creator_id: number;
+}
+
+export interface SelectedCategoryTagProps {
+  category: string;
+  onRemove: (category: string) => void;
 }
