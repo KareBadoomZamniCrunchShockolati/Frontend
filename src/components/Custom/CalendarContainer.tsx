@@ -104,7 +104,7 @@ const CalendarContainer = ({
   return (
     <div
       className={cn(
-        "relative flex items-center overflow-hidden justify-between bg-[#FFEBE3]  rounded-[8px] h-[90px] py-3 border-2 border-black",
+        "relative flex items-center overflow-hidden justify-between bg-calendar  rounded-xl h-[90px] py-3 border-2 border-black",
         classname
       )}
     >

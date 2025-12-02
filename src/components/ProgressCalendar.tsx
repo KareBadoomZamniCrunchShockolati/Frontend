@@ -76,7 +76,7 @@ const ProgressCalendar = () => {
     }
   };
   return (
-    <div className="p-4 bg[#FFF8F5]">
+    <div className="p-4 bg-light-orange">
       <BackButtonAndMenu />
       <p className="mt-15 text-right text-3xl font-bold">
         {challengeInfo.title}

@@ -58,12 +58,12 @@ const CircularProgress = ({
             min="0"
             max="100"
             autoFocus
-            className="w-24 text-4xl font-bold text-[#FF7700] text-center border-2 border-[#FF7700] rounded-lg outline-none bg-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
+            className="w-24 text-4xl font-bold text-primary text-center border-2 border-primary rounded-lg outline-none bg-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
           />
         ) : (
           <span
             onClick={onPercentageClick}
-            className="text-4xl font-bold text-[#FF7700] cursor-pointer hover:text-[#FF7700] select-none"
+            className="text-4xl font-bold text-primary cursor-pointer hover:text-primary select-none"
           >
             {convertToPersianDigits(String(percentage))}%
           </span>

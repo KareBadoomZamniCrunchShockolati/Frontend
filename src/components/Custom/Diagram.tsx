@@ -39,7 +39,7 @@ export default function Diagram({ freq }: { freq: number }) {
               className="absolute left-0 right-0 border-t-2 border-dashed border-orange-400 z-10"
               style={{ top: `${100 - averageLine}%` }}
             >
-              <div className="absolute -top-4 right-8 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+              <div className="absolute -top-4 right-8 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
                 میانگین
               </div>
             </div>
