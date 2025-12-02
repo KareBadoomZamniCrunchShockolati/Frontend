@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CalendarContainer from "./CalendarContainer";
+import convertToPersianDigits from "@/utils/convertToPersianDigits";
 
 const CircularProgress = ({
   percentage = 15,
@@ -64,7 +65,7 @@ const CircularProgress = ({
             onClick={onPercentageClick}
             className="text-4xl font-bold text-[#FF7700] cursor-pointer hover:text-[#FF7700] select-none"
           >
-            {percentage}%
+            {convertToPersianDigits(String(percentage))}%
           </span>
         )}
       </div>

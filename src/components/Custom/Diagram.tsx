@@ -17,9 +17,9 @@ export default function Diagram({ freq }: { freq: number }) {
   console.log(freq);
 
   return (
-    <Card className="border border-black py-2 mt-10 bg-[rgba(56,114,221,0.06)] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-[8px]">
+    <Card className="border border-black py-2 mt-10 bg-light-blue-challengestats shadow-card rounded-md">
       <CardContent>
-        <p className="text-[24px] font-medium text-right mb-5">
+        <p className="text-2xl font-medium text-right mb-5">
           روز های مختلف چالش
         </p>
 

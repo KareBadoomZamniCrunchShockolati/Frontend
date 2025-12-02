@@ -1,10 +1,8 @@
 import { useState } from "react";
 import CalendarContainer from "./Custom/CalendarContainer";
-import { progressPercentage } from "motion/react";
 import CircularProgress from "./Custom/ProgressBar";
 import BackButtonAndMenu from "./ChallengeManagement/info/BackButtonAndMenu";
-import { date } from "yup";
-import { Title } from "@radix-ui/react-dialog";
+
 import DayFraction from "./Custom/DayFraction";
 import Diagram from "./Custom/Diagram";
 import FeelingOverview from "./Custom/FeelingOverview";
@@ -80,7 +78,7 @@ const ProgressCalendar = () => {
   return (
     <div className="p-4 bg[#FFF8F5]">
       <BackButtonAndMenu />
-      <p className="mt-5 text-right text-[32px] font-bold">
+      <p className="mt-15 text-right text-3xl font-bold">
         {challengeInfo.title}
       </p>
       <CalendarContainer
@@ -90,8 +88,8 @@ const ProgressCalendar = () => {
         setUp={setUp}
         freq={challengeInfo.freq}
       />
-      <div className="border border-black py-2 px-5 mt-10 bg-[rgba(56,114,221,0.06)] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-[8px]">
-        <p className="text-[24px] font-medium text-right mb-5">
+      <div className="border border-black py-2 px-5 mt-10 bg-light-blue-challengestats shadow-card rounded-md">
+        <p className="text-2xl font-medium text-right mb-5">
           !چالش خودت رو تا اینجا ارزیابی کن
         </p>
         <div className="flex justify-center items-center">

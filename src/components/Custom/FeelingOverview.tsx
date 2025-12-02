@@ -2,7 +2,7 @@ import sad from "../../assets/Img/Icon/emoji-sad.svg";
 import happy from "../../assets/Img/Icon/emoji-happy.svg";
 const FeelingOverview = () => {
   return (
-    <div className="relative border border-black py-2 mt-10 bg-[rgba(56,114,221,0.06)] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-[8px]">
+    <div className="relative border border-black py-2 mt-10 bg-light-blue-challengestats shadow-card rounded-md">
       <img
         className="absolute"
         style={{ left: 5, bottom: "15%" }}
