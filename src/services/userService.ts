@@ -79,10 +79,15 @@ export const putUserProfileService = async ({
 
 // گرفتن اطلاعات کلی کاربر
 export const getUserProfileService = async (userId: string | number) => {
+  console.log("iii", userId);
+
   if (!userId) throw new Error("User ID is required");
-  return await getData({
+  const data = await getData({
     endPoint: `/api/v1/users/profile`,
   });
+  console.log("data:", data);
+
+  return data;
 };
 
 // گرفتن تعداد followers و following
@@ -143,7 +148,8 @@ export const verifyEmailChangeService = async ({
   new_email: string;
   code: string;
 }) => {
-  if (!old_email || !new_email || !code) throw new Error("All fields are required");
+  if (!old_email || !new_email || !code)
+    throw new Error("All fields are required");
 
   return await postData({
     endPoint: `/api/v1/users/email/verify-change`,
