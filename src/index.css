@@ -216,6 +216,7 @@
   --popover-foreground: oklch(0.145 0 0);
   --primary: #ff7700;
   --primary-hover: #ffca9b;
+  --primary-picture-background : #FFF1E5;
   --secondary: #3871dd;
   --secondary-hover: #6c96e6;
   --error: #c30025;
@@ -242,6 +243,7 @@
   --borderInvalid: oklch(0.5347 0.2194 29.23);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+  --heart: oklch(0.627 0.214 25.885);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -327,6 +329,7 @@
   --color-disable: var(--disable);
   --color-neutral-gray: var(--neutral-gray);
   --color-neutral-gray-bold: var(--neutral-gray-bold);
+  --color-primary-picture-background : var(--primary-picture-background);
   --shadow-button: var(--shadow-button);
   --shadow-button-active: var(--shadow-button-active);
   --text-title: var(--title-size);
@@ -367,7 +370,9 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
-
+.shadow-border-default {
+  box-shadow: 0px 1px 0px var(--borderDefault);
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;
