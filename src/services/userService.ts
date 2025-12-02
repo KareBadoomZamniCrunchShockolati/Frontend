@@ -150,3 +150,8 @@ export const verifyEmailChangeService = async ({
     data: { old_email, new_email, code },
   });
 };
+
+// export const updatePostService = async (postId: number, dto: { description?: string; pictures?: string[] }) => {
+//   return await putData({ endPoint: `/api/v1/posts/${postId}`, data: dto });
+// };
+
