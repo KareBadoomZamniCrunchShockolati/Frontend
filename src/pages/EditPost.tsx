@@ -157,7 +157,7 @@ const EditPost = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mt-[20px] mr-[24px] ml-[24px]">
+      <div className="flex items-center justify-between mt-5 mr-5 ml-5">
         <button
           className="p-2 border-2 border-primary rounded-xl hover:bg-primary-hover transition-colors"
           onClick={() => navigate(`/dashboard/${userId}`)}
@@ -180,7 +180,7 @@ const EditPost = () => {
         {({ values, setFieldValue }) => (
           <Form>
             {/* پیش نمایش تصاویر */}
-            <div className="flex flex-col items-center gap-2 mr-[24px] ml-[24px] mt-[20px]">
+            <div className="flex flex-col items-center gap-2 mr-5 ml-5 mt-4">
               <label className="w-full h-64 border-2 border-gray-400 rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden">
                 {imageURLs.length > 0 ? (
                   <Carousel className="w-full h-full relative">
@@ -234,13 +234,13 @@ const EditPost = () => {
                 <p className="text-center text-base">
                   {imageURLs.length >= 5 ? "حداکثر تصویر رسیده" : "افزودن تصویر"}
                 </p>
-                <Upload className="absolute right-5 !w-[25px] !h-[25px]" />
+                <Upload className="absolute right-5 !w-6 !h-6 " />
               </CustomButton>
-              <p className="text-xs text-gray-500">{imageURLs.length}/5 تصویر</p>
+              <p className="text-xs text-neutral-gray">{imageURLs.length}/5 تصویر</p>
             </div>
 
             {/* توضیحات */}
-            <div className="mr-[24px] ml-[24px] mt-[22.5px]">
+            <div className="mr-5 ml-5 mt-4">
               <CustomInput
                 name="description"
                 label="توضیحات"
@@ -251,7 +251,7 @@ const EditPost = () => {
             </div>
 
             {/* انتخاب چالش */}
-            <div className="mr-[24px] ml-[24px] mt-[12.5px]">
+            <div className="mr-5 ml-5 mt-2">
               <p className="text-right text-xl font-bold mb-2">
                 چالش مربوطه (اختیاری)
               </p>
@@ -268,14 +268,14 @@ const EditPost = () => {
             </div>
 
             {/* دکمه ذخیره */}
-            <div className="mt-10 mr-[24px] ml-[24px]">
+            <div className="mt-10 mr-5 ml-5">
               <CustomButton
                 type="submit"
-                className="h-[46.6px] bg-secondary w-full mb-2"
+                className="bg-secondary w-full mb-2"
                 disabled={loading}
               >
                 <p className="text-center text-base">ذخیره تغییرات</p>
-                <ArrowRight className="!w-[25px] !h-[25px]" />
+                <ArrowRight className="!w-6 !h-6" />
               </CustomButton>
             </div>
           </Form>
