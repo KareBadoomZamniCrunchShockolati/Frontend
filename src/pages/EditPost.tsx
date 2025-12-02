@@ -1,15 +1,11 @@
 import CustomButton from "@/components/Custom/CustomButton";
 import CustomToast from "@/components/Custom/CustomToast";
 import useUserStore from "@/store/userStore/userStore";
-import { ArrowLeft, ArrowRight, Upload } from "lucide-react";
+import { ArrowLeft, ArrowRight, Upload, FileX } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CustomInput from "@/components/Custom/CustomInput";
-import CustomDropdown from "@/components/Custom/CustomDropdown";
 import { Formik, Form } from "formik";
-import AutocompleteSingleSelect from "@/components/Custom/AutocompleteSingleSelect";
-import { Card, CardContent } from "@/components/ui/card";
-import { FileX } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -17,16 +13,20 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-const PostCreation = () => {
+import { updatePostService } from "@/services/userService"; // 🔹 سرویس آپدیت پست
+
+const EditPost = () => {
   const { token, userId } = useUserStore.getState();
-  const [imageURLs, setImageURLs] = useState<string[]>([]);
+  const { id: postId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
   if (!token) {
-    CustomToast("you need to login first!", "error");
+    CustomToast("You need to login first!", "error");
     return <div>you need to login first!</div>;
   }
 
-  const navigate = useNavigate();
   const [images, setImages] = useState<File[]>([]);
+  const [imageURLs, setImageURLs] = useState<string[]>([]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -37,25 +37,41 @@ const PostCreation = () => {
       setImageURLs((prev) => [...prev, ...newURLs]);
     }
   };
+
   const handleDelete = (index: number) => {
-    URL.revokeObjectURL(imageURLs[index]); // free memory
+    URL.revokeObjectURL(imageURLs[index]);
     setImages((prev) => prev.filter((_, i) => i !== index));
     setImageURLs((prev) => prev.filter((_, i) => i !== index));
   };
-  const handleSubmit = (values: any) => {
-    if (images.length === 0) {
-      CustomToast("لطفا تصویر را بارگذاری کنید", "error");
+
+  const handleSubmit = async (values: any) => {
+    if (!postId) {
+      CustomToast("شناسه پست معتبر نیست", "error");
       return;
     }
-    console.log("Post submitted:", values);
+
+    // محدودیت حداکثر 5 تصویر
+    if (images.length > 5) {
+      CustomToast("حداکثر ۵ تصویر مجاز است", "error");
+      return;
+    }
+
+    // 🔹 اگر لازم است ابتدا تصاویر را آپلود کنید و URL ها را بگیرید
+    // فرض می‌کنیم همین imageURLs قابل ارسال است
+    const dto = {
+      description: values.description || undefined,
+      pictures: imageURLs.length > 0 ? imageURLs : undefined,
+    };
+
+    try {
+      await updatePostService(Number(postId), dto);
+      CustomToast("ویرایش پست با موفقیت انجام شد", "success");
+      navigate(`/dashboard/${userId}`);
+    } catch (err) {
+      console.error(err);
+      CustomToast("خطا در ویرایش پست", "error");
+    }
   };
-  const challenges = [
-    { id: 1, name: "چالش روزی 8 لیوان آب خوردن" },
-    { id: 2, name: "چالش پیاده‌روی هفتگی" },
-    { id: 3, name: "چالش سلام دادن با افراد غریبه" },
-    { id: 4, name: "چالش شنا کردن" },
-    { id: 5, name: "چالش میو میو کردن" },
-  ];
 
   return (
     <>
@@ -66,23 +82,20 @@ const PostCreation = () => {
         >
           <ArrowLeft className="w-8 h-8 text-primary" />
         </button>
-
         <p className="text-center font-bold text-title text-primary">
-          ساخت پست
+          ویرایش پست
         </p>
       </div>
 
-      {/* FORM */}
       <Formik
         initialValues={{
           description: "",
-          challenge: "",
         }}
         onSubmit={handleSubmit}
       >
-        {({ values, setFieldValue, isSubmitting }) => (
+        {({ values, setFieldValue }) => (
           <Form>
-            {/* Image preview + Upload */}
+            {/* پیش نمایش تصاویر */}
             <div className="flex flex-col items-center gap-2 mr-[24px] ml-[24px] mt-[20px]">
               <label className="w-full h-64 border-2 border-gray-400 rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden">
                 {images.length > 0 ? (
@@ -105,16 +118,8 @@ const PostCreation = () => {
                         </CarouselItem>
                       ))}
                     </CarouselContent>
-
-                    {/* Absolute buttons on the edges of the label */}
-                    <CarouselPrevious
-                      type="button"
-                      className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20"
-                    />
-                    <CarouselNext
-                      type="button"
-                      className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20"
-                    />
+                    <CarouselPrevious className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
+                    <CarouselNext className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
                   </Carousel>
                 ) : (
                   <span className="text-neutral-gray font-bold text-center">
@@ -136,9 +141,8 @@ const PostCreation = () => {
               </CustomButton>
             </div>
 
-            {/* Description */}
+            {/* توضیحات */}
             <div className="mr-[24px] ml-[24px] mt-[22.5px]">
-              {/* <p className="text-right text-xl font-bold mb-2">توضیحات</p> */}
               <CustomInput
                 name="description"
                 label="توضیحات"
@@ -147,33 +151,14 @@ const PostCreation = () => {
                 as="textarea"
               />
             </div>
-            {/* challenge selector */}
-            <div className="mr-[24px] ml-[24px] mt-[12.5px]">
-              <p className="text-right text-xl font-bold mb-2">
-                چالش مربوطه (اختیاری)
-              </p>
-              <AutocompleteSingleSelect
-                items={challenges}
-                value={values.challenge}
-                onChange={(val) => {
-                  setFieldValue("challenge", val);
-                  console.log("Challenge selected:", val);
-                }}
-                placeHolder="انتخاب چالش"
-              />
-            </div>
 
-            {/* Submit Button */}
+            {/* دکمه ذخیره */}
             <div className="mt-10 mr-[24px] ml-[24px]">
               <CustomButton
                 type="submit"
-                className="h-[46.6px] bg-secondary w-full"
-                pageAddress={`/dashboard/${userId}`}
-
-                // disabled={isSubmitting || images.length === 0}
-                // loading={isSubmitting}
+                className="h-[46.6px] bg-secondary w-full mb-2"
               >
-                <p className="text-center text-base">اتمام ویرایش</p>
+                <p className="text-center text-base">ذخیره تغییرات</p>
                 <ArrowRight className="!w-[25px] !h-[25px]" />
               </CustomButton>
             </div>
@@ -184,4 +169,4 @@ const PostCreation = () => {
   );
 };
 
-export default PostCreation;
+export default EditPost;
