@@ -1,4 +1,4 @@
-import type { UserProfile } from "@/types/userTypes";
+import type { FetchedUserProfile, UserProfile } from "@/types/userTypes";
 
 export interface DateAndLocationInputProps {
   challengeDate: string;
@@ -82,10 +82,11 @@ export interface ChallengeDataDetails {
   categories: string[];
   type: string;
   memberCount: string;
-  participants: UserProfile[];
+  participants: FetchedUserProfile[];
   like_count: number;
   start_time: string;
   end_time: string;
+  visibility: string;
 }
 
 export interface UserCardListProps {

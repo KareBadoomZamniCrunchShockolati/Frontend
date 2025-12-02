@@ -1,6 +1,6 @@
 /*  ChallengeInfo.tsx  */
 import React, { useState, useMemo, useEffect } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { data, useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomButton from "@/components/Custom/CustomButton";
 import BackButtonAndMenu from "@/components/ChallengeManagement/info/BackButtonAndMenu";
 import ImageAndBadgeContainer from "@/components/ChallengeManagement/info/ImageAndBadgeContainer";
@@ -10,38 +10,52 @@ import DateAndLocation from "@/components/ChallengeManagement/info/DateAndLocati
 import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
 import UserCardList from "@/components/ChallengeManagement/public/UserCardsList";
 import ChallengeSlideshow from "@/components/ChallengeManagement/info/SlideShow";
-import type { UserProfile } from "@/types/userTypes";
+import type { FetchedUserProfile, UserProfile } from "@/types/userTypes";
 import type {
   ChallengeData,
   ChallengeDataDetails,
 } from "@/types/challengeElementsTypes";
 import { mockUsers } from "@/data/mockUsers";
 import { mockChallenges } from "@/data/mockChallenges";
-import { fetchChallengeById } from "@/services/challengeService";
-import { getUserById, getUserProfileService } from "@/services/userService";
+import {
+  fetchChallengeById,
+  joinPrivateChallenge,
+  joinPublicChallenge,
+} from "@/services/challengeService";
+import {
+  getFollowersService,
+  getFollowingService,
+  getUserById,
+  getUserProfileService,
+} from "@/services/userService";
 
 const DEFAULT_CHALLENGE_IMG =
   "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
 
-const defaultChallenge: ChallengeData = {
-  Img: DEFAULT_CHALLENGE_IMG,
-  title: "عنوان چالش",
-  description:
-    "این چالش برای آزمایش استقامت و مهارت‌های حل مسئله شما طراحی شده است. سفر شامل پیمودن زمین‌های سخت و غلبه بر موانع مختلف است. آیا آماده‌اید تا این ماجراجویی را شروع کنید و مرزهای خود را بسنجید؟",
-  dateRange: "از 28 اردیبهشت تا 8 شهریور - سه روز در هفته",
-  location: "قله کوه اورست",
+const defaultChallenge: ChallengeDataDetails = {
   commentsEnabled: false,
   categories: [],
   type: "عمومی",
   memberCount: "0",
-  members: [],
+  title: "عنوان چالش",
+  description:
+    "این چالش برای آزمایش استقامت و مهارت‌های حل مسئله شما طراحی شده است. سفر شامل پیمودن زمین‌های سخت و غلبه بر موانع مختلف است. آیا آماده‌اید تا این ماجراجویی را شروع کنید و مرزهای خود را بسنجید؟",
+
+  dateRange: "از 28 اردیبهشت تا 8 شهریور - سه روز در هفته",
+  location: "قله کوه اورست",
+  Img: DEFAULT_CHALLENGE_IMG,
+  participants: [],
+  like_count: 0,
+  start_time: "28 اردیبهشت",
+  end_time: "8شهریور",
+  visibility: "public",
 };
 
 const ChallengeInfo: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const payload: ChallengeData =
-    (location.state?.challenge as ChallengeData) ?? defaultChallenge;
+  const payload: ChallengeDataDetails =
+    (location.state?.challenge as ChallengeDataDetails) ?? defaultChallenge;
 
   const {
     Img,
@@ -49,7 +63,6 @@ const ChallengeInfo: React.FC = () => {
     description,
     dateRange,
     location: challengeLocation,
-    members: incomingMembers = [],
   } = payload;
 
   const safeImageUrl = Img && Img.trim() !== "" ? Img : DEFAULT_CHALLENGE_IMG;
@@ -110,20 +123,53 @@ const ChallengeInfo: React.FC = () => {
   }, [challengeId]);
   useEffect(() => {
     const fetchUsers = async () => {
-      const users = [];
+      let users = [];
       for (let user of challenge.participants) {
         console.log("user: ", user);
 
         const x = await getUserById(user.user_id);
-        users.push(x);
+        const y: any = await getFollowersService(user.user_id);
+        const z: any = await getFollowingService(user.user_id);
+        users.push({ ...x, followersCount: y.count, followingCount: z.count }); // there is no user summary type
+
         console.log("x: ", x);
       }
+      users = users.map((x) => convertUserType(x));
       setParticipants(users);
     };
     fetchUsers();
-    // console.log("sickk", fetchUsers());
   }, [challenge.participants]);
-
+  useEffect(() => console.log(challenge), [challenge]);
+  const convertUserType = (user: any) => {
+    return {
+      id: user.id,
+      username: user.username,
+      imagePath: user.profile_pricture,
+      bio: user.bio,
+      followersCount: user.followersCount, // does not matter. I dont use these three properties here
+      followingCount: user.followingCount,
+      doneChallengesCount: 0,
+    };
+  };
+  const joinChallengeHandler = async () => {
+    if (challenge.visibility == "public") {
+      if (challengeId) {
+        try {
+          const data = await joinPublicChallenge(challengeId);
+        } catch (e) {
+          console.log("error: ", e);
+        }
+      }
+    } else if (challenge.visibility == "private") {
+      if (challengeId) {
+        try {
+          const data = await joinPrivateChallenge(challengeId);
+        } catch (e) {
+          console.log("error: ", e);
+        }
+      }
+    }
+  };
   return (
     <div className="min-h-screen flex flex-col justify-between p-4">
       <div className="flex-1 flex flex-col items-center">
@@ -147,7 +193,10 @@ const ChallengeInfo: React.FC = () => {
           location={challengeLocation}
         />
 
-        <CustomButton className="mt-6 w-full sm:w-full md:w-full max-w-xl bg-primary rounded-[8px] p-5 text-lg hover:bg-primary">
+        <CustomButton
+          onClick={joinChallengeHandler}
+          className="mt-6 w-full sm:w-full md:w-full max-w-xl bg-primary rounded-2xl p-5 text-lg hover:bg-primary"
+        >
           پیوستن
         </CustomButton>
 

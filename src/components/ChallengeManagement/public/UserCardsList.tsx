@@ -21,7 +21,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
           msOverflowStyle: "none",
         }}
       >
-        {users.map((user) => (
+        {users?.map((user) => (
           <UserCard
             key={user.id}
             id={user.id}
@@ -30,6 +30,9 @@ const UserCardList: React.FC<UserCardListProps> = ({
             bio={user.bio}
             onDelete={onDelete}
             isOwner={isOwner}
+            followersCount={user.followersCount}
+            followingCount={user.followingCount}
+            doneChallengesCount={0} //where is the end point of this?
             className="w-full sm:w-full md:w-full lg:w-full"
           />
         ))}

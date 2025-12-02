@@ -1,10 +1,7 @@
+import type { UserProfile } from "./userTypes";
+
 export interface UserCardListProps {
-  users: Array<{
-    id: string;
-    username: string;
-    imagePath: string;
-    bio: string;
-  }>;
+  users: UserProfile[] | null;
   onDelete: (id: string, username: string) => void;
   isOwner: boolean;
 }
