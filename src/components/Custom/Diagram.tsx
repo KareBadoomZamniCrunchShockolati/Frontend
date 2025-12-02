@@ -1,16 +1,9 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { diagramData } from "@/data/mockDiagramDatas";
 
 export default function Diagram({ freq }: { freq: number }) {
-  const data = [
-    { date: "۱۶/۰۹", value: 100 },
-    { date: "۱۶/۰۹", value: 75 },
-    { date: "۱۶/۰۹", value: 55 },
-    { date: "۱۶/۰۹", value: 30 },
-    { date: "۱۶/۰۹", value: 45 },
-    { date: "۱۶/۰۹", value: 85 },
-    { date: "۱۶/۰۹", value: 25 },
-  ];
+  const data = diagramData;
 
   const maxValue = Math.max(...data.map((d) => d.value));
   const averageLine = 65; // Positioning the average line
@@ -25,7 +18,7 @@ export default function Diagram({ freq }: { freq: number }) {
 
         <div className=" relative">
           {/* Y-axis labels */}
-          <div className="absolute left-0 top-0 bottom-5 flex flex-col justify-between text-sm text-gray-600 pr-2">
+          <div className="absolute left-0 top-0 bottom-5 flex flex-col justify-between text-sm text-neutral-gray-bold pr-2">
             <span>۱۰۰٪</span>
             <span>۷۵٪</span>
             <span>۵۰٪</span>
@@ -36,7 +29,7 @@ export default function Diagram({ freq }: { freq: number }) {
           <div className="ml-12 relative">
             {/* Average line with label */}
             <div
-              className="absolute left-0 right-0 border-t-2 border-dashed border-orange-400 z-10"
+              className="absolute left-0 right-0 border-t-2 border-dashed border-primary z-10"
               style={{ top: `${100 - averageLine}%` }}
             >
               <div className="absolute -top-4 right-8 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
@@ -44,8 +37,8 @@ export default function Diagram({ freq }: { freq: number }) {
               </div>
             </div>
 
-            {/* Bars container */}
-            <div className="flex items-end justify-around h-[200px] pt-8">
+            {/* Bars container h-50 is h-[200px] :) */}
+            <div className="flex items-end justify-around h-50 pt-8">
               {data.map((item, index) => (
                 <div
                   key={index}
@@ -53,14 +46,14 @@ export default function Diagram({ freq }: { freq: number }) {
                 >
                   {/* Bar */}
                   <div
-                    className="w-full bg-gradient-to-t from-blue-400 to-blue-500 rounded-t-sm border-2 border-blue-600 transition-all duration-300 hover:opacity-80"
+                    className="w-full bg-secondary rounded-t-sm border-2 transition-all duration-300 hover:opacity-80"
                     style={{
                       height: `${Math.floor((item.value * 165) / freq)}px`,
                       maxWidth: "80px",
                     }}
                   />
                   {/* Date label */}
-                  <span className="mt-2 text-sm text-gray-700">
+                  <span className="mt-2 text-sm text-neutral-gray-bold">
                     {item.date}
                   </span>
                 </div>
