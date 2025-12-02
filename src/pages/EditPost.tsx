@@ -14,6 +14,10 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { updatePostService, getPostService } from "@/services/postService";
+import AutocompleteSingleSelect from "@/components/Custom/AutocompleteSingleSelect";
+import type { ChallengePreview } from "@/types/postTypes";
+import type { SimpleChallenge } from "@/types/createPostFormTypes";
+import { getParticipatingChallengesService } from "@/services/postService";
 
 const EditPost = () => {
   const { token, userId } = useUserStore.getState();
@@ -24,6 +28,7 @@ const EditPost = () => {
   const [imageURLs, setImageURLs] = useState<string[]>([]);
   const [initialData, setInitialData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [challenges, setChallenges] = useState<SimpleChallenge[]>([]);
 
   useEffect(() => {
     const fetchPostData = async () => {
@@ -49,6 +54,27 @@ const EditPost = () => {
     fetchPostData();
   }, [postId]);
 
+  useEffect(() => {
+    const fetchChallenges = async () => {
+      try {
+        const fullChallenges = await getParticipatingChallengesService();
+
+        const simpleChallenges: SimpleChallenge[] = fullChallenges.map(
+          (c: ChallengePreview) => ({
+            id: c.id,
+            name: c.title,
+          })
+        );
+
+        setChallenges(simpleChallenges);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchChallenges();
+  }, []);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
@@ -66,7 +92,6 @@ const EditPost = () => {
   };
 
   const handleDeleteImage = (index: number) => {
-    // حذف از imageURLs
     const newImageURLs = [...imageURLs];
     newImageURLs.splice(index, 1);
     setImageURLs(newImageURLs);
@@ -84,7 +109,6 @@ const EditPost = () => {
       return;
     }
 
-    // محدودیت حداکثر 5 تصویر
     if (images.length > 5) {
       CustomToast("حداکثر ۵ تصویر مجاز است", "error");
       return;
@@ -93,6 +117,7 @@ const EditPost = () => {
     const dto = {
       description: values.description || undefined,
       pictures: imageURLs.length > 0 ? imageURLs : undefined,
+      challengeID: values.challengeID || undefined,
     };
 
     try {
@@ -147,94 +172,114 @@ const EditPost = () => {
       <Formik
         initialValues={{
           description: initialData.description || "",
+          challengeID: initialData.challengeID || null,
         }}
         onSubmit={handleSubmit}
         enableReinitialize
       >
-        <Form>
-          {/* پیش نمایش تصاویر */}
-          <div className="flex flex-col items-center gap-2 mr-[24px] ml-[24px] mt-[20px]">
-            <label className="w-full h-64 border-2 border-gray-400 rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden">
-              {imageURLs.length > 0 ? (
-                <Carousel className="w-full h-full relative">
-                  <CarouselContent className="h-full">
-                    {imageURLs.map((imgUrl, index) => (
-                      <CarouselItem
-                        key={index}
-                        className="w-full h-full flex items-center justify-center relative"
-                      >
-                        <FileX
-                          className="absolute top-2 right-2 w-6 h-6 text-destructive cursor-pointer z-20 bg-white rounded-full p-1"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleDeleteImage(index);
-                          }}
-                        />
-                        <img
-                          src={imgUrl}
-                          alt={`Preview ${index}`}
-                          className="w-full h-full object-contain"
-                        />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  {imageURLs.length > 1 && (
-                    <>
-                      <CarouselPrevious className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
-                      <CarouselNext className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
-                    </>
-                  )}
-                </Carousel>
-              ) : (
-                <span className="text-neutral-gray font-bold text-center">
-                  پیش‌نمایه
-                </span>
-              )}
-            </label>
+        {({ values, setFieldValue }) => (
+          <Form>
+            {/* پیش نمایش تصاویر */}
+            <div className="flex flex-col items-center gap-2 mr-[24px] ml-[24px] mt-[20px]">
+              <label className="w-full h-64 border-2 border-gray-400 rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden">
+                {imageURLs.length > 0 ? (
+                  <Carousel className="w-full h-full relative">
+                    <CarouselContent className="h-full">
+                      {imageURLs.map((imgUrl, index) => (
+                        <CarouselItem
+                          key={index}
+                          className="w-full h-full flex items-center justify-center relative"
+                        >
+                          <FileX
+                            className="absolute top-2 right-2 w-6 h-6 text-destructive cursor-pointer z-20 bg-white rounded-full p-1"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleDeleteImage(index);
+                            }}
+                          />
+                          <img
+                            src={imgUrl}
+                            alt={`Preview ${index}`}
+                            className="w-full h-full object-contain"
+                          />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    {imageURLs.length > 1 && (
+                      <>
+                        <CarouselPrevious className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
+                        <CarouselNext className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
+                      </>
+                    )}
+                  </Carousel>
+                ) : (
+                  <span className="text-neutral-gray font-bold text-center">
+                    پیش‌نمایه
+                  </span>
+                )}
+              </label>
 
-            <CustomButton
-              type="button"
-              className="relative flex items-center w-full bg-secondary"
-            >
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImageChange}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                disabled={imageURLs.length >= 5}
+              <CustomButton
+                type="button"
+                className="relative flex items-center w-full bg-secondary"
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  disabled={imageURLs.length >= 5}
+                />
+                <p className="text-center text-base">
+                  {imageURLs.length >= 5 ? "حداکثر تصویر رسیده" : "افزودن تصویر"}
+                </p>
+                <Upload className="absolute right-5 !w-[25px] !h-[25px]" />
+              </CustomButton>
+              <p className="text-xs text-gray-500">{imageURLs.length}/5 تصویر</p>
+            </div>
+
+            {/* توضیحات */}
+            <div className="mr-[24px] ml-[24px] mt-[22.5px]">
+              <CustomInput
+                name="description"
+                label="توضیحات"
+                width="w-full"
+                className="h-32 rounded-xl"
+                as="textarea"
               />
-              <p className="text-center text-base">
-                {imageURLs.length >= 5 ? "حداکثر تصویر رسیده" : "افزودن تصویر"}
+            </div>
+
+            {/* انتخاب چالش */}
+            <div className="mr-[24px] ml-[24px] mt-[12.5px]">
+              <p className="text-right text-xl font-bold mb-2">
+                چالش مربوطه (اختیاری)
               </p>
-              <Upload className="absolute right-5 !w-[25px] !h-[25px]" />
-            </CustomButton>
-            <p className="text-xs text-gray-500">{imageURLs.length}/5 تصویر</p>
-          </div>
+              <AutocompleteSingleSelect
+                items={challenges}
+                value={
+                  challenges.find((c) => c.id === values.challengeID)?.name || ""
+                }
+                onChange={(selected: SimpleChallenge | null) =>
+                  setFieldValue("challengeID", selected ? selected.id : null)
+                }
+                placeHolder="انتخاب چالش"
+              />
+            </div>
 
-          {/* توضیحات */}
-          <div className="mr-[24px] ml-[24px] mt-[22.5px]">
-            <CustomInput
-              name="description"
-              label="توضیحات"
-              width="w-full"
-              className="h-32 rounded-xl"
-              as="textarea"
-            />
-          </div>
-
-          {/* دکمه ذخیره */}
-          <div className="mt-10 mr-[24px] ml-[24px]">
-            <CustomButton
-              type="submit"
-              className="h-[46.6px] bg-secondary w-full mb-2"
-              disabled={loading}
-            >
-              <p className="text-center text-base">ذخیره تغییرات</p>
-              <ArrowRight className="!w-[25px] !h-[25px]" />
-            </CustomButton>
-          </div>
-        </Form>
+            {/* دکمه ذخیره */}
+            <div className="mt-10 mr-[24px] ml-[24px]">
+              <CustomButton
+                type="submit"
+                className="h-[46.6px] bg-secondary w-full mb-2"
+                disabled={loading}
+              >
+                <p className="text-center text-base">ذخیره تغییرات</p>
+                <ArrowRight className="!w-[25px] !h-[25px]" />
+              </CustomButton>
+            </div>
+          </Form>
+        )}
       </Formik>
     </>
   );
