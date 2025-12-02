@@ -33,7 +33,7 @@ export interface DateAndLocationProps {
 }
 
 export interface ImageContainerWithShadowProps {
-  imageUrl: string;
+  imageUrl: string | undefined;
 }
 
 export interface LikeSaveButtonsProps {
@@ -72,6 +72,22 @@ export interface ChallengeData {
   members: UserProfile[];
 }
 
+export interface ChallengeDataDetails {
+  title: string;
+  description: string;
+  dateRange: string;
+  location: string;
+  Img: string | null;
+  commentsEnabled: boolean;
+  categories: string[];
+  type: string;
+  memberCount: string;
+  participants: UserProfile[];
+  like_count: number;
+  start_time: string;
+  end_time: string;
+}
+
 export interface UserCardListProps {
   users: UserProfile[];
   searchTerm: string;
@@ -79,7 +95,6 @@ export interface UserCardListProps {
   onDelete?: (id: string, username: string) => void;
   disabled?: boolean; // NEW: disables all add buttons
 }
-
 
 export interface ChallengeUserCardProps {
   id: string;
@@ -90,7 +105,7 @@ export interface ChallengeUserCardProps {
   followingCount: number;
   doneChallengesCount: number;
   onDelete: (id: string, username: string) => void;
-  onAdd?: () => void;                
+  onAdd?: () => void;
   isOwner: boolean;
   className: string;
 }

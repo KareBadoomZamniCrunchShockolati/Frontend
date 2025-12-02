@@ -9,6 +9,8 @@ const UserCardList: React.FC<UserCardListProps> = ({
   onDelete,
   isOwner,
 }) => {
+  console.log(users);
+
   return (
     <div className="w-full mt-4 max-w-xl mx-auto">
       <div
@@ -21,8 +23,8 @@ const UserCardList: React.FC<UserCardListProps> = ({
       >
         {users.map((user) => (
           <UserCard
-            key={user.user_id}
-            id={user.user_id}
+            key={user.id}
+            id={user.id}
             username={user.username}
             imagePath={user.imagePath}
             bio={user.bio}

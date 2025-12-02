@@ -22,6 +22,12 @@ export const getUserProfileService = async (userId: string | number) => {
     endPoint: `/api/v1/users/profile`,
   });
 };
+export const getUserById = async (userId: string | number) => {
+  if (!userId) throw new Error("User ID is required");
+  return await getData({
+    endPoint: `/api/v1/users/${userId}`,
+  });
+};
 
 // گرفتن تعداد followers و following
 export const getFollowStatsService = async (
@@ -81,7 +87,8 @@ export const verifyEmailChangeService = async ({
   new_email: string;
   code: string;
 }) => {
-  if (!old_email || !new_email || !code) throw new Error("All fields are required");
+  if (!old_email || !new_email || !code)
+    throw new Error("All fields are required");
 
   return await postData({
     endPoint: `/api/v1/users/email/verify-change`,

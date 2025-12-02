@@ -49,7 +49,7 @@ export const router = createBrowserRouter([
         element: <Edit />,
       },
       {
-        path: "/challenge",
+        path: "/challenge/:challengeId",
         element: <Challenge />,
       },
     ],

@@ -1,24 +1,23 @@
 export interface UserCardListProps {
-    users: Array<{
-      id: string;
-      username: string;
-      imagePath: string;
-      bio: string;
-    }>;
-    onDelete: (id: string, username: string) => void;
-    isOwner: boolean;
-  }
-
-
-  export interface UserCardProps {
+  users: Array<{
     id: string;
     username: string;
     imagePath: string;
     bio: string;
-    followersCount: number;
-    followingCount: number;
-    doneChallengesCount: number;
-    onDelete: (id: string, username: string) => void;
-    isOwner: boolean;
-    className: string;
-  }
+  }>;
+  onDelete: (id: string, username: string) => void;
+  isOwner: boolean;
+}
+
+export interface UserCardProps {
+  id: string;
+  username: string;
+  imagePath: string;
+  bio: string;
+  followersCount: number;
+  followingCount: number;
+  doneChallengesCount: number;
+  onDelete: (id: string, username: string) => void;
+  isOwner: boolean;
+  className: string;
+}
