@@ -104,11 +104,11 @@ export default function ChallengeCard({
       <div className="flex flex-col md:flex-row">
         {/* === تصویر === */}
         <div
-          className="w-full md:w-2/5 relative flex-shrink-0 h-40 md:h-auto bg-gray-100 cursor-pointer"
+          className="w-full md:w-2/5 relative flex-shrink-0 h-40 md:h-auto bg-neutral-gray cursor-pointer"
           onClick={onClick}
         >
           {!imageLoaded && (
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-100 animate-pulse" />
+            <div className="absolute inset-0 bg-gradient-to-br from-neutral-gray to-neutral-gray-bold animate-pulse" />
           )}
           <img
             src={coverImage}
@@ -152,7 +152,7 @@ export default function ChallengeCard({
 
           <div className="absolute bottom-4 right-4">
             <span
-              className={`text-xs font-bold px-3 py-1.5 rounded-full border-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)] ${
+              className={`text-xs font-bold px-3 py-1.5 rounded-full border-2 shadow-shadow-strong ${
                 isJoined
                   ? "bg-success text-white border-success"
                   : "bg-white text-neutral-gray-bold border-neutral-gray"
@@ -192,10 +192,13 @@ export default function ChallengeCard({
                 )}
 
                 <button
-                  onClick={handleSave}
+                  onClick={(e) => {
+                    e.stopPropagation(); // جلوی کلیک پدر رو می‌گیرد
+                    handleSave();
+                  }}
                   className={`p-2 rounded-full transition-all duration-200 border-2 shadow-lg hover:scale-105 ${
                     isSaved
-                      ? "bg-amber-50 text-primary border-primary"
+                      ? "bg-save-color text-primary border-primary"
                       : "bg-white text-neutral-gray-bold border-black"
                   }`}
                 >

@@ -166,13 +166,13 @@ const ProfileChallenges = () => {
   if (error) {
     return (
       <div className="flex justify-center items-center h-40">
-        <div className="text-red-500 text-center">
+        <div className="text-error text-center">
           <p>{error}</p>
           <button
             onClick={
               isMyChallengesSelected ? fetchMyChallenges : fetchChallenges
             }
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="mt-2 px-4 py-2 bg-secondry text-white rounded hover:bg-secondry"
           >
             تلاش مجدد
           </button>
@@ -261,7 +261,7 @@ const ProfileChallenges = () => {
 
       {!loading && filteredChallenges.length === 0 && (
         <div className="flex justify-center items-center h-40">
-          <p className="text-gray-500">
+          <p className="text-neutral-gray">
             {search || selectedCategoryIds.length > 0
               ? "چالشی با این فیلترها یافت نشد"
               : isMyChallengesSelected
@@ -274,12 +274,12 @@ const ProfileChallenges = () => {
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 m-2.5">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="animate-pulse bg-gray-200 rounded-lg h-80">
-              <div className="h-40 bg-gray-300 rounded-t-lg"></div>
+            <div key={i} className="animate-pulse bg-neutral-gray rounded-lg h-80">
+              <div className="h-40 bg-neutral-gray rounded-t-lg"></div>
               <div className="p-4 space-y-3">
-                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                <div className="h-3 bg-gray-300 rounded w-full"></div>
-                <div className="h-3 bg-gray-300 rounded w-2/3"></div>
+                <div className="h-4 bg-neutral-gray rounded w-3/4"></div>
+                <div className="h-3 bg-neutral-gray rounded w-full"></div>
+                <div className="h-3 bg-neutral-gray rounded w-2/3"></div>
               </div>
             </div>
           ))}
