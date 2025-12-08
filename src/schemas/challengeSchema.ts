@@ -21,11 +21,8 @@ export const step1Schema = Yup.object({
       .min(10, "توضیحات باید حداقل ۱۰ کاراکتر باشد"),
   });
   
- export const step2Schema = Yup.object({
-    selectedCategories: Yup.array()
-      .of(Yup.string())
-      .min(1, "حداقل یک دسته‌بندی انتخاب کنید")
-      .required("دسته‌بندی الزامی است"),
+  export const step2Schema = Yup.object({
+    selectedCategory: Yup.string().required("حداقل یک دسته‌بندی انتخاب کنید"),
     startDate: Yup.string().required("تاریخ شروع الزامی است"),
     startTime: Yup.string().required("ساعت شروع الزامی است"),
     endDate: Yup.string().required("تاریخ پایان الزامی است"),

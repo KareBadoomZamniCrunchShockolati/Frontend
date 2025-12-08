@@ -15,8 +15,9 @@ import { fetchUsers } from "@/services/followerFollowingService";
 import {
   createChallenge,
   inviteMultipleUsersToChallenge,
+  fetchChallengeCategories,
+  type ChallengeCategory,
 } from "@/services/challengeService";
-import { mockCategories, categoryNameToId } from "@/data/mockCategories";
 import {
   step1Schema,
   step2Schema,
@@ -27,7 +28,7 @@ type FormValues = {
   title: string;
   description: string;
   image: string | null;
-  selectedCategories: string[];
+  selectedCategory: string; // فقط یک دسته‌بندی
   startDate: string;
   startTime: string;
   endDate: string;
@@ -42,10 +43,12 @@ type FormValues = {
 const ChallengeCreate: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [categorySearch, setCategorySearch] = useState("");
   const [userSearch, setUserSearch] = useState("");
   const [fetchedUsers, setFetchedUsers] = useState<UserProfile[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+
+  const [categories, setCategories] = useState<ChallengeCategory[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
   const token = useUserStore((s) => s.token);
   const userId = useUserStore((s) => s.userId);
@@ -66,11 +69,26 @@ const ChallengeCreate: React.FC = () => {
     load();
   }, [userId, token]);
 
+  useEffect(() => {
+    const loadCategories = async () => {
+      setLoadingCategories(true);
+      try {
+        const cats = await fetchChallengeCategories();
+        setCategories(cats);
+      } catch (err) {
+        CustomToast("خطا در بارگذاری دسته‌بندی‌ها", "error");
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    loadCategories();
+  }, []);
+
   const initialValues: FormValues = {
     title: "",
     description: "",
     image: null,
-    selectedCategories: [],
+    selectedCategory: "",
     startDate: "",
     startTime: "",
     endDate: "",
@@ -128,13 +146,17 @@ const ChallengeCreate: React.FC = () => {
       const start_time = `${values.startDate}T${values.startTime}:00Z`;
       const end_time = `${values.endDate}T${values.endTime}:59Z`;
 
+      let category_id = 1;
+      if (values.selectedCategory) {
+        const found = categories.find((c) => c.name === values.selectedCategory);
+        category_id = found?.id || 1;
+      }
+
       const payload = {
         title: values.title.trim(),
         description: values.description.trim(),
-        category_id: categoryNameToId[values.selectedCategories[0]] || 1,
-        max_participants: values.memberCount
-          ? parseInt(values.memberCount)
-          : null,
+        category_id,
+        max_participants: values.memberCount ? parseInt(values.memberCount) : null,
         visibility: values.challengeType === "شخصی" ? "private" : "public",
         rule: "none",
         comments_enabled: values.isCommentsEnabled,
@@ -174,7 +196,7 @@ const ChallengeCreate: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-4 items-center">
+    <div className="min-h-screen flex flex-col p-4 items-center bg-gray-50">
       <div className="flex justify-center items-center w-full max-w-xl mb-10 mt-4">
         <BackButtonWithSteps
           onClick={() =>
@@ -195,39 +217,24 @@ const ChallengeCreate: React.FC = () => {
         {({
           values,
           setFieldValue,
+          setFieldTouched,
           setTouched,
           setErrors,
           isSubmitting,
           errors,
           touched,
         }) => {
-          const safeSelectedCategories = Array.isArray(
-            values.selectedCategories
-          )
-            ? values.selectedCategories
-            : [];
-
-          const filteredCategories = mockCategories.filter(
-            (cat) =>
-              cat.includes(categorySearch) &&
-              !safeSelectedCategories.includes(cat)
-          );
-
           const availableUsers = fetchedUsers
             .filter((u) => !values.selectedUsers.some((s) => s.id === u.id))
             .filter(
               (u) =>
                 u.username.toLowerCase().includes(userSearch.toLowerCase()) ||
-                (u.full_name
-                  ?.toLowerCase()
-                  .includes(userSearch.toLowerCase()) ??
-                  false)
+                (u.full_name?.toLowerCase().includes(userSearch.toLowerCase()) ?? false)
             );
 
           const canAddMore =
             !values.memberCount ||
-            values.selectedUsers.length <
-              parseInt(values.memberCount || "0", 10);
+            values.selectedUsers.length < parseInt(values.memberCount || "0", 10);
 
           return (
             <Form className="flex-1 flex flex-col mt-10 justify-start items-center w-full">
@@ -248,25 +255,20 @@ const ChallengeCreate: React.FC = () => {
 
               {currentStep === 2 && (
                 <Step2Details
-                  selectedCategories={safeSelectedCategories}
-                  onCategoriesChange={(newCats) =>
-                    setFieldValue("selectedCategories", newCats)
-                  }
-                  categorySearch={categorySearch}
-                  setCategorySearch={setCategorySearch}
-                  filteredCategories={filteredCategories}
+                  categories={categories}
+                  loadingCategories={loadingCategories}
                   values={values}
                   setFieldValue={setFieldValue}
+                  setFieldTouched={setFieldTouched}
                   errors={{
-                    selectedCategories:
-                      touched.selectedCategories && errors.selectedCategories,
+                    selectedCategory: touched.selectedCategory && errors.selectedCategory,
                     startDate: touched.startDate && errors.startDate,
                     startTime: touched.startTime && errors.startTime,
                     endDate: touched.endDate && errors.endDate,
                     endTime: touched.endTime && errors.endTime,
-                    challengeLocation:
-                      touched.challengeLocation && errors.challengeLocation,
+                    challengeLocation: touched.challengeLocation && errors.challengeLocation,
                   }}
+                  touched={touched}
                 />
               )}
 
@@ -288,10 +290,7 @@ const ChallengeCreate: React.FC = () => {
                       CustomToast("حداکثر تعداد عضو پر شده", "warning");
                       return;
                     }
-                    setFieldValue("selectedUsers", [
-                      ...values.selectedUsers,
-                      user,
-                    ]);
+                    setFieldValue("selectedUsers", [...values.selectedUsers, user]);
                   }}
                   canAddMore={canAddMore}
                   loadingUsers={loadingUsers}
@@ -306,16 +305,18 @@ const ChallengeCreate: React.FC = () => {
                       ? () => handleNext(values, setTouched, setErrors)
                       : undefined
                   }
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || loadingCategories}
                   className={`w-full max-w-xl rounded-primary-radius p-5 text-lg transition-all text-white
                     ${currentStep === 3 ? "bg-primary" : "bg-secondary"}
-                    ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
+                    ${isSubmitting || loadingCategories ? "opacity-70 cursor-not-allowed" : ""}`}
                 >
                   {isSubmitting
                     ? "در حال ثبت..."
+                    : loadingCategories
+                    ? "در حال بارگذاری..."
                     : currentStep === 3
-                      ? "ثبت چالش"
-                      : "بعدی"}
+                    ? "ثبت چالش"
+                    : "بعدی"}
                 </CustomButton>
               </div>
             </Form>

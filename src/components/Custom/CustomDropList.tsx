@@ -114,7 +114,7 @@ export default function CustomSelect({
                   `}
                   style={{ direction: isRTL ? "rtl" : "ltr" }}
                 >
-                  {hasValue ? selectedLabel : label}
+                  {hasValue ? selectedLabel : ""}
                 </span>
 
                 {/* ICON – left side in RTL, right side in LTR */}

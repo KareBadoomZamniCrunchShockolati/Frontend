@@ -2,6 +2,48 @@
 
 import { getData, postData, putData, deleteData } from "./services";
 import type { UserProfile } from "@/types/userTypes";
+import CustomToast from "@/components/Custom/CustomToast";
+
+// ================================
+// Types
+// ================================
+
+export interface ChallengeCategory {
+  id: number;
+  name: string;
+}
+
+let cachedCategories: ChallengeCategory[] | null = null;
+
+export const fetchChallengeCategories = async (): Promise<ChallengeCategory[]> => {
+  if (cachedCategories) return cachedCategories;
+
+  try {
+    const response = await getData({
+      endPoint: "/api/v1/challenges/categories",
+    });
+
+    const raw = response?.data || response;
+    const list = Array.isArray(raw) ? raw : raw?.data || [];
+
+    const categories: ChallengeCategory[] = list.map((item: any) => ({
+      id: Number(item.ID),
+      name: item.Name || "Unknown",
+    }));
+
+    cachedCategories = categories;
+    return categories;
+  } catch (error) {
+    console.error("Failed to fetch categories:", error);
+    CustomToast("خطا در دریافت دسته‌بندی‌ها", "error");
+    cachedCategories = [];
+    return [];
+  }
+};
+
+// ================================
+// Create Challenge
+// ================================
 
 export const createChallenge = async (payload: {
   title: string;
@@ -28,17 +70,25 @@ export const createChallenge = async (payload: {
   }
 };
 
+// ================================
+// Fetch Challenge by ID
+// ================================
+
 export const fetchChallengeById = async (challengeId: string | number) => {
   try {
     const response = await getData({
       endPoint: `/api/v1/challenges/${challengeId}`,
     });
-    return response.data; // اطلاعات کامل چالش
+    return response.data;
   } catch (error) {
     console.error("Failed to fetch challenge:", error);
     throw error;
   }
 };
+
+// ================================
+// Update Challenge
+// ================================
 
 export const updateChallenge = async (
   challengeId: string | number,
@@ -64,6 +114,10 @@ export const updateChallenge = async (
   }
 };
 
+// ================================
+// Remove Participant
+// ================================
+
 export const removeParticipantFromChallenge = async (
   challengeId: string | number,
   participantId: string | number
@@ -82,6 +136,10 @@ export const removeParticipantFromChallenge = async (
     throw new Error(message);
   }
 };
+
+// ================================
+// Invite Single User
+// ================================
 
 export const inviteUserToChallenge = async (
   challengeId: number | string,
@@ -103,6 +161,10 @@ export const inviteUserToChallenge = async (
     throw error;
   }
 };
+
+// ================================
+// Invite Multiple Users
+// ================================
 
 export const inviteMultipleUsersToChallenge = async (
   challengeId: number | string,
