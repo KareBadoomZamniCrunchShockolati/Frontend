@@ -10,7 +10,7 @@ import DateAndLocation from "@/components/ChallengeManagement/info/DateAndLocati
 import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
 import UserCardList from "@/components/ChallengeManagement/public/UserCardsList";
 import ChallengeSlideshow from "@/components/ChallengeManagement/info/SlideShow";
-import type { FetchedUserProfile, UserProfile } from "@/types/userTypes";
+import type { UserProfile } from "@/types/userTypes";
 import type {
   ChallengeData,
   ChallengeDataDetails,
@@ -21,6 +21,7 @@ import {
   fetchChallengeById,
   joinPrivateChallenge,
   joinPublicChallenge,
+  leaveChallenge,
 } from "@/services/challengeService";
 import {
   getFollowersService,
@@ -28,6 +29,9 @@ import {
   getUserById,
   getUserProfileService,
 } from "@/services/userService";
+import { getParticipatingChallengesService } from "@/services/postService";
+import { cn } from "@/lib/utils";
+import { set } from "react-hook-form";
 
 const DEFAULT_CHALLENGE_IMG =
   "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
@@ -77,6 +81,7 @@ const ChallengeInfo: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [likeCount, setLikeCount] = useState(10);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isParticipated, setIsParticipated] = useState<boolean>(false);
 
   const filteredUsers = useMemo(() => {
     if (participants) {
@@ -119,11 +124,14 @@ const ChallengeInfo: React.FC = () => {
       const fetchedChallenge = await fetchChallengeById(String(challengeId));
       setChallenge(fetchedChallenge);
     };
+
     fetchChallenge();
   }, [challengeId]);
   useEffect(() => {
     const fetchUsers = async () => {
       let users = [];
+      console.log("pppp: ", challenge.participants);
+      if (!challenge.participants) return;
       for (let user of challenge.participants) {
         console.log("user: ", user);
 
@@ -151,11 +159,29 @@ const ChallengeInfo: React.FC = () => {
       doneChallengesCount: 0,
     };
   };
+  // useEffect(() => {
+  //   const checkChallengeList = async () => {
+  //     const list = await getParticipatingChallengesService();
+  //     console.log("list: ", list);
+
+  //     for (let x of list) {
+  //       if (x.id == challengeId) {
+  //         setIsParticipated(true);
+  //         break;
+  //       }
+  //     }
+  //   };
+  //   checkChallengeList();
+  // }, [isParticipated]);
+  // useEffect(() => {
+  //   console.log("is participated: ", isParticipated);
+  // }, [isParticipated]);
   const joinChallengeHandler = async () => {
     if (challenge.visibility == "public") {
       if (challengeId) {
         try {
           const data = await joinPublicChallenge(challengeId);
+          console.log(data);
         } catch (e) {
           console.log("error: ", e);
         }
@@ -164,9 +190,21 @@ const ChallengeInfo: React.FC = () => {
       if (challengeId) {
         try {
           const data = await joinPrivateChallenge(challengeId);
+          console.log(data);
         } catch (e) {
           console.log("error: ", e);
         }
+      }
+    }
+  };
+  const leaveChallengeHandler = async () => {
+    if (challengeId) {
+      try {
+        const data = await leaveChallenge(challengeId);
+        setIsParticipated(false);
+        console.log(data);
+      } catch (e) {
+        console.log("error: ", e);
       }
     }
   };
@@ -195,9 +233,21 @@ const ChallengeInfo: React.FC = () => {
 
         <CustomButton
           onClick={joinChallengeHandler}
-          className="mt-6 w-full sm:w-full md:w-full max-w-xl bg-primary rounded-2xl p-5 text-lg hover:bg-primary"
+          className={cn(
+            "mt-6 w-full sm:w-full md:w-full max-w-xl bg-primary rounded-2xl p-5 text-lg hover:bg-primary",
+            isParticipated && "hidden"
+          )}
         >
           پیوستن
+        </CustomButton>
+        <CustomButton
+          // onClick={leaveChallengeHandler}
+          className={cn(
+            "mt-6 w-full sm:w-full md:w-full max-w-xl bg-red-main rounded-2xl p-5 text-lg hover:bg-primary",
+            isParticipated || "hidden"
+          )}
+        >
+          ترک چالش
         </CustomButton>
 
         <div className="w-full max-w-2xl mt-8" dir="rtl">

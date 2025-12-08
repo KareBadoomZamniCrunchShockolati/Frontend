@@ -12,6 +12,7 @@ import Test from "@/pages/test";
 import Edit from "@/pages/EditProfile";
 import PostCreation from "@/pages/PostCreation";
 import PostPage from "@/pages/PostPage";
+import EditPost from "@/pages/EditPost";
 
 // import { LogIn } from "lucide-react";
 import Challenge from "@/pages/ChallengeInfo";
@@ -80,6 +81,10 @@ export const router = createBrowserRouter([
       {
         path: "/createChallenge",
         element: <ChallengeCreate />,
+      },
+      {
+        path: "/editpost/:id",
+        element: <EditPost />,
       },
     ],
   },

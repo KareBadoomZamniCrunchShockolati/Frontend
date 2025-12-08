@@ -18,15 +18,7 @@ export interface UserProfile {
   followingCount: number;
   doneChallengesCount: number;
 }
-export interface FetchedUserProfile {
-  user_id: string;
-  username: string;
-  imagePath: string;
-  bio: string;
-  followersCount: number;
-  followingCount: number;
-  doneChallengesCount: number;
-}
+
 //   username: string;
 //   setUsername: (username: string) => void;
 //   token: string;

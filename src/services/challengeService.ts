@@ -164,3 +164,15 @@ export const joinPrivateChallenge = async (challengeId: number) => {
     throw Error("could not join the challenge");
   }
 };
+
+export const leaveChallenge = async (challengeId: number) => {
+  try {
+    const response = await postData({
+      endPoint: `/api/v1/challenges/${challengeId}/leave`,
+      data: {},
+    });
+    return response.data;
+  } catch (error) {
+    throw Error("could not join the challenge");
+  }
+};
