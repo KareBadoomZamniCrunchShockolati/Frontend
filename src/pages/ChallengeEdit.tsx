@@ -1,5 +1,4 @@
 // src/pages/ChallengeEdit.tsx
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CustomButton from "@/components/Custom/CustomButton";
@@ -9,6 +8,7 @@ import BackButton from "@/components/ChallengeManagement/edit/BackButton";
 import ImageAndBadgeContainerEdit from "@/components/ChallengeManagement/edit/ImageAndBadgeContainerEdit";
 import TitleAndDescriptionInput from "@/components/ChallengeManagement/edit/TitleAndDescriptionInput";
 import DateAndLocationInput from "@/components/ChallengeManagement/edit/DateAndLocationInput";
+import CategorySelectEdit from "@/components/ChallengeManagement/edit/CategorySelectEdit";
 import CustomToast from "@/components/Custom/CustomToast";
 import useUserStore from "@/store/userStore/userStore";
 import type { UserProfile } from "@/types/userTypes";
@@ -17,12 +17,12 @@ import {
   fetchChallengeById,
   updateChallenge,
   removeParticipantFromChallenge,
+  fetchChallengeCategories,
+  type ChallengeCategory,
 } from "@/services/challengeService";
 import type { ChallengeData } from "@/types/challengeCreateTypes";
 
 import { DEFAULT_IMG } from "@/data/mockImages";
-
-
 
 const ChallengeEdit: React.FC = () => {
   const { challengeId } = useParams<{ challengeId: string }>();
@@ -33,18 +33,27 @@ const ChallengeEdit: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isCreator, setIsCreator] = useState(false);
 
+  // فرم فیلدها
   const [image, setImage] = useState<string>(DEFAULT_IMG);
   const [challengeTitle, setChallengeTitle] = useState("");
   const [challengeDescription, setChallengeDescription] = useState("");
   const [startDate, setStartDate] = useState("");
-  const [startTime, setStartTime] = useState("");
+  const [startTime, setStartDateTime] = useState("");
   const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
   const [challengeLocation, setChallengeLocation] = useState("");
+
+  // دسته‌بندی
+  const [categories, setCategories] = useState<ChallengeCategory[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
+
+  // شرکت‌کنندگان
   const [participants, setParticipants] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
+  // بارگذاری چالش
   useEffect(() => {
     const loadChallenge = async () => {
       if (!challengeId || !token || !userId) {
@@ -65,18 +74,22 @@ const ChallengeEdit: React.FC = () => {
         setIsCreator(true);
         setChallenge(data);
 
-        // پر کردن فرم
+        // پر كردن فرم
         setChallengeTitle(data.title);
         setChallengeDescription(data.description || "");
         setImage(data.image_url || DEFAULT_IMG);
         setChallengeLocation(data.location || "");
 
         setStartDate(data.start_time.split("T")[0]);
-        setStartTime(data.start_time.split("T")[1]?.slice(0, 5) || "09:00");
+        setStartDateTime(data.start_time.split("T")[1]?.slice(0, 5) || "09:00");
         setEndDate(data.end_time.split("T")[0]);
         setEndTime(data.end_time.split("T")[1]?.slice(0, 5) || "18:00");
 
-        // حذف خود کاربر از لیست شرکت‌کنندگان
+        // دسته‌بندی فعلی
+        if (data.category_name) {
+          setSelectedCategoryName(data.category_name);
+        }
+
         const others = data.participants.filter(p => p.user_id !== Number(userId));
         setParticipants(others);
       } catch (err) {
@@ -89,6 +102,22 @@ const ChallengeEdit: React.FC = () => {
 
     loadChallenge();
   }, [challengeId, token, userId, navigate]);
+
+  // بارگذاری دسته‌بندی‌ها
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const cats = await fetchChallengeCategories();
+        setCategories(cats);
+      } catch (err) {
+        CustomToast("خطا در بارگذاری دسته‌بندی‌ها", "error");
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    loadCategories();
+  }, []);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -112,25 +141,32 @@ const ChallengeEdit: React.FC = () => {
   };
 
   const handleSave = async () => {
-    if (!challengeTitle.trim()) {
-      CustomToast("عنوان چالش الزامی است", "error");
-      return;
+    // اعتبارسنجی تاریخ و زمان
+    if (typeof window.forceValidateDateLocation === "function") {
+      window.forceValidateDateLocation();
     }
-    if (!startDate || !startTime || !endDate || !endTime) {
-      CustomToast("تاریخ و زمان شروع و پایان الزامی است", "error");
+
+    if (!challengeTitle.trim()) return;
+    if (!startDate || !startTime || !endDate || !endTime) return;
+    if (!selectedCategoryName) {
+      CustomToast("لطفاً دسته‌بندی چالش را انتخاب کنید", "error");
       return;
     }
 
     setIsSaving(true);
 
+    const selectedCat = categories.find(c => c.name === selectedCategoryName);
+    const category_id = selectedCat?.id || null;
+
     const payload = {
       title: challengeTitle.trim(),
-      description: challengeDescription.trim(),
+      description: challengeDescription.trim() || null,
       image_url: image !== DEFAULT_IMG ? image : null,
       location: challengeLocation.trim() || null,
       start_time: `${startDate}T${startTime}:00Z`,
       end_time: `${endDate}T${endTime}:59Z`,
       timezone: "UTC",
+      category_id,
     };
 
     try {
@@ -160,6 +196,7 @@ const ChallengeEdit: React.FC = () => {
       </div>
     );
   }
+
   if (!challenge || !isCreator) return null;
 
   return (
@@ -172,7 +209,7 @@ const ChallengeEdit: React.FC = () => {
 
         <ImageAndBadgeContainerEdit onImageChange={handleImageChange} imageUrl={image} />
 
-        <div className="w-full max-w-xl space-y-6 mt-6">
+        <div className="w-full max-w-xl space-y-10 mt-6">
           <TitleAndDescriptionInput
             title={challengeTitle}
             onTitleChange={setChallengeTitle}
@@ -187,12 +224,21 @@ const ChallengeEdit: React.FC = () => {
             endTime={endTime}
             location={challengeLocation}
             onStartDateChange={setStartDate}
-            onStartTimeChange={setStartTime}
+            onStartTimeChange={setStartDateTime}
             onEndDateChange={setEndDate}
             onEndTimeChange={setEndTime}
             onLocationChange={setChallengeLocation}
           />
 
+          {/* دسته‌بندی چالش — دقیقاً مثل صفحه ساخت */}
+          <CategorySelectEdit
+            categories={categories}
+            loading={loadingCategories}
+            selectedCategory={selectedCategoryName}
+            onCategoryChange={setSelectedCategoryName}
+          />
+
+          {/* شرکت‌کنندگان */}
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-4 text-right">
               شرکت‌کنندگان ({participants.length} نفر)
@@ -207,7 +253,7 @@ const ChallengeEdit: React.FC = () => {
                 />
               </>
             ) : (
-              <p className="text-center text-primary py-8 rounded-xl">
+              <p className="text-center text-primary py-8 bg-gray-50 rounded-xl">
                 هنوز کسی عضو چالش نشده است
               </p>
             )}
@@ -215,11 +261,11 @@ const ChallengeEdit: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex justify-center w-full mt-10">
+      <div className="flex justify-center w-full mt-10 pb-6">
         <CustomButton
           disabled={isSaving}
           onClick={handleSave}
-          className="w-full max-w-xl bg-primary text-white rounded-primary-radius p-5 text-lg disabled:opacity-70"
+          className="w-full max-w-xl bg-primary text-white rounded-primary-radius p-5 text-lg font-medium disabled:opacity-70"
         >
           {isSaving ? "در حال ذخیره..." : "ذخیره تغییرات"}
         </CustomButton>
