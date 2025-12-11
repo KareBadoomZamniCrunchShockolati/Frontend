@@ -19,6 +19,7 @@ import Challenge from "@/pages/ChallengeInfo";
 import ChallengeEdit from "@/pages/ChallengeEdit";
 import ChallengeCreate from "@/pages/ChallengeCreate";
 import ProgressCalendar from "@/components/ProgressCalendar";
+import PostComments from "@/pages/PostComments";
 
 export const router = createBrowserRouter([
   {
@@ -73,6 +74,10 @@ export const router = createBrowserRouter([
       {
         path: "/post/:id",
         element: <PostPage />,
+      },
+      {
+      path: "/post/:id/comments", 
+      element: <PostComments/>,
       },
       {
         path: "/editChallenge/:challengeId",
