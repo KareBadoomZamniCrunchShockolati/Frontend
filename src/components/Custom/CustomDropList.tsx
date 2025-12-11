@@ -174,13 +174,6 @@ export default function CustomSelect({
                 </div>
               )}
             </div>
-
-            {/* ────────────────────── ERROR MESSAGE ────────────────────── */}
-            {hasError && (
-              <div className="mt-1 text-xs pr-4 text-right">
-                <p className="text-error">{meta.error}</p>
-              </div>
-            )}
           </div>
         );
       }}
