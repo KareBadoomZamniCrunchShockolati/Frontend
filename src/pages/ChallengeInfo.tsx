@@ -106,8 +106,11 @@ const ChallengeInfo: React.FC = () => {
 
         <DateAndLocation dateRange={dateRange} location={challengeLocation} />
 
-        <CustomButton className="mt-6 w-full sm:w-full md:w-full max-w-xl bg-primary rounded-[8px] p-5 text-lg hover:bg-primary">
+        <CustomButton className="mt-6 w-full sm:w-full md:w-full max-w-xl bg-primary rounded-primary-radius p-5 text-lg hover:bg-primary">
           پیوستن
+        </CustomButton>
+        <CustomButton className="mt-6 w-full sm:w-full md:w-full max-w-xl bg-secondary rounded-primary-radius p-5 text-lg hover:bg-secondary">
+         مشاهده پیشرفت 
         </CustomButton>
 
         <div className="w-full max-w-2xl mt-8" dir="rtl">
