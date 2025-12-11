@@ -5,20 +5,7 @@ import CustomSelect from "@/components/Custom/CustomDropList";
 import CustomCheckbox from "@/components/Custom/CustomCheckbox";
 import { Field } from "formik";
 import type { FieldProps } from "formik";
-
-interface ChallengeCategory {
-  id: number;
-  name: string;
-}
-
-interface Step2DetailsProps {
-  categories: ChallengeCategory[];
-  loadingCategories?: boolean;
-  values: any;
-  setFieldValue: any;
-  errors?: any;
-  touched?: any;
-}
+import type { Step2DetailsProps } from "@/types/challengeCreateTypes";
 
 const Step2Details: React.FC<Step2DetailsProps> = ({
   categories,
@@ -30,11 +17,11 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
 }) => {
   if (loadingCategories)
     return (
-      <div className="text-center py-12 text-gray-600">در حال بارگذاری...</div>
+      <div className="text-center py-12 text-gray-text">در حال بارگذاری...</div>
     );
   if (!categories?.length)
     return (
-      <div className="text-center py-12 text-red-500">دسته‌بندی موجود نیست</div>
+      <div className="text-center py-12 text-error">دسته‌بندی موجود نیست</div>
     );
 
   return (
@@ -51,7 +38,7 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
         />
 
         {touched.selectedCategory && errors.selectedCategory && (
-          <p className="text-sm text-red-500 text-right">
+          <p className="text-sm text-error text-right">
             {errors.selectedCategory}
           </p>
         )}

@@ -1,6 +1,6 @@
 // components/ChallengeManagement/edit/DateAndLocationInput.tsx
 import React from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field } from "formik";
 import CustomInput from "@/components/Custom/CustomInput";
 import type { DateAndLocationInputProps } from "@/types/challengeCreateTypes";
 import { validationDateSchema } from "@/schemas/challengeSchema";
@@ -27,13 +27,12 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
         location,
       }}
       validationSchema={validationDateSchema}
-      enableReinitialize={true} // وقتی داده از API میاد، فرم آپدیت میشه
+      enableReinitialize={true}
       validateOnBlur={true}
       validateOnChange={false}
       onSubmit={() => {}}
     >
       {({ values, setTouched }) => {
-        // هر تغییری در فرم → فوراً به صفحه والد منتقل بشه
         React.useEffect(() => {
           onStartDateChange(values.startDate);
           onStartTimeChange(values.startTime);
@@ -48,7 +47,6 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
           values.location,
         ]);
 
-        // تابع برای والد که قبل از ذخیره، خطاها رو نشون بده
         React.useEffect(() => {
           // @ts-ignore - فقط برای دسترسی از ChallengeEdit
           window.forceValidateDateLocation = () => {
@@ -74,11 +72,10 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
                         {...field}
                         type="date"
                         label="تاریخ شروع"
-                        showError={false} // خطا فقط زیر فیلد نمایش داده بشه
+                        showError={false}
                       />
                     )}
                   </Field>
-
                 </div>
 
                 <div>
@@ -92,7 +89,6 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
                       />
                     )}
                   </Field>
-
                 </div>
               </div>
             </div>
@@ -111,7 +107,6 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
                       />
                     )}
                   </Field>
-
                 </div>
 
                 <div>
@@ -125,7 +120,6 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
                       />
                     )}
                   </Field>
-
                 </div>
               </div>
             </div>
@@ -143,7 +137,6 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
                   />
                 )}
               </Field>
-
             </div>
           </Form>
         );

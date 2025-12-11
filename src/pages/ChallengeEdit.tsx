@@ -8,7 +8,7 @@ import BackButton from "@/components/ChallengeManagement/edit/BackButton";
 import ImageAndBadgeContainerEdit from "@/components/ChallengeManagement/edit/ImageAndBadgeContainerEdit";
 import TitleAndDescriptionInput from "@/components/ChallengeManagement/edit/TitleAndDescriptionInput";
 import DateAndLocationInput from "@/components/ChallengeManagement/edit/DateAndLocationInput";
-import CategorySelectEdit from "@/components/ChallengeManagement/edit/CategorySelectEdit";
+import CategorySelectEdit from "@/components/ChallengeManagement/edit/categorySelectEdit";
 import CustomToast from "@/components/Custom/CustomToast";
 import useUserStore from "@/store/userStore/userStore";
 import type { UserProfile } from "@/types/userTypes";
@@ -18,8 +18,9 @@ import {
   updateChallenge,
   removeParticipantFromChallenge,
   fetchChallengeCategories,
-  type ChallengeCategory,
 } from "@/services/challengeService";
+
+import type { ChallengeCategoryType } from "@/types/challengeCreateTypes";
 import type { ChallengeData } from "@/types/challengeCreateTypes";
 
 import { DEFAULT_IMG } from "@/data/mockImages";
@@ -44,7 +45,7 @@ const ChallengeEdit: React.FC = () => {
   const [challengeLocation, setChallengeLocation] = useState("");
 
   // دسته‌بندی
-  const [categories, setCategories] = useState<ChallengeCategory[]>([]);
+  const [categories, setCategories] = useState<ChallengeCategoryType[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
 
@@ -90,7 +91,9 @@ const ChallengeEdit: React.FC = () => {
           setSelectedCategoryName(data.category_name);
         }
 
-        const others = data.participants.filter(p => p.user_id !== Number(userId));
+        const others = data.participants.filter(
+          (p) => p.user_id !== Number(userId)
+        );
         setParticipants(others);
       } catch (err) {
         CustomToast("خطا در بارگذاری چالش", "error");
@@ -133,7 +136,9 @@ const ChallengeEdit: React.FC = () => {
 
     try {
       await removeParticipantFromChallenge(challengeId, participantId);
-      setParticipants(prev => prev.filter(u => u.user_id !== Number(participantId)));
+      setParticipants((prev) =>
+        prev.filter((u) => u.user_id !== Number(participantId))
+      );
       CustomToast("کاربر با موفقیت حذف شد", "success");
     } catch (err: any) {
       CustomToast(err.message || "حذف ناموفق بود", "error");
@@ -141,7 +146,6 @@ const ChallengeEdit: React.FC = () => {
   };
 
   const handleSave = async () => {
-    // اعتبارسنجی تاریخ و زمان
     if (typeof window.forceValidateDateLocation === "function") {
       window.forceValidateDateLocation();
     }
@@ -155,7 +159,7 @@ const ChallengeEdit: React.FC = () => {
 
     setIsSaving(true);
 
-    const selectedCat = categories.find(c => c.name === selectedCategoryName);
+    const selectedCat = categories.find((c) => c.name === selectedCategoryName);
     const category_id = selectedCat?.id || null;
 
     const payload = {
@@ -181,7 +185,7 @@ const ChallengeEdit: React.FC = () => {
   };
 
   const filteredParticipants = participants.filter(
-    user =>
+    (user) =>
       user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.full_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -191,7 +195,9 @@ const ChallengeEdit: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-lg font-medium text-neutral-gray-bold">در حال بارگذاری چالش...</p>
+          <p className="text-lg font-medium text-neutral-gray-bold">
+            در حال بارگذاری چالش...
+          </p>
         </div>
       </div>
     );
@@ -207,7 +213,10 @@ const ChallengeEdit: React.FC = () => {
           <h1 className="text-2xl font-bold text-primary">ویرایش چالش</h1>
         </div>
 
-        <ImageAndBadgeContainerEdit onImageChange={handleImageChange} imageUrl={image} />
+        <ImageAndBadgeContainerEdit
+          onImageChange={handleImageChange}
+          imageUrl={image}
+        />
 
         <div className="w-full max-w-xl space-y-10 mt-6">
           <TitleAndDescriptionInput
@@ -245,7 +254,10 @@ const ChallengeEdit: React.FC = () => {
             </h2>
             {participants.length > 0 ? (
               <>
-                <SearchBar searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
+                <SearchBar
+                  searchTerm={searchTerm}
+                  onSearchTermChange={setSearchTerm}
+                />
                 <UserCardList
                   users={filteredParticipants}
                   onDelete={handleDeleteParticipant}
@@ -253,7 +265,7 @@ const ChallengeEdit: React.FC = () => {
                 />
               </>
             ) : (
-              <p className="text-center text-primary py-8 bg-gray-50 rounded-xl">
+              <p className="text-center text-primary py-8 bg-white rounded-primary-radius">
                 هنوز کسی عضو چالش نشده است
               </p>
             )}

@@ -16,29 +16,15 @@ import {
   createChallenge,
   inviteMultipleUsersToChallenge,
   fetchChallengeCategories,
-  type ChallengeCategory,
 } from "@/services/challengeService";
+import type { ChallengeCategoryType } from "@/types/challengeCreateTypes";
 import {
   step1Schema,
   step2Schema,
   step3Schema,
 } from "@/schemas/challengeSchema";
 
-type FormValues = {
-  title: string;
-  description: string;
-  image: string | null;
-  selectedCategory: string; // فقط یک دسته‌بندی
-  startDate: string;
-  startTime: string;
-  endDate: string;
-  endTime: string;
-  challengeLocation: string;
-  challengeType: "عمومی" | "شخصی";
-  isCommentsEnabled: boolean;
-  memberCount: string;
-  selectedUsers: UserProfile[];
-};
+import type { createFormValues } from "@/types/challengeCreateTypes";
 
 const ChallengeCreate: React.FC = () => {
   const navigate = useNavigate();
@@ -47,7 +33,7 @@ const ChallengeCreate: React.FC = () => {
   const [fetchedUsers, setFetchedUsers] = useState<UserProfile[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
 
-  const [categories, setCategories] = useState<ChallengeCategory[]>([]);
+  const [categories, setCategories] = useState<ChallengeCategoryType[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
 
   const token = useUserStore((s) => s.token);
@@ -84,7 +70,7 @@ const ChallengeCreate: React.FC = () => {
     loadCategories();
   }, []);
 
-  const initialValues: FormValues = {
+  const initialValues: createFormValues = {
     title: "",
     description: "",
     image: null,
@@ -101,7 +87,7 @@ const ChallengeCreate: React.FC = () => {
   };
 
   const handleNext = async (
-    values: FormValues,
+    values: createFormValues,
     setTouched: (touched: any) => void,
     setErrors: (errors: any) => void
   ) => {
@@ -133,8 +119,8 @@ const ChallengeCreate: React.FC = () => {
   };
 
   const handleSubmit = async (
-    values: FormValues,
-    { setSubmitting }: FormikHelpers<FormValues>
+    values: createFormValues,
+    { setSubmitting }: FormikHelpers<createFormValues>
   ) => {
     if (!token) {
       CustomToast("لطفاً وارد حساب کاربری شوید", "error");
@@ -148,7 +134,9 @@ const ChallengeCreate: React.FC = () => {
 
       let category_id = 1;
       if (values.selectedCategory) {
-        const found = categories.find((c) => c.name === values.selectedCategory);
+        const found = categories.find(
+          (c) => c.name === values.selectedCategory
+        );
         category_id = found?.id || 1;
       }
 
@@ -156,7 +144,9 @@ const ChallengeCreate: React.FC = () => {
         title: values.title.trim(),
         description: values.description.trim(),
         category_id,
-        max_participants: values.memberCount ? parseInt(values.memberCount) : null,
+        max_participants: values.memberCount
+          ? parseInt(values.memberCount)
+          : null,
         visibility: values.challengeType === "شخصی" ? "private" : "public",
         rule: "none",
         comments_enabled: values.isCommentsEnabled,
@@ -196,7 +186,7 @@ const ChallengeCreate: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-4 items-center bg-gray-50">
+    <div className="min-h-screen flex flex-col p-4 items-center bg-white">
       <div className="flex justify-center items-center w-full max-w-xl mb-10 mt-4">
         <BackButtonWithSteps
           onClick={() =>
@@ -229,12 +219,16 @@ const ChallengeCreate: React.FC = () => {
             .filter(
               (u) =>
                 u.username.toLowerCase().includes(userSearch.toLowerCase()) ||
-                (u.full_name?.toLowerCase().includes(userSearch.toLowerCase()) ?? false)
+                (u.full_name
+                  ?.toLowerCase()
+                  .includes(userSearch.toLowerCase()) ??
+                  false)
             );
 
           const canAddMore =
             !values.memberCount ||
-            values.selectedUsers.length < parseInt(values.memberCount || "0", 10);
+            values.selectedUsers.length <
+              parseInt(values.memberCount || "0", 10);
 
           return (
             <Form className="flex-1 flex flex-col mt-10 justify-start items-center w-full">
@@ -261,12 +255,14 @@ const ChallengeCreate: React.FC = () => {
                   setFieldValue={setFieldValue}
                   setFieldTouched={setFieldTouched}
                   errors={{
-                    selectedCategory: touched.selectedCategory && errors.selectedCategory,
+                    selectedCategory:
+                      touched.selectedCategory && errors.selectedCategory,
                     startDate: touched.startDate && errors.startDate,
                     startTime: touched.startTime && errors.startTime,
                     endDate: touched.endDate && errors.endDate,
                     endTime: touched.endTime && errors.endTime,
-                    challengeLocation: touched.challengeLocation && errors.challengeLocation,
+                    challengeLocation:
+                      touched.challengeLocation && errors.challengeLocation,
                   }}
                   touched={touched}
                 />
@@ -290,7 +286,10 @@ const ChallengeCreate: React.FC = () => {
                       CustomToast("حداکثر تعداد عضو پر شده", "warning");
                       return;
                     }
-                    setFieldValue("selectedUsers", [...values.selectedUsers, user]);
+                    setFieldValue("selectedUsers", [
+                      ...values.selectedUsers,
+                      user,
+                    ]);
                   }}
                   canAddMore={canAddMore}
                   loadingUsers={loadingUsers}
@@ -313,10 +312,10 @@ const ChallengeCreate: React.FC = () => {
                   {isSubmitting
                     ? "در حال ثبت..."
                     : loadingCategories
-                    ? "در حال بارگذاری..."
-                    : currentStep === 3
-                    ? "ثبت چالش"
-                    : "بعدی"}
+                      ? "در حال بارگذاری..."
+                      : currentStep === 3
+                        ? "ثبت چالش"
+                        : "بعدی"}
                 </CustomButton>
               </div>
             </Form>

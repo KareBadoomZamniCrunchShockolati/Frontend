@@ -1,21 +1,14 @@
 // src/services/challengeService.ts
 
 import { getData, postData, putData, deleteData } from "./services";
-import type { UserProfile } from "@/types/userTypes";
 import CustomToast from "@/components/Custom/CustomToast";
+import type { ChallengeCategoryType } from "@/types/challengeCreateTypes";
 
-// ================================
-// Types
-// ================================
+let cachedCategories: ChallengeCategoryType[] | null = null;
 
-export interface ChallengeCategory {
-  id: number;
-  name: string;
-}
-
-let cachedCategories: ChallengeCategory[] | null = null;
-
-export const fetchChallengeCategories = async (): Promise<ChallengeCategory[]> => {
+export const fetchChallengeCategories = async (): Promise<
+  ChallengeCategoryType[]
+> => {
   if (cachedCategories) return cachedCategories;
 
   try {
@@ -26,7 +19,7 @@ export const fetchChallengeCategories = async (): Promise<ChallengeCategory[]> =
     const raw = response?.data || response;
     const list = Array.isArray(raw) ? raw : raw?.data || [];
 
-    const categories: ChallengeCategory[] = list.map((item: any) => ({
+    const categories: ChallengeCategoryType[] = list.map((item: any) => ({
       id: Number(item.ID),
       name: item.Name || "Unknown",
     }));
@@ -157,7 +150,10 @@ export const inviteUserToChallenge = async (
     });
     return response;
   } catch (error) {
-    console.error(`Failed to invite user ${inviteeId} to challenge ${challengeId}:`, error);
+    console.error(
+      `Failed to invite user ${inviteeId} to challenge ${challengeId}:`,
+      error
+    );
     throw error;
   }
 };
@@ -190,8 +186,8 @@ export const inviteMultipleUsersToChallenge = async (
         typeof reason === "object" && reason?.error
           ? reason.error
           : typeof reason === "string"
-          ? reason
-          : "Unknown error";
+            ? reason
+            : "Unknown error";
 
       return {
         userId: userIds[index],

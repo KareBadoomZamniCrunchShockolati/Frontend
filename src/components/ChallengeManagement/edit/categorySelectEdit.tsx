@@ -3,10 +3,10 @@ import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import CustomSelect from "@/components/Custom/CustomDropList";
-import type { ChallengeCategory } from "@/services/challengeService";
+import type { ChallengeCategoryType } from "@/types/challengeCreateTypes";
 
 interface CategorySelectEditProps {
-  categories: ChallengeCategory[];
+  categories: ChallengeCategoryType[];
   loading?: boolean;
   selectedCategory: string;
   onCategoryChange: (name: string) => void;
@@ -35,11 +35,19 @@ const CategorySelectEdit: React.FC<CategorySelectEditProps> = ({
         }, [values.selectedCategory]);
 
         if (loading) {
-          return <div className="text-center py-6 text-gray-500">در حال بارگذاری...</div>;
+          return (
+            <div className="text-center py-6 text-gray-text">
+              در حال بارگذاری...
+            </div>
+          );
         }
 
         if (!categories.length) {
-          return <div className="text-center py-6 text-red-500">دسته‌بندی موجود نیست</div>;
+          return (
+            <div className="text-center py-6 text-error">
+              دسته‌بندی موجود نیست
+            </div>
+          );
         }
 
         return (
@@ -60,7 +68,7 @@ const CategorySelectEdit: React.FC<CategorySelectEditProps> = ({
 
             <ErrorMessage name="selectedCategory">
               {(msg) => (
-                <div className="text-red-500 text-sm mt-1 text-right pr-1">
+                <div className="text-error text-sm mt-1 text-right pr-1">
                   {msg}
                 </div>
               )}
