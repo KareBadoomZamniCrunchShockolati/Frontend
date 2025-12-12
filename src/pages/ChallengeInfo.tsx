@@ -135,12 +135,16 @@ const ChallengeInfo: React.FC = () => {
       for (let user of challenge.participants) {
         console.log("user: ", user);
 
-        const x = await getUserById(user.user_id);
-        const y: any = await getFollowersService(user.user_id);
-        const z: any = await getFollowingService(user.user_id);
-        users.push({ ...x, followersCount: y.count, followingCount: z.count }); // there is no user summary type
+        const recievedUser = await getUserById(user.user_id);
+        const followerData: any = await getFollowersService(user.user_id);
+        const followingData: any = await getFollowingService(user.user_id);
+        users.push({
+          ...recievedUser,
+          followersCount: followerData.count,
+          followingCount: followingData.count,
+        }); // there is no user summary type
 
-        console.log("x: ", x);
+        console.log("recievedUser: ", recievedUser);
       }
       users = users.map((x) => convertUserType(x));
       setParticipants(users);
@@ -180,7 +184,7 @@ const ChallengeInfo: React.FC = () => {
     if (challenge.visibility == "public") {
       if (challengeId) {
         try {
-          const data = await joinPublicChallenge(challengeId);
+          const data = await joinPublicChallenge(Number(challengeId));
           console.log(data);
         } catch (e) {
           console.log("error: ", e);
@@ -189,7 +193,7 @@ const ChallengeInfo: React.FC = () => {
     } else if (challenge.visibility == "private") {
       if (challengeId) {
         try {
-          const data = await joinPrivateChallenge(challengeId);
+          const data = await joinPrivateChallenge(Number(challengeId));
           console.log(data);
         } catch (e) {
           console.log("error: ", e);
@@ -200,7 +204,7 @@ const ChallengeInfo: React.FC = () => {
   const leaveChallengeHandler = async () => {
     if (challengeId) {
       try {
-        const data = await leaveChallenge(challengeId);
+        const data = await leaveChallenge(Number(challengeId));
         setIsParticipated(false);
         console.log(data);
       } catch (e) {
