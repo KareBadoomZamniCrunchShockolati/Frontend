@@ -19,6 +19,7 @@ import Challenge from "@/pages/ChallengeInfo";
 import ChallengeEdit from "@/pages/ChallengeEdit";
 import ChallengeCreate from "@/pages/ChallengeCreate";
 import ProgressCalendar from "@/components/ProgressCalendar";
+import AcceptList from "@/components/Custom/AcceptList";
 
 export const router = createBrowserRouter([
   {
@@ -52,6 +53,10 @@ export const router = createBrowserRouter([
       {
         path: "/challenge/:id",
         element: <Challenge />,
+      },
+      {
+        path: "/fuck",
+        element: <AcceptList />,
       },
     ],
   },
