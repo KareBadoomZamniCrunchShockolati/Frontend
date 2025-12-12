@@ -1,4 +1,4 @@
-import type { CommentRequest } from "@/types/commentTypes";
+import type { CommentRequest, GetCommentsRequest } from "@/types/commentTypes";
 import { deleteData, getData, postData, PROTECTED_BASE } from "./services";
 
 export const CommentService = async ({
@@ -17,7 +17,7 @@ export const CommentService = async ({
 export const GetCommentsService = async ({
   entity_type,
   entity_id,
-}: CommentRequest) => {
+}: GetCommentsRequest) => {
   return await getData({
     endPoint: `${PROTECTED_BASE}/comments`,
     params: { entity_type, entity_id },

@@ -18,3 +18,8 @@ export interface CommentResponse {
   created_at: string;
   replies?: CommentResponse[]; 
 }
+
+export interface GetCommentsRequest {
+  entity_type: "post" | "challenge";
+  entity_id: number;
+}

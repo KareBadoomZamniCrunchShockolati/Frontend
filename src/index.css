@@ -280,6 +280,10 @@
   --login-from-w: 420px;
   --shadow-strong: 3px 3px 0px 0px rgba(0, 0, 0, 1);
   --save-color: #fffbbb;
+  --side-page: 24px;
+  --top-page: 20px;
+  --comment-gap: 10px;
+  --profpic: 50px;
 }
 
 @theme inline {

@@ -321,7 +321,7 @@ const PostPage = () => {
                   </p>
                 </div>
                 <div className="gap-[4px] flex items-center" dir="rtl">
-                  <TertiaryCustomButton>
+                  <TertiaryCustomButton pageAddress={`/post/${postData?.id}/comments`}>
                     <span dir="rtl" className="text-primary">
                       نظر
                     </span>
@@ -500,7 +500,7 @@ const PostPage = () => {
                 </p>
               </div>
               <div className="gap-[4px] flex items-center" dir="rtl">
-                <TertiaryCustomButton>
+                <TertiaryCustomButton pageAddress={`/post/${postData?.id}/comments`}>
                   <span dir="rtl" className="text-primary">
                     نظر
                   </span>
