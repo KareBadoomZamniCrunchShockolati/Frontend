@@ -99,7 +99,10 @@ export const inviteUserToChallenge = async (
     });
     return response;
   } catch (error) {
-    console.error(`Failed to invite user ${inviteeId} to challenge ${challengeId}:`, error);
+    console.error(
+      `Failed to invite user ${inviteeId} to challenge ${challengeId}:`,
+      error
+    );
     throw error;
   }
 };
@@ -128,8 +131,8 @@ export const inviteMultipleUsersToChallenge = async (
         typeof reason === "object" && reason?.error
           ? reason.error
           : typeof reason === "string"
-          ? reason
-          : "Unknown error";
+            ? reason
+            : "Unknown error";
 
       return {
         userId: userIds[index],
@@ -138,4 +141,38 @@ export const inviteMultipleUsersToChallenge = async (
       };
     }
   });
+};
+export const joinPublicChallenge = async (challengeId: number) => {
+  try {
+    const response = await postData({
+      endPoint: `/api/v1/challenges/${challengeId}/join`,
+      data: {},
+    });
+    return response.data;
+  } catch (error) {
+    throw Error("could not join the challenge");
+  }
+};
+export const joinPrivateChallenge = async (challengeId: number) => {
+  try {
+    const response = await postData({
+      endPoint: `/api/v1/challenges/${challengeId}/request`,
+      data: {},
+    });
+    return response.data;
+  } catch (error) {
+    throw Error("could not join the challenge");
+  }
+};
+
+export const leaveChallenge = async (challengeId: number) => {
+  try {
+    const response = await postData({
+      endPoint: `/api/v1/challenges/${challengeId}/leave`,
+      data: {},
+    });
+    return response.data;
+  } catch (error) {
+    throw Error("could not join the challenge");
+  }
 };
