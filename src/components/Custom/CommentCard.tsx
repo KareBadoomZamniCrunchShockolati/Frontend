@@ -12,12 +12,13 @@ import CustomInput from "./CustomInput";
 import { CommentService } from "@/services/commentService";
 import CustomToast from "./CustomToast";
 import { useParams } from "react-router-dom";
-import { SendHorizontal } from 'lucide-react';
+import { SendHorizontal } from "lucide-react";
 
 interface CommentCardProps {
+  refreshComments: () => void;
   comment: CommentResponse;
 }
-const CommentCard = ({ comment }: CommentCardProps) => {
+const CommentCard = ({ comment, refreshComments }: CommentCardProps) => {
   const { id } = useParams();
   const postId = Number(id);
   const [openReplySection, setOpenReplySection] = useState(false);
@@ -27,6 +28,7 @@ const CommentCard = ({ comment }: CommentCardProps) => {
   const [likeCount, setLikeCount] = useState(comment.like_count);
   const isFirstLevel = comment.parent_id ? false : true;
   const thumsupColor = isLiked ? "text-secondary" : "text-neutral-gray";
+  const [showAllReplies, setShowAllReplies] = useState(false);
   const handleLikeToggle = async () => {
     try {
       if (isLiked) {
@@ -55,6 +57,7 @@ const CommentCard = ({ comment }: CommentCardProps) => {
     setOpenReplySection(false);
     CustomToast("نظر با موفقیت ایجاد شد!", "success");
     console.log("Comment submitted:", response);
+    refreshComments();
   };
   let border = "shadow-none border-none";
   if (isFirstLevel) {
@@ -62,7 +65,7 @@ const CommentCard = ({ comment }: CommentCardProps) => {
   }
   return (
     <Card className={`w-full rounded-xl ${border}`}>
-      <CardContent className="pt-2 px-4 pb-6" dir="rtl">
+      <CardContent className="pt-2 px-4 pb-2" dir="rtl">
         {/* Top Row: Avatar + Username + Timestamp */}
         <div className="flex items-center gap-3">
           {/* Avatar */}
@@ -141,6 +144,42 @@ const CommentCard = ({ comment }: CommentCardProps) => {
             </div>
           )}
         </div>
+        {comment.replies &&
+          showAllReplies === false &&
+          comment.replies.length > 1 && (
+            <p
+              className="mt-4 text-sm text-neutral-gray font-medium mr-[calc(var(--profpic)+12px)]"
+              onClick={() => setShowAllReplies(true)}
+            >
+              <span className="inline-block w-[30px] border-b border-neutral-gray-bold align-middle"></span>
+              <span className="mr-[7px]">
+                مشاهده پاسخ‌ها ({convertToPersianDigits(comment.replies.length.toString())})
+              </span>
+            </p>
+          )}
+        {comment.replies && showAllReplies && comment.replies.length > 0 && (
+          <div className="mt-4 flex flex-col">
+            {comment.replies.map((reply) => (
+              <CommentCard
+                key={reply.id}
+                comment={reply}
+                refreshComments={refreshComments}
+              />
+            ))}
+          </div>
+        )}
+        {comment.replies &&
+          showAllReplies === true && (
+            <p
+              className="mt-4 text-sm text-neutral-gray font-medium mr-[calc(var(--profpic)+12px)]"
+              onClick={() => setShowAllReplies(false)}
+            >
+              <span className="inline-block w-[30px] border-b border-neutral-gray-bold align-middle"></span>
+              <span className="mr-[7px]">
+                مخفی کردن پاسخ‌ها
+              </span>
+            </p>
+          )}
       </CardContent>
     </Card>
   );

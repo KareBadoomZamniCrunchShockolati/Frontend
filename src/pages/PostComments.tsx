@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { mockComments } from "@/data/mockComments";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { CommentRequest, CommentResponse } from "@/types/commentTypes";
-import { Form, Formik } from "formik";
+import { Form, Formik, type FormikHelpers } from "formik";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomButton from "@/components/Custom/CustomButton";
 import { ArrowLeft, MessageCircle } from "lucide-react";
@@ -21,37 +21,36 @@ const PostComments = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  
+
   // useEffect(() => {
   //   setComments(mockComments);
   //   setLoading(false);
   // }, []);
 
-    useEffect(() => {
-      const fetchComments = async () => {
-        try {
-          const data = await GetCommentsService({
-            entity_type: "post",
-            entity_id: postId,
-          });
+  const fetchComments = async () => {
+    try {
+      const data = await GetCommentsService({
+        entity_type: "post",
+        entity_id: postId,
+      });
 
-          setComments(data);
-        } catch (err) {
-          console.error(err);
-          setError("Failed to load comments");
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchComments();
-      console.log("comments:", comments);
-    }, [postId]);
+      setComments(data);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load comments");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchComments();
+    console.log("comments:", comments);
+  }, [postId]);
 
   if (loading) return <div>Loading comments...</div>; //need to make skeleton for this instead ------------------------------------
   if (error) return <div>{error}</div>;
 
-  const handleSubmitComment = async (values: { commentText: string }) => {
+  const handleSubmitComment = async (values: { commentText: string },{ resetForm }: FormikHelpers<{ commentText: string }>) => {
     console.log("Submitting comment with values:", values);
     const response: CommentResponse = await CommentService({
       entity_type: "post",
@@ -60,6 +59,8 @@ const PostComments = () => {
     });
     CustomToast("نظر با موفقیت ایجاد شد!", "success");
     console.log("Comment submitted:", response);
+    fetchComments();
+    resetForm();
   };
   return (
     <>
@@ -102,11 +103,15 @@ const PostComments = () => {
       <div className="flex flex-col gap-[var(--comment-gap)] mt-[var(--top-page)]">
         {comments.length === 0 && (
           <p className="text-center text-primary font-medium">
-           ! هنوز نظری ثبت نشده است
+            ! هنوز نظری ثبت نشده است
           </p>
         )}
         {comments.map((comment) => (
-          <CommentCard key={comment.id} comment={comment} />
+          <CommentCard
+            key={comment.id}
+            comment={comment}
+            refreshComments={fetchComments}
+          />
         ))}
         {/* <CommentCard isFirstLevel={true} id={1} />
         <CommentCard isFirstLevel={false} id={2} /> */}
