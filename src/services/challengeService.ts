@@ -197,3 +197,37 @@ export const inviteMultipleUsersToChallenge = async (
     }
   });
 };
+export const joinPublicChallenge = async (challengeId: number) => {
+  try {
+    const response = await postData({
+      endPoint: `/api/v1/challenges/${challengeId}/join`,
+      data: {},
+    });
+    return response.data;
+  } catch (error) {
+    throw Error("could not join the challenge");
+  }
+};
+export const joinPrivateChallenge = async (challengeId: number) => {
+  try {
+    const response = await postData({
+      endPoint: `/api/v1/challenges/${challengeId}/request`,
+      data: {},
+    });
+    return response.data;
+  } catch (error) {
+    throw Error("could not join the challenge");
+  }
+};
+
+export const leaveChallenge = async (challengeId: number) => {
+  try {
+    const response = await postData({
+      endPoint: `/api/v1/challenges/${challengeId}/leave`,
+      data: {},
+    });
+    return response.data;
+  } catch (error) {
+    throw Error("could not join the challenge");
+  }
+};
