@@ -17,8 +17,15 @@ import { SendHorizontal } from "lucide-react";
 interface CommentCardProps {
   refreshComments: () => void;
   comment: CommentResponse;
+  depth?: number;
+  parentUsername?: string;
 }
-const CommentCard = ({ comment, refreshComments }: CommentCardProps) => {
+const CommentCard = ({
+  comment,
+  refreshComments,
+  depth = 0,
+  parentUsername,
+}: CommentCardProps) => {
   const { id } = useParams();
   const postId = Number(id);
   const [openReplySection, setOpenReplySection] = useState(false);
@@ -29,6 +36,7 @@ const CommentCard = ({ comment, refreshComments }: CommentCardProps) => {
   const isFirstLevel = comment.parent_id ? false : true;
   const thumsupColor = isLiked ? "text-secondary" : "text-neutral-gray";
   const [showAllReplies, setShowAllReplies] = useState(false);
+  const cardIndent = depth === 0 ? "px-4" : depth === 1 ? "pr-12 pl-0" : "px-0";
   const handleLikeToggle = async () => {
     try {
       if (isLiked) {
@@ -64,8 +72,40 @@ const CommentCard = ({ comment, refreshComments }: CommentCardProps) => {
     border = "border-2 border-black";
   }
   return (
+    // this got added for the line
     <Card className={`w-full rounded-xl ${border}`}>
-      <CardContent className="pt-2 px-4 pb-2" dir="rtl">
+      <CardContent className={`pt-2 ${cardIndent} pb-2 relative`} dir="rtl">
+        {/* Vertical line for top-level comments */}
+        {depth === 0 &&
+          showAllReplies &&
+          comment.replies &&
+          comment.replies.length > 0 && (
+            <span
+              className="
+      absolute
+      top-[calc(var(--profpic)+8px)]
+      bottom-[146px]
+      right-[39px]
+      w-[3px]
+      bg-primary
+    "
+            />
+          )}
+        {depth === 1 && (
+          <span
+            className="
+      absolute
+      top-[calc(var(--profpic)-35px)]   /* align with avatar center */
+      right-[23px]                    /* horizontal distance to vertical line */
+      w-[28px]                        /* width of the horizontal line */
+      h-[20px]                        /* height of the vertical line */
+      border-r-3 border-b-3           /* right + bottom borders only */
+      border-primary                  /* color */
+      rounded-br-lg                   /* curve at bottom-right corner */
+    "
+          />
+        )}
+
         {/* Top Row: Avatar + Username + Timestamp */}
         <div className="flex items-center gap-3">
           {/* Avatar */}
@@ -89,7 +129,13 @@ const CommentCard = ({ comment, refreshComments }: CommentCardProps) => {
         </div>
 
         {/* Comment Text: aligned with username */}
-        <div className="mr-[calc(var(--profpic)+12px)]">
+        <div className={`mr-[calc(var(--profpic)+12px)]`}>
+          {depth > 1 && parentUsername && (
+            <p className="text-neutral-gray text-xs mb-1">
+              در پاسخ به <span className="font-medium">@{parentUsername}</span>
+            </p>
+          )}
+
           <p className="text-gray-text font-medium text-sm">
             {comment.content}
           </p>
@@ -153,7 +199,8 @@ const CommentCard = ({ comment, refreshComments }: CommentCardProps) => {
             >
               <span className="inline-block w-[30px] border-b border-neutral-gray-bold align-middle"></span>
               <span className="mr-[7px]">
-                مشاهده پاسخ‌ها ({convertToPersianDigits(comment.replies.length.toString())})
+                مشاهده پاسخ‌ها (
+                {convertToPersianDigits(comment.replies.length.toString())})
               </span>
             </p>
           )}
@@ -164,22 +211,21 @@ const CommentCard = ({ comment, refreshComments }: CommentCardProps) => {
                 key={reply.id}
                 comment={reply}
                 refreshComments={refreshComments}
+                depth={depth + 1}
+                parentUsername={comment.username}
               />
             ))}
           </div>
         )}
-        {comment.replies &&
-          showAllReplies === true && (
-            <p
-              className="mt-4 text-sm text-neutral-gray font-medium mr-[calc(var(--profpic)+12px)]"
-              onClick={() => setShowAllReplies(false)}
-            >
-              <span className="inline-block w-[30px] border-b border-neutral-gray-bold align-middle"></span>
-              <span className="mr-[7px]">
-                مخفی کردن پاسخ‌ها
-              </span>
-            </p>
-          )}
+        {comment.replies && showAllReplies === true && (
+          <p
+            className="mt-4 text-sm text-neutral-gray font-medium mr-[calc(var(--profpic)+12px)]"
+            onClick={() => setShowAllReplies(false)}
+          >
+            <span className="inline-block w-[30px] border-b border-neutral-gray-bold align-middle"></span>
+            <span className="mr-[7px]">مخفی کردن پاسخ‌ها</span>
+          </p>
+        )}
       </CardContent>
     </Card>
   );
