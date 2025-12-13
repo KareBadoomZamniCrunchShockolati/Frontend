@@ -20,6 +20,7 @@ import ChallengeEdit from "@/pages/ChallengeEdit";
 import ChallengeCreate from "@/pages/ChallengeCreate";
 import ProgressCalendar from "@/components/ProgressCalendar";
 import AcceptList from "@/components/Custom/AcceptList";
+import InviteList from "@/components/Custom/InviteList";
 
 export const router = createBrowserRouter([
   {
@@ -57,6 +58,10 @@ export const router = createBrowserRouter([
       {
         path: "/fuck",
         element: <AcceptList />,
+      },
+      {
+        path: "/fuck2",
+        element: <InviteList />,
       },
     ],
   },
