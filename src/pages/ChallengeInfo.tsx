@@ -245,7 +245,7 @@ const ChallengeInfo: React.FC = () => {
           پیوستن
         </CustomButton>
         <CustomButton
-          //onClick={navigate("/challengeContent")}
+          //onClick={navigate("/X")}
           className={cn(
             "mt-6 w-full sm:w-full md:w-full max-w-xl bg-secondary rounded-2xl p-5 text-lg hover:bg-secondary",
             isParticipated || "hidden"
