@@ -1,9 +1,14 @@
 // components/ChallengeManagement/edit/DateAndLocationInput.tsx
 import React from "react";
 import { Formik, Form, Field } from "formik";
+import type { FormikProps } from "formik";
 import CustomInput from "@/components/Custom/CustomInput";
 import type { DateAndLocationInputProps } from "@/types/challengeCreateTypes";
 import { validationDateSchema } from "@/schemas/challengeSchema";
+import { dateLocationDefaultValues } from "@/services/challengeService";
+import type { FormValues } from "@/types/challengeElementsTypes";
+
+
 
 const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
   startDate = "",
@@ -17,28 +22,33 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
   onEndTimeChange,
   onLocationChange,
 }) => {
+  const initialValues: FormValues = {
+    ...dateLocationDefaultValues,
+    startDate,
+    startTime,
+    endDate,
+    endTime,
+    location,
+  };
+
   return (
-    <Formik
-      initialValues={{
-        startDate,
-        startTime,
-        endDate,
-        endTime,
-        location,
-      }}
+    <Formik<FormValues>
+      initialValues={initialValues}
       validationSchema={validationDateSchema}
       enableReinitialize={true}
       validateOnBlur={true}
-      validateOnChange={false}
+      validateOnChange={true}
       onSubmit={() => {}}
     >
-      {({ values, setTouched }) => {
+      {(formik: FormikProps<FormValues>) => {
+        const { values, setTouched } = formik;
+
         React.useEffect(() => {
           onStartDateChange(values.startDate);
           onStartTimeChange(values.startTime);
           onEndDateChange(values.endDate);
           onEndTimeChange(values.endTime);
-          onLocationChange(values.location || "");
+          onLocationChange(values.location);
         }, [
           values.startDate,
           values.startTime,
@@ -48,8 +58,7 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
         ]);
 
         React.useEffect(() => {
-          // @ts-ignore - فقط برای دسترسی از ChallengeEdit
-          window.forceValidateDateLocation = () => {
+          (window as any).forceValidateDateLocation = () => {
             setTouched({
               startDate: true,
               startTime: true,
@@ -58,16 +67,20 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
               location: true,
             });
           };
+
+          return () => {
+            delete (window as any).forceValidateDateLocation;
+          };
         }, [setTouched]);
 
         return (
           <Form className="space-y-10" dir="rtl">
-            {/* تاریخ و زمان شروع */}
+            {/* Your existing form fields */}
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <Field name="startDate">
-                    {({ field }: any) => (
+                    {({ field }: { field: any }) => (
                       <CustomInput
                         {...field}
                         type="date"
@@ -77,10 +90,9 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
                     )}
                   </Field>
                 </div>
-
                 <div>
                   <Field name="startTime">
-                    {({ field }: any) => (
+                    {({ field }: { field: any }) => (
                       <CustomInput
                         {...field}
                         type="time"
@@ -93,12 +105,11 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
               </div>
             </div>
 
-            {/* تاریخ و زمان پایان */}
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div>
                   <Field name="endDate">
-                    {({ field }: any) => (
+                    {({ field }: { field: any }) => (
                       <CustomInput
                         {...field}
                         type="date"
@@ -108,10 +119,9 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
                     )}
                   </Field>
                 </div>
-
                 <div>
                   <Field name="endTime">
-                    {({ field }: any) => (
+                    {({ field }: { field: any }) => (
                       <CustomInput
                         {...field}
                         type="time"
@@ -124,10 +134,9 @@ const DateAndLocationInput: React.FC<DateAndLocationInputProps> = ({
               </div>
             </div>
 
-            {/* مکان برگزاری */}
             <div className="space-y-6">
               <Field name="location">
-                {({ field }: any) => (
+                {({ field }: { field: any }) => (
                   <CustomInput
                     {...field}
                     type="text"

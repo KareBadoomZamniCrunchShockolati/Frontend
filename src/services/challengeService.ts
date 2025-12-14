@@ -231,3 +231,16 @@ export const leaveChallenge = async (challengeId: number) => {
     throw Error("could not join the challenge");
   }
 };
+
+export const dateLocationDefaultValues = {
+  startDate: "",
+  startTime: "",
+  endDate: "",
+  endTime: "",
+  location: "",
+};
+
+export const titleAndDescriptionDefaultValues = {
+  challengeTitle: "",
+  challengeDescription: "",
+};

@@ -305,10 +305,21 @@ const ChallengeCreate: React.FC = () => {
                       : undefined
                   }
                   disabled={isSubmitting || loadingCategories}
-                  className={`w-full max-w-xl rounded-primary-radius p-5 text-lg transition-all text-white
-                    ${currentStep === 3 ? "bg-primary" : "bg-secondary"}
-                    ${isSubmitting || loadingCategories ? "opacity-70 cursor-not-allowed" : ""}`}
+                  className={`w-full max-w-xl rounded-primary-radius p-5 text-lg transition-all text-white flex items-center justify-center gap-3
+    ${currentStep === 3 ? "bg-primary" : "bg-secondary"}
+    ${isSubmitting || loadingCategories ? "opacity-70 cursor-not-allowed" : ""}`}
                 >
+                  {(isSubmitting || loadingCategories) && (
+                    <div
+                      className="inline-block h-5 w-5 animate-spin rounded-full border-3 border-solid border-white border-r-transparent"
+                      role="status"
+                    >
+                      <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                        Loading...
+                      </span>
+                    </div>
+                  )}
+
                   {isSubmitting
                     ? "در حال ثبت..."
                     : loadingCategories

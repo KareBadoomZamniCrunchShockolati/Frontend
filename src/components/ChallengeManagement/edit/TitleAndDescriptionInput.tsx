@@ -1,29 +1,48 @@
 // components/ChallengeManagement/edit/TitleAndDescriptionInput.tsx
 import React from "react";
 import { Formik, Form, Field } from "formik";
+import type { FormikProps } from "formik";
 import CustomInput from "@/components/Custom/CustomInput";
 import type { ChallengeTitleAndDescriptionInputProps } from "@/types/challengeElementsTypes";
-import { editValidationSchema } from "@/schemas/challengeSchema";
+import {
+  editChallengeSchema,
+} from "@/schemas/challengeSchema";
+import { titleAndDescriptionDefaultValues } from "@/services/challengeService";
+import type { TitleAndDescriptionFormValues } from "@/types/challengeElementsTypes";
 
-const TitleAndDescriptionInput: React.FC<
-  ChallengeTitleAndDescriptionInputProps
-> = ({ title = "", description = "", onTitleChange, onDescriptionChange }) => {
+
+
+const TitleAndDescriptionInput: React.FC<ChallengeTitleAndDescriptionInputProps> = ({
+  title = "",
+  description = "",
+  onTitleChange,
+  onDescriptionChange,
+}) => {
+  const initialValues: TitleAndDescriptionFormValues = {
+    ...titleAndDescriptionDefaultValues,
+    challengeTitle: title,
+    challengeDescription: description,
+  };
+
   return (
-    <Formik
-      initialValues={{
-        challengeTitle: title,
-        challengeDescription: description,
-      }}
-      validationSchema={editValidationSchema}
-      enableReinitialize={true} // این خط حیاتی است! باعث می‌شه وقتی prop تغییر کرد، فرم آپدیت بشه
+    <Formik<TitleAndDescriptionFormValues>
+      initialValues={initialValues}
+      validationSchema={editChallengeSchema}
+      enableReinitialize={true}
+      validateOnBlur={true}
+      validateOnChange={true}
       onSubmit={() => {}}
     >
-      {({ values }) => {
-        // هر بار که values تغییر کرد، به والد اطلاع بده (همگام‌سازی با state صفحه)
+      {(formik: FormikProps<TitleAndDescriptionFormValues>) => {
+        const { values } = formik;
+
         React.useEffect(() => {
           onTitleChange(values.challengeTitle);
-          onDescriptionChange(values.challengeDescription || "");
-        }, [values.challengeTitle, values.challengeDescription]);
+          onDescriptionChange(values.challengeDescription);
+        }, [
+          values.challengeTitle,
+          values.challengeDescription,
+        ]);
 
         return (
           <Form
@@ -33,13 +52,13 @@ const TitleAndDescriptionInput: React.FC<
             {/* عنوان چالش */}
             <div>
               <Field name="challengeTitle">
-                {({ field }: any) => (
+                {({ field }: { field: any }) => (
                   <CustomInput
                     {...field}
                     label="عنوان چالش"
                     width="w-full"
                     className="rounded-primary-radius"
-                    showError={false} // خطا فقط زیر فیلد نمایش داده بشه
+                    showError={false}
                   />
                 )}
               </Field>
@@ -48,7 +67,7 @@ const TitleAndDescriptionInput: React.FC<
             {/* توضیحات چالش */}
             <div>
               <Field name="challengeDescription">
-                {({ field }: any) => (
+                {({ field }: { field: any }) => (
                   <CustomInput
                     {...field}
                     as="textarea"

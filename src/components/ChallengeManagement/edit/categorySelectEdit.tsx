@@ -1,20 +1,9 @@
 // components/ChallengeManagement/edit/CategorySelectEdit.tsx
 import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import CustomSelect from "@/components/Custom/CustomDropList";
-import type { ChallengeCategoryType } from "@/types/challengeCreateTypes";
-
-interface CategorySelectEditProps {
-  categories: ChallengeCategoryType[];
-  loading?: boolean;
-  selectedCategory: string;
-  onCategoryChange: (name: string) => void;
-}
-
-const validationSchema = Yup.object({
-  selectedCategory: Yup.string().required("انتخاب دسته‌بندی الزامی است"),
-});
+import type { CategorySelectEditProps } from "@/types/challengeElementsTypes";
+import { selectSchema } from "@/schemas/challengeSchema";
 
 const CategorySelectEdit: React.FC<CategorySelectEditProps> = ({
   categories,
@@ -25,7 +14,7 @@ const CategorySelectEdit: React.FC<CategorySelectEditProps> = ({
   return (
     <Formik
       initialValues={{ selectedCategory }}
-      validationSchema={validationSchema}
+      validationSchema={selectSchema}
       enableReinitialize={true}
       onSubmit={() => {}}
     >
@@ -36,8 +25,17 @@ const CategorySelectEdit: React.FC<CategorySelectEditProps> = ({
 
         if (loading) {
           return (
-            <div className="text-center py-6 text-gray-text">
-              در حال بارگذاری...
+            <div className="flex flex-col items-center justify-center py-6 text-gray-text">
+              <div
+                className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-gray-400 border-r-transparent align-[-0.125em]"
+                role="status"
+                aria-label="در حال بارگذاری"
+              >
+                <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                  Loading...
+                </span>
+              </div>
+              <p className="mt-4">در حال بارگذاری...</p>
             </div>
           );
         }

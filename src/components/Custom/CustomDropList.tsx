@@ -19,6 +19,7 @@ export default function CustomSelect({
   icon = <ChevronDown className="w-5 h-5" />,
   onIconClick,
   width = "",
+  error: propError, // ← prop جدید برای دریافت خطا از بیرون
 }: CustomSelectProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [isRTL, setIsRTL] = useState(true);
@@ -33,7 +34,13 @@ export default function CustomSelect({
       {({ field, meta }: FieldProps) => {
         const hasValue = field.value?.length > 0;
         const isFloating = isFocused || hasValue;
-        const hasError = meta.touched && meta.error;
+
+        // اولویت با propError (اگر از بیرون پاس داده شد)، در غیر این صورت از meta.error
+        const displayError =
+          propError ?? (meta.touched && meta.error ? meta.error : undefined);
+
+        const hasError = !!displayError;
+
         const selectedLabel =
           options.find((o) => o.value === field.value)?.label || "";
 
@@ -89,7 +96,7 @@ export default function CustomSelect({
                   relative flex items-center
                   ${
                     hasError
-                      ? "!border-[var(--borderInvalid)] shadow-[0px_1px_0px_var(--borderInvalidShadow)]"
+                      ? "!border-[var(--borderInvalid)] !shadow-[0px_1px_0px_var(--borderInvalidShadow)]"
                       : ""
                   }
                   ${
@@ -174,6 +181,13 @@ export default function CustomSelect({
                 </div>
               )}
             </div>
+
+            {/* ────────────────────── ERROR MESSAGE ────────────────────── */}
+            {displayError && (
+              <p className="mt-1 text-sm text-error text-right">
+                {displayError}
+              </p>
+            )}
           </div>
         );
       }}

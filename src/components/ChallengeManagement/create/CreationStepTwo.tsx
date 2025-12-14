@@ -15,18 +15,32 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
   errors,
   touched,
 }) => {
-  if (loadingCategories)
+  if (loadingCategories) {
     return (
-      <div className="text-center py-12 text-gray-text">در حال بارگذاری...</div>
+      <div className="flex flex-col items-center justify-center py-12 text-gray-text">
+        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-gray-400 border-r-transparent align-[-0.125em]" 
+             role="status" 
+             aria-label="در حال بارگذاری">
+          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+            Loading...
+          </span>
+        </div>
+        <p className="mt-4">در حال بارگذاری...</p>
+      </div>
     );
-  if (!categories?.length)
+  }
+
+  if (!categories?.length) {
     return (
-      <div className="text-center py-12 text-error">دسته‌بندی موجود نیست</div>
+      <div className="text-center py-12 text-error">
+        دسته‌بندی موجود نیست
+      </div>
     );
+  }
 
   return (
     <div className="w-full max-w-xl mt-7 mb-5 space-y-10">
-      {/* دسته‌بندی چالش — بدون تکرار لیبل */}
+      {/* دسته‌بندی چالش */}
       <div className="space-y-3">
         <CustomSelect
           name="selectedCategory"
@@ -35,16 +49,11 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
             value: cat.name,
             label: cat.name,
           }))}
+          error={touched.selectedCategory && errors.selectedCategory} // ← خطا رو به کامپوننت پاس می‌دیم
         />
-
-        {touched.selectedCategory && errors.selectedCategory && (
-          <p className="text-sm text-error text-right">
-            {errors.selectedCategory}
-          </p>
-        )}
       </div>
 
-      {/* بقیه فیلدها */}
+      {/* تاریخ و ساعت شروع و پایان */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field name="startDate">
           {({ field, meta }: FieldProps) => (
@@ -56,6 +65,7 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
             />
           )}
         </Field>
+
         <Field name="startTime">
           {({ field, meta }: FieldProps) => (
             <CustomInput
@@ -66,6 +76,7 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
             />
           )}
         </Field>
+
         <Field name="endDate">
           {({ field, meta }: FieldProps) => (
             <CustomInput
@@ -76,6 +87,7 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
             />
           )}
         </Field>
+
         <Field name="endTime">
           {({ field, meta }: FieldProps) => (
             <CustomInput
@@ -88,6 +100,7 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
         </Field>
       </div>
 
+      {/* مکان چالش */}
       <Field name="challengeLocation">
         {({ field, meta }: FieldProps) => (
           <CustomInput
@@ -98,6 +111,7 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
         )}
       </Field>
 
+      {/* نوع چالش */}
       <div className="mt-6">
         <CustomSelect
           name="challengeType"
@@ -109,6 +123,7 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
         />
       </div>
 
+      {/* چک‌باکس کامنت‌ها */}
       <div className="mt-6 flex justify-end">
         <CustomCheckbox
           name="isCommentsEnabled"

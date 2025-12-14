@@ -66,3 +66,8 @@ export const validationDateSchema = Yup.object({
   endDate: Yup.string().required("تاریخ پایان الزامی است"),
   endTime: Yup.string().required("زمان پایان الزامی است"),
 });
+
+
+export const selectSchema = Yup.object({
+  selectedCategory: Yup.string().required("انتخاب دسته‌بندی الزامی است"),
+});
