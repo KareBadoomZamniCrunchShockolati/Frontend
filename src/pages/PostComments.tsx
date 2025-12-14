@@ -100,7 +100,7 @@ const PostComments = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-[var(--comment-gap)] mt-[var(--top-page)]">
+      <div className="flex flex-col gap-[var(--comment-gap)] my-[var(--top-page)] mx-[var(--side-page)]">
         {comments.length === 0 && (
           <p className="text-center text-primary font-medium">
             ! هنوز نظری ثبت نشده است

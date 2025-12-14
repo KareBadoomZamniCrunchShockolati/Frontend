@@ -219,7 +219,7 @@ const PostPage = () => {
               </AvatarFallback>
             </Avatar>
             <div dir="rtl" className="flex flex-col gap-2 translate-y-[2px]">
-              <p className="text-sm sm:text-base font-semibold text-black">
+              <p className="text-sm sm:text-base font-semibold text-black" onClick={() => navigate(`/dashboard/${postData?.user_id}`)}>
                 {username}
               </p>
               <p
@@ -285,7 +285,7 @@ const PostPage = () => {
                   className="gap-[4px] flex items-center mb-[16px]"
                   dir="rtl"
                   onClick={() =>
-                    console.log("Go to challenge:", postmock.challenge?.id)
+                    navigate(`/challenge/${postData.challenge_id}`)
                   }
                 >
                   <ClipboardCheck className="w-5 h-5 text-secondary" />

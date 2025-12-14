@@ -11,7 +11,7 @@ import { Form, Formik } from "formik";
 import CustomInput from "./CustomInput";
 import { CommentService } from "@/services/commentService";
 import CustomToast from "./CustomToast";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { SendHorizontal } from "lucide-react";
 
 interface CommentCardProps {
@@ -19,12 +19,14 @@ interface CommentCardProps {
   comment: CommentResponse;
   depth?: number;
   parentUsername?: string;
+  parentUserId?: number;
 }
 const CommentCard = ({
   comment,
   refreshComments,
   depth = 0,
   parentUsername,
+  parentUserId,
 }: CommentCardProps) => {
   const { id } = useParams();
   const postId = Number(id);
@@ -37,6 +39,7 @@ const CommentCard = ({
   const thumsupColor = isLiked ? "text-secondary" : "text-neutral-gray";
   const [showAllReplies, setShowAllReplies] = useState(false);
   const cardIndent = depth === 0 ? "px-4" : depth === 1 ? "pr-12 pl-0" : "px-0";
+  const navigate = useNavigate();
   const handleLikeToggle = async () => {
     try {
       if (isLiked) {
@@ -69,7 +72,7 @@ const CommentCard = ({
   };
   let border = "shadow-none border-none";
   if (isFirstLevel) {
-    border = "border-2 border-black";
+    border = "border-2 border-black shadow-shadow-medium"; //ask khuban shadow-shadow-strong ------------------------------------------------------------------------------
   }
   return (
     // this got added for the line
@@ -132,7 +135,7 @@ const CommentCard = ({
         <div className={`mr-[calc(var(--profpic)+12px)]`}>
           {depth > 1 && parentUsername && (
             <p className="text-neutral-gray text-xs mb-1">
-              در پاسخ به <span className="font-medium">@{parentUsername}</span>
+              در پاسخ به <span className="font-semibold" onClick={() => navigate(`/dashboard/${parentUserId}`)}>@{parentUsername}</span>
             </p>
           )}
 
@@ -192,7 +195,7 @@ const CommentCard = ({
         </div>
         {comment.replies &&
           showAllReplies === false &&
-          comment.replies.length > 1 && (
+          comment.replies.length > 0 && (
             <p
               className="mt-4 text-sm text-neutral-gray font-medium mr-[calc(var(--profpic)+12px)]"
               onClick={() => setShowAllReplies(true)}
@@ -213,6 +216,7 @@ const CommentCard = ({
                 refreshComments={refreshComments}
                 depth={depth + 1}
                 parentUsername={comment.username}
+                parentUserId={comment.user_id}
               />
             ))}
           </div>
