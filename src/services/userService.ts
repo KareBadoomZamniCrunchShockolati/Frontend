@@ -89,6 +89,12 @@ export const getUserProfileService = async (userId: string | number) => {
 
   return data;
 };
+export const getUserById = async (userId: string | number) => {
+  if (!userId) throw new Error("User ID is required");
+  return await getData({
+    endPoint: `/api/v1/users/${userId}`,
+  });
+};
 
 // گرفتن تعداد followers و following
 export const getFollowStatsService = async (
