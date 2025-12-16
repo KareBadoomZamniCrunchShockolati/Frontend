@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import thumb from "@/assets/Img/Group 101.png";
 import TopBackText from "./TopBackText";
 import checked from "@/assets/Img/Icon/checked.svg";
@@ -7,8 +7,21 @@ import checked from "@/assets/Img/Icon/checked.svg";
 // import UserIconBlue from "@/assets/Img/UserUnknownBlue.png";
 import userI from "@/assets/Img/Icon/User.svg";
 import { cn } from "@/lib/utils";
+import {
+  inviteMultipleUsersToChallenge,
+  showRequestingUsers,
+} from "@/services/challengeService";
+import {
+  getFollowersService,
+  getUserProfileService,
+} from "@/services/userService";
+import CustomBtn from "./CustomBtn";
 const InviteList = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [user, setUser] = useState<Number>();
+  const [followers, setFollowers] = useState<{ users: User[]; count: number }>(
+    []
+  );
   const [selectedUsers, setSelectedUsers] = useState<
     { id: number; username: string }[]
   >([]);
@@ -25,6 +38,26 @@ const InviteList = () => {
     { id: 8, username: "amir" },
     { id: 9, username: "hamed" },
   ];
+  useEffect(() => {
+    loadUser();
+  }, []);
+  useEffect(() => {
+    if (user) {
+      loadFollowers();
+      console.log(user);
+    }
+  }, [user]);
+  useEffect(() => {
+    if (followers) console.log(followers);
+  }, [followers]);
+  const loadUser = async () => {
+    const user = await getUserProfileService(1);
+    setUser(Number(user.id));
+  };
+  const loadFollowers = async () => {
+    const followers = await getFollowersService(String(user));
+    setFollowers(followers);
+  };
   const Chip = ({
     id,
     username,
@@ -57,7 +90,12 @@ const InviteList = () => {
       <div>{username}</div>
     </div>
   );
-
+  const inviteUsers = async () => {
+    inviteMultipleUsersToChallenge(
+      1,
+      selectedUsers.map((user) => user.id)
+    );
+  };
   return (
     <div className=" p-4 bg-light-orange">
       <TopBackText text="دعوت افراد جدید" />
@@ -76,6 +114,13 @@ const InviteList = () => {
           ))}
         </div>
       </div>
+      <CustomBtn
+        color="bg-primary"
+        onClick={() => inviteUsers()}
+        className="mb-[5px]"
+      >
+        دعوت
+      </CustomBtn>
       <div
         className="h-full scrollbar-svg"
         style={{
@@ -111,7 +156,7 @@ const InviteList = () => {
               }
             `}</style>
         <div className="flex flex-col w-full">
-          {users.map((user) => (
+          {followers.users.map((user) => (
             <div
               onClick={() => {
                 if (selectedUsers.find((u) => u.id === user.id))

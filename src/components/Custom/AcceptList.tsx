@@ -1,26 +1,68 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
 import tick from "@/assets/Img/Icon/tick-square.svg";
 import cross from "@/assets/Img/Icon/Close Square.svg";
 import thumb from "@/assets/Img/Group 101.png";
 import TopBackText from "./TopBackText";
+import {
+  acceptReq,
+  deleteReq,
+  showRequestingUsers,
+} from "@/services/challengeService";
+import { getUserProfileService } from "@/services/userService";
 const AcceptList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  type User = { id: number; username: string };
-  const users: User[] = [
-    { id: 1, username: "sina" },
-    { id: 2, username: "ali" },
-    { id: 3, username: "reza" },
-    { id: 4, username: "mohammad" },
-    { id: 5, username: "hossein" },
-    { id: 6, username: "vahid" },
-    { id: 7, username: "nima" },
-    { id: 8, username: "amir" },
-    { id: 9, username: "hamed" },
-  ];
+  type User = {
+    user: {
+      id: number;
+      username: string;
+    };
+    requestId: number;
+  };
+  const [users, setUsers] = useState<User[]>([]);
+  // const users: User[] = [
+  //   { id: 1, username: "sina" },
+  //   { id: 2, username: "ali" },
+  //   { id: 3, username: "reza" },
+  //   { id: 4, username: "mohammad" },
+  //   { id: 5, username: "hossein" },
+  //   { id: 6, username: "vahid" },
+  //   { id: 7, username: "nima" },
+  //   { id: 8, username: "amir" },
+  //   { id: 9, username: "hamed" },
+  // ];
   const searchedUsers = users.filter((user) =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase())
+    user.user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  useEffect(() => {
+    loadUsers();
+  }, []);
+  const loadUsers = async () => {
+    try {
+      const users = await showRequestingUsers(1);
+
+      setUsers(users);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const handleAccept = async (reqId: number) => {
+    try {
+      const data = await acceptReq(reqId);
+      console.log(data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  const handleDelete = async (reqId: number) => {
+    try {
+      const data = await deleteReq(reqId);
+      console.log(data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <div className=" p-4 bg-light-orange">
       <TopBackText text="درخواست‌ های پیوستن" />
@@ -61,20 +103,30 @@ const AcceptList = () => {
             `}</style>
         <div className="flex flex-col w-full">
           {searchedUsers.map((user) => (
-            <div className="flex justify-between border bg-white border-black rounded-xl p-4 mt-4 items-center">
+            <div
+              onClick={() => console.log(user)}
+              key={user.requestId}
+              className="flex justify-between border bg-white border-black rounded-xl p-4 mt-4 items-center"
+            >
               <div className="flex gap-4 items-center">
                 <img
                   className="w-16 h-16 rounded-full border-1 border-black"
                   src={""}
                   alt="profile"
                 />
-                <p className="font-semibold text-xl">{user.username}</p>
+                <p className="font-semibold text-xl">{user.user.username}</p>
               </div>
               <div className="flex gap-2">
-                <button>
+                <button
+                  className="cursor-pointer"
+                  onClick={() => handleDelete(user.requestId)}
+                >
                   <img src={cross} alt="" />
                 </button>
-                <button>
+                <button
+                  className="cursor-pointer"
+                  onClick={() => handleAccept(user.requestId)}
+                >
                   <img src={tick} alt="" />
                 </button>
               </div>
