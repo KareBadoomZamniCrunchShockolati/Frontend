@@ -19,9 +19,10 @@ import CustomBtn from "./CustomBtn";
 const InviteList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [user, setUser] = useState<Number>();
-  const [followers, setFollowers] = useState<{ users: User[]; count: number }>(
-    []
-  );
+  const [followers, setFollowers] = useState<{ users: User[]; count: number }>({
+    users: [],
+    count: 0,
+  });
   const [selectedUsers, setSelectedUsers] = useState<
     { id: number; username: string }[]
   >([]);
@@ -48,7 +49,7 @@ const InviteList = () => {
     }
   }, [user]);
   useEffect(() => {
-    if (followers) console.log(followers);
+    if (followers) console.log("cos: ", followers.users);
   }, [followers]);
   const loadUser = async () => {
     const user = await getUserProfileService(1);
@@ -91,10 +92,13 @@ const InviteList = () => {
     </div>
   );
   const inviteUsers = async () => {
-    inviteMultipleUsersToChallenge(
-      1,
-      selectedUsers.map((user) => user.id)
+    console.log(
+      "dola abi: ",
+      selectedUsers.map((u) => u.id)
     );
+    const ids = selectedUsers.map((u) => u.id);
+
+    const data = await inviteMultipleUsersToChallenge(3, ids);
   };
   return (
     <div className=" p-4 bg-light-orange">

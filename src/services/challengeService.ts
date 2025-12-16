@@ -113,6 +113,10 @@ export const inviteMultipleUsersToChallenge = async (
   challengeId: number | string,
   userIds: (number | string)[]
 ) => {
+  console.log("challengeId: ", challengeId);
+
+  console.log("ids: ", userIds);
+
   const promises = userIds.map((userId) =>
     inviteUserToChallenge(challengeId, userId).catch((err) => ({
       userId,
