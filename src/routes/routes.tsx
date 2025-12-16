@@ -20,6 +20,7 @@ import ChallengeEdit from "@/pages/ChallengeEdit";
 import ChallengeCreate from "@/pages/ChallengeCreate";
 import ProgressCalendar from "@/components/ProgressCalendar";
 import PostComments from "@/pages/PostComments";
+import ChallengePosts from "@/pages/ChallengePosts";
 
 export const router = createBrowserRouter([
   {
@@ -90,6 +91,10 @@ export const router = createBrowserRouter([
       {
         path: "/editpost/:id",
         element: <EditPost />,
+      },
+      {
+        path: "/challenge/:id/posts",
+        element: <ChallengePosts />,
       },
     ],
   },

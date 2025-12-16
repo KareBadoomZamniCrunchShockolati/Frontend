@@ -121,7 +121,7 @@ const CommentCard = ({
 
           {/* Username and Time stacked vertically */}
           <div className="flex gap-[10px] items-center">
-            <p className="font-semibold text-sm">
+            <p className="font-semibold text-sm" onClick={() => navigate(`/dashboard/${comment.user_id}`)}>
               {/* {username} */}
               {comment.username}
             </p>
@@ -135,7 +135,13 @@ const CommentCard = ({
         <div className={`mr-[calc(var(--profpic)+12px)]`}>
           {depth > 1 && parentUsername && (
             <p className="text-neutral-gray text-xs mb-1">
-              در پاسخ به <span className="font-semibold" onClick={() => navigate(`/dashboard/${parentUserId}`)}>@{parentUsername}</span>
+              در پاسخ به{" "}
+              <span
+                className="font-semibold"
+                onClick={() => navigate(`/dashboard/${parentUserId}`)}
+              >
+                @{parentUsername}
+              </span>
             </p>
           )}
 
