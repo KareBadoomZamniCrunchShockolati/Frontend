@@ -2,10 +2,9 @@ import { getData, putData, postData, deleteData } from "./services";
 import type { FollowStats, UserSummary } from "@/types/userTypes";
 import type { PutUserProfileParams } from "@/types/putUserProfileTypes";
 import type { Challenge, LikeRequest } from "@/types/challengeTypes";
-
+import { categoryNameToId } from "@/data/mockCategories";
 
 // services/userService.ts
-
 
 export const getMutualFollowersService = async (challengeId: number) => {
   return await getData({
@@ -34,14 +33,55 @@ export const UnlikeService = async ({
   });
 };
 
-
-
 // گرفتن لیست چالش‌هایی که کاربر در آنها شرکت کرده
 export const getParticipatingChallengesService = async (): Promise<Challenge[]> => {
   const response = await getData({ endPoint: `/api/v1/challenges/participating` });
   return response.data; // فقط آرایه
 };
 
+export const getPublicChallengesService = async (): Promise<Challenge[]> => {
+  const response = await getData({ endPoint: `/api/v1/challenges/public` });
+  return response.data; // فقط آرایه
+};
+
+export const getPopularChallengesService = async (): Promise<Challenge[]> => {
+  const response = await getData({ endPoint: `/api/v1/challenges/like-count` });
+  return response.data; // فقط آرایه
+};
+
+// گرفتن چالش‌ها بر اساس نوع (برای صفحه اصلی)
+export const getChallengesByTypeService = async (type: string): Promise<Challenge[]> => {
+  let endPoint = '';
+  
+  switch(type) {
+    case 'popular':
+      endPoint = '/api/v1/challenges/like-count';
+      break;
+    case 'near':
+      // اگر API مخصوص چالش‌های نزدیک دارید
+      endPoint = '/api/v1/challenges/nearby';
+      break;
+    case 'following':
+      // اگر API مخصوص چالش‌های دنبال‌شوندگان دارید
+      endPoint = '/api/v1/challenges/following';
+      break;
+    default:
+      endPoint = '/api/v1/challenges/public';
+  }
+  
+  const response = await getData({ endPoint });
+  return response.data || [];
+};
+
+export const getChallengesByCategoryService = async (
+  categoryName: string
+): Promise<Challenge[]> => {
+  const response = await getData({ 
+    endPoint: `/api/v1/challenges/category-name/${categoryName}` 
+  });
+  console.log(response);
+  return response.data;
+};
 
 // گرفتن چالش‌های ساخته شده توسط کاربر
 export const getCreatedChallengesService = async (creatorId: number): Promise<Challenge[]> => {
@@ -54,14 +94,33 @@ export const getCreatedChallengesService = async (creatorId: number): Promise<Ch
   return response.data; // فقط آرایه را برمی‌گرداند
 };
 
-
-// جستجوی چالش‌ها
-export const searchChallengesService = async (query: string): Promise<Challenge[]> => {
-  if (!query.trim()) throw new Error("Search query is required");
+// جستجوی چالش‌ها با API بک‌اند
+export const searchChallengesService = async (query: string): Promise<{ data: Challenge[] }> => {
+  if (!query.trim()) {
+    throw new Error("Search query is required");
+  }
   
-  return await getData({
+  const response = await getData({
     endPoint: `/api/v1/challenges/search?query=${encodeURIComponent(query)}`,
   });
+  
+  return {
+    data: response.data || []
+  };
+};
+
+export const searchMyChallengesService = async (query: string): Promise<{ data: Challenge[] }> => {
+  if (!query.trim()) {
+    throw new Error("Search query is required");
+  }
+  
+  const response = await getData({
+    endPoint: `/api/v1/challenges/my/search?query=${encodeURIComponent(query)}`,
+  });
+  
+  return {
+    data: response.data || []
+  };
 };
 
 // آپدیت پروفایل
@@ -166,4 +225,3 @@ export const verifyEmailChangeService = async ({
 // export const updatePostService = async (postId: number, dto: { description?: string; pictures?: string[] }) => {
 //   return await putData({ endPoint: `/api/v1/posts/${postId}`, data: dto });
 // };
-

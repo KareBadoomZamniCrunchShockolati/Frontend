@@ -2,6 +2,8 @@
 import type { Payload } from "@/types/payloadChallengeService";
 import { getData, postData, putData, deleteData } from "./services";
 import { getUserById } from "./userService";
+
+// export const createChallenge = async (payload: Payload) => {
 import type { ChallengeCategoryType } from "@/types/challengeCreateTypes";
 import CustomToast from "@/components/Custom/CustomToast";
 
