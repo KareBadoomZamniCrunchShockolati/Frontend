@@ -4,9 +4,10 @@ import { getData, postData, putData, deleteData } from "./services";
 import { getUserById } from "./userService";
 
 // export const createChallenge = async (payload: Payload) => {
-import CustomToast from "@/components/Custom/CustomToast";
 import type { ChallengeCategoryType } from "@/types/challengeCreateTypes";
+import CustomToast from "@/components/Custom/CustomToast";
 
+// ================================
 let cachedCategories: ChallengeCategoryType[] | null = null;
 
 export const fetchChallengeCategories = async (): Promise<
@@ -41,19 +42,7 @@ export const fetchChallengeCategories = async (): Promise<
 // Create Challenge
 // ================================
 
-export const createChallenge = async (payload: {
-  title: string;
-  description: string;
-  category_id: number;
-  max_participants?: number | null;
-  visibility: "public" | "private";
-  rule?: string;
-  comments_enabled: boolean;
-  start_time: string;
-  end_time: string;
-  timezone: string;
-  image_url?: string | null;
-}) => {
+export const createChallenge = async (payload: Payload) => {
   try {
     const response = await postData({
       endPoint: "/api/v1/challenges",
