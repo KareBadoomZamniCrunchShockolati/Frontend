@@ -120,6 +120,9 @@ const ChallengeInfo: React.FC = () => {
     );
 
   useEffect(() => {
+    console.log("mewww: ", challenge);
+  }, [challenge]);
+  useEffect(() => {
     const fetchChallenge = async () => {
       const fetchedChallenge = await fetchChallengeById(String(challengeId));
       setChallenge(fetchedChallenge);
@@ -253,7 +256,7 @@ const ChallengeInfo: React.FC = () => {
         >
           مشاهده پیشرفت
         </CustomButton>
-        
+
         <CustomButton
           // onClick={leaveChallengeHandler}
           className={cn(
