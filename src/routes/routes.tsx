@@ -21,6 +21,8 @@ import ChallengeCreate from "@/pages/ChallengeCreate";
 import ProgressCalendar from "@/components/ProgressCalendar";
 import PostComments from "@/pages/PostComments";
 import ChallengePosts from "@/pages/ChallengePosts";
+import AcceptList from "@/components/Custom/AcceptList";
+import InviteList from "@/components/Custom/InviteList";
 
 export const router = createBrowserRouter([
   {
@@ -54,6 +56,14 @@ export const router = createBrowserRouter([
       {
         path: "/challenge/:challengeId",
         element: <Challenge />,
+      },
+      {
+        path: "/challenge/:challengeId/acceptlist",
+        element: <AcceptList />,
+      },
+      {
+        path: "/challenge/:challengeId/invitelist",
+        element: <InviteList />,
       },
     ],
   },
