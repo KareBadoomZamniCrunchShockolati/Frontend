@@ -13,12 +13,16 @@ import Edit from "@/pages/EditProfile";
 import PostCreation from "@/pages/PostCreation";
 import PostPage from "@/pages/PostPage";
 import EditPost from "@/pages/EditPost";
+import MainPage from "@/pages/MainPage";
+import SectionChallengesScreen from "@/pages/SectionChallengesScreen";
 
 // import { LogIn } from "lucide-react";
 import Challenge from "@/pages/ChallengeInfo";
 import ChallengeEdit from "@/pages/ChallengeEdit";
 import ChallengeCreate from "@/pages/ChallengeCreate";
 import ProgressCalendar from "@/components/ProgressCalendar";
+import PostComments from "@/pages/PostComments";
+import ChallengePosts from "@/pages/ChallengePosts";
 import AcceptList from "@/components/Custom/AcceptList";
 import InviteList from "@/components/Custom/InviteList";
 
@@ -56,6 +60,18 @@ export const router = createBrowserRouter([
         element: <Challenge />,
       },
       {
+        path: "/main",
+        element: <MainPage />,
+      },
+      {
+        path: "/section/:type", // نمایش چالش‌های محبوب یا نزدیک و ...
+        element: <SectionChallengesScreen />,
+      },
+      {
+        path: "/category/:categoryId", // نمایش چالش‌های دسته‌بندی (مثلاً سلامت)
+        element: <SectionChallengesScreen />,
+      },
+      {
         path: "/challenge/:challengeId/acceptlist",
         element: <AcceptList />,
       },
@@ -85,6 +101,10 @@ export const router = createBrowserRouter([
         element: <PostPage />,
       },
       {
+      path: "/post/:id/comments", 
+      element: <PostComments/>,
+      },
+      {
         path: "/editChallenge/:challengeId",
         element: <ChallengeEdit />,
       },
@@ -95,6 +115,10 @@ export const router = createBrowserRouter([
       {
         path: "/editpost/:id",
         element: <EditPost />,
+      },
+      {
+        path: "/challenge/:id/posts",
+        element: <ChallengePosts />,
       },
     ],
   },
