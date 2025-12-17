@@ -13,6 +13,8 @@ import Edit from "@/pages/EditProfile";
 import PostCreation from "@/pages/PostCreation";
 import PostPage from "@/pages/PostPage";
 import EditPost from "@/pages/EditPost";
+import MainPage from "@/pages/MainPage";
+import SectionChallengesScreen from "@/pages/SectionChallengesScreen";
 
 // import { LogIn } from "lucide-react";
 import Challenge from "@/pages/ChallengeInfo";
@@ -58,6 +60,16 @@ export const router = createBrowserRouter([
         element: <Challenge />,
       },
       {
+        path: "/main",
+        element: <MainPage />,
+      },
+      {
+        path: "/section/:type", // نمایش چالش‌های محبوب یا نزدیک و ...
+        element: <SectionChallengesScreen />,
+      },
+      {
+        path: "/category/:categoryId", // نمایش چالش‌های دسته‌بندی (مثلاً سلامت)
+        element: <SectionChallengesScreen />, // همون صفحه، فقط مسیر فرق داره
         path: "/challenge/:challengeId/acceptlist",
         element: <AcceptList />,
       },
