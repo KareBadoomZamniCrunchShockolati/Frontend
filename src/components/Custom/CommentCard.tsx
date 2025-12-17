@@ -13,14 +13,8 @@ import { CommentService } from "@/services/commentService";
 import CustomToast from "./CustomToast";
 import { useNavigate, useParams } from "react-router-dom";
 import { SendHorizontal } from "lucide-react";
+import type { CommentCardProps } from "@/types/commentCardProps";
 
-interface CommentCardProps {
-  refreshComments: () => void;
-  comment: CommentResponse;
-  depth?: number;
-  parentUsername?: string;
-  parentUserId?: number;
-}
 const CommentCard = ({
   comment,
   refreshComments,
