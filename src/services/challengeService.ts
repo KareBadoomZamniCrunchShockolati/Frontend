@@ -4,6 +4,56 @@ import { getData, postData, putData, deleteData } from "./services";
 import { getUserById } from "./userService";
 
 export const createChallenge = async (payload: Payload) => {
+import CustomToast from "@/components/Custom/CustomToast";
+import type { ChallengeCategoryType } from "@/types/challengeCreateTypes";
+
+let cachedCategories: ChallengeCategoryType[] | null = null;
+
+export const fetchChallengeCategories = async (): Promise<
+  ChallengeCategoryType[]
+> => {
+  if (cachedCategories) return cachedCategories;
+
+  try {
+    const response = await getData({
+      endPoint: "/api/v1/challenges/categories",
+    });
+
+    const raw = response?.data || response;
+    const list = Array.isArray(raw) ? raw : raw?.data || [];
+
+    const categories: ChallengeCategoryType[] = list.map((item: any) => ({
+      id: Number(item.ID),
+      name: item.Name || "Unknown",
+    }));
+
+    cachedCategories = categories;
+    return categories;
+  } catch (error) {
+    console.error("Failed to fetch categories:", error);
+    CustomToast("خطا در دریافت دسته‌بندی‌ها", "error");
+    cachedCategories = [];
+    return [];
+  }
+};
+
+// ================================
+// Create Challenge
+// ================================
+
+export const createChallenge = async (payload: {
+  title: string;
+  description: string;
+  category_id: number;
+  max_participants?: number | null;
+  visibility: "public" | "private";
+  rule?: string;
+  comments_enabled: boolean;
+  start_time: string;
+  end_time: string;
+  timezone: string;
+  image_url?: string | null;
+}) => {
   try {
     const response = await postData({
       endPoint: "/api/v1/challenges",
@@ -16,17 +66,25 @@ export const createChallenge = async (payload: Payload) => {
   }
 };
 
+// ================================
+// Fetch Challenge by ID
+// ================================
+
 export const fetchChallengeById = async (challengeId: string | number) => {
   try {
     const response = await getData({
       endPoint: `/api/v1/challenges/${challengeId}`,
     });
-    return response.data; // اطلاعات کامل چالش
+    return response.data;
   } catch (error) {
     console.error("Failed to fetch challenge:", error);
     throw error;
   }
 };
+
+// ================================
+// Update Challenge
+// ================================
 
 export const updateChallenge = async (
   challengeId: string | number,
@@ -52,6 +110,10 @@ export const updateChallenge = async (
   }
 };
 
+// ================================
+// Remove Participant
+// ================================
+
 export const removeParticipantFromChallenge = async (
   challengeId: string | number,
   participantId: string | number
@@ -70,6 +132,10 @@ export const removeParticipantFromChallenge = async (
     throw new Error(message);
   }
 };
+
+// ================================
+// Invite Single User
+// ================================
 
 export const inviteUserToChallenge = async (
   challengeId: number | string,
@@ -94,6 +160,10 @@ export const inviteUserToChallenge = async (
     throw error;
   }
 };
+
+// ================================
+// Invite Multiple Users
+// ================================
 
 export const inviteMultipleUsersToChallenge = async (
   challengeId: number | string,
@@ -225,3 +295,15 @@ export const deleteReq = async (requestId: number) => {
 //     throw error;
 //   }
 // };
+export const dateLocationDefaultValues = {
+  startDate: "",
+  startTime: "",
+  endDate: "",
+  endTime: "",
+  location: "",
+};
+
+export const titleAndDescriptionDefaultValues = {
+  challengeTitle: "",
+  challengeDescription: "",
+};
