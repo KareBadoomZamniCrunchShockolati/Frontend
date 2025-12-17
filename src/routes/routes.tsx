@@ -56,11 +56,11 @@ export const router = createBrowserRouter([
         element: <Challenge />,
       },
       {
-        path: "/fuck",
+        path: "/challenge/:challengeId/acceptlist",
         element: <AcceptList />,
       },
       {
-        path: "/fuck2",
+        path: "/challenge/:challengeId/invitelist",
         element: <InviteList />,
       },
     ],

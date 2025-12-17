@@ -1,23 +1,9 @@
 // src/services/challengeService.ts
-
-import { UsersIcon } from "lucide-react";
+import type { Payload } from "@/types/payloadChallengeService";
 import { getData, postData, putData, deleteData } from "./services";
-import type { UserProfile } from "@/types/userTypes";
 import { getUserById } from "./userService";
 
-export const createChallenge = async (payload: {
-  title: string;
-  description: string;
-  category_id: number;
-  max_participants?: number | null;
-  visibility: "public" | "private";
-  rule?: string;
-  comments_enabled: boolean;
-  start_time: string;
-  end_time: string;
-  timezone: string;
-  image_url?: string | null;
-}) => {
+export const createChallenge = async (payload: Payload) => {
   try {
     const response = await postData({
       endPoint: "/api/v1/challenges",
@@ -188,15 +174,17 @@ export const showRequestingUsers = async (challengeId: number) => {
     const response = await getData({
       endPoint: `/api/v1/challenges/${challengeId}/requests`,
     });
+    console.log("data: ", response.data);
+
     const userIds = response.data
-      .filter((req) => req.status == "pending")
+      .filter((req) => req.Status == "pending")
       .map((req) => [req.RequesterID, req.ID]);
     const users = [];
     for (let [reqester, req] of userIds) {
       const user = await getUserById(reqester);
       users.push({ user: user, requestId: req });
     }
-    console.log("fuck", users);
+    console.log("users: ", users);
     return users;
   } catch (error) {
     throw Error("could not join the challenge");

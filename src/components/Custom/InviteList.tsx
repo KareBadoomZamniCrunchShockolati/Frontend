@@ -2,63 +2,58 @@ import { useEffect, useState } from "react";
 import thumb from "@/assets/Img/Group 101.png";
 import TopBackText from "./TopBackText";
 import checked from "@/assets/Img/Icon/checked.svg";
-// import UserIconGray from "@/assets/Img/UserUnknownGray.png";
-// import UserIconOrange from "@/assets/Img/UserUnknownOrange.png";
-// import UserIconBlue from "@/assets/Img/UserUnknownBlue.png";
 import userI from "@/assets/Img/Icon/User.svg";
 import { cn } from "@/lib/utils";
-import {
-  inviteMultipleUsersToChallenge,
-  showRequestingUsers,
-} from "@/services/challengeService";
+import { inviteMultipleUsersToChallenge } from "@/services/challengeService";
 import {
   getFollowersService,
   getUserProfileService,
 } from "@/services/userService";
 import CustomBtn from "./CustomBtn";
+import type { User, UserColor, UserIvite } from "@/types/acceptUser";
+import styles from "./InviteList.module.css";
+import { useParams } from "react-router-dom";
+
 const InviteList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [user, setUser] = useState<Number>();
-  const [followers, setFollowers] = useState<{ users: User[]; count: number }>({
+  const [followers, setFollowers] = useState<{
+    users: UserIvite[];
+    count: number;
+  }>({
     users: [],
     count: 0,
   });
-  const [selectedUsers, setSelectedUsers] = useState<
-    { id: number; username: string }[]
-  >([]);
-  type UserColor = "gray" | "orange" | "blue";
-  type User = { id: number; username: string };
-  const users: User[] = [
-    { id: 1, username: "sina" },
-    { id: 2, username: "ali" },
-    { id: 3, username: "reza" },
-    { id: 4, username: "mohammad" },
-    { id: 5, username: "hossein" },
-    { id: 6, username: "vahid" },
-    { id: 7, username: "nima" },
-    { id: 8, username: "amir" },
-    { id: 9, username: "hamed" },
-  ];
+  const [selectedUsers, setSelectedUsers] = useState<UserIvite[]>([]);
+  const { challengeId } = useParams<{ challengeId: string }>();
   useEffect(() => {
     loadUser();
   }, []);
+
   useEffect(() => {
     if (user) {
       loadFollowers();
       console.log(user);
     }
   }, [user]);
+
   useEffect(() => {
-    if (followers) console.log("cos: ", followers.users);
+    if (followers) console.log("followers: ", followers.users);
   }, [followers]);
+
   const loadUser = async () => {
-    const user = await getUserProfileService(1);
-    setUser(Number(user.id));
+    if (!isNaN(Number(challengeId))) {
+      const user = await getUserProfileService(1); //the argument is not important here
+      setUser(Number(user.id));
+    }
   };
+
   const loadFollowers = async () => {
-    const followers = await getFollowersService(String(user));
-    setFollowers(followers);
+    const followers: { users: UserIvite[]; count: number } =
+      await getFollowersService(String(user));
+    setFollowers(followers); // must check which one is not already attended
   };
+
   const Chip = ({
     id,
     username,
@@ -77,38 +72,35 @@ const InviteList = () => {
         );
       }}
       className={cn(
-        "flex items-end gap-1 rounded-full pr-2",
+        styles.chip,
         color === "gray"
-          ? "bg-gray-300"
+          ? styles.chipGray
           : color === "orange"
-            ? "bg-orange-300"
-            : "bg-blue-300"
+            ? styles.chipOrange
+            : styles.chipBlue
       )}
     >
-      <div className="rounded-full w-[25px] h-[25px]">
+      <div className={styles.chipIcon}>
         <img src={userI} alt="" />
       </div>
       <div>{username}</div>
     </div>
   );
-  const inviteUsers = async () => {
-    console.log(
-      "dola abi: ",
-      selectedUsers.map((u) => u.id)
-    );
-    const ids = selectedUsers.map((u) => u.id);
 
+  const inviteUsers = async () => {
+    const ids = selectedUsers.map((u) => u.id);
     const data = await inviteMultipleUsersToChallenge(3, ids);
   };
+
   return (
-    <div className=" p-4 bg-light-orange">
+    <div className={styles.container}>
       <TopBackText text="دعوت افراد جدید" />
-      {/* <SearchBar searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
-       */}
-      <div className="mb-6 p-4 border-2 border-blue-400 rounded-2xl">
+
+      <div className="mb-6 p-4 border-2 border-secondary rounded-2xl">
         <div className="flex flex-wrap gap-2">
           {selectedUsers.map((user, index) => (
             <Chip
+              key={user.id}
               id={user.id}
               username={user.username}
               color={
@@ -118,6 +110,7 @@ const InviteList = () => {
           ))}
         </div>
       </div>
+
       <CustomBtn
         color="bg-primary"
         onClick={() => inviteUsers()}
@@ -125,43 +118,19 @@ const InviteList = () => {
       >
         دعوت
       </CustomBtn>
+
       <div
-        className="h-full scrollbar-svg"
-        style={{
-          backgroundColor: "#FFF8F5",
-          height: "calc(100vh )",
-          overflowY: "scroll",
-          paddingRight: "8px",
-          "--thumb-image": `url('${thumb}')`,
-        }}
+        className={styles.scrollContainer}
+        style={
+          {
+            "--thumb-image": `url('${thumb}')`,
+          } as React.CSSProperties
+        }
       >
-        <style>{`
-              .scrollbar-svg::-webkit-scrollbar {
-                width: 16px;
-              }
-              
-              .scrollbar-svg::-webkit-scrollbar-track {
-                background: #E5E7EB;
-                border-radius: 100px;
-              }
-              
-              .scrollbar-svg::-webkit-scrollbar-thumb {
-                background: #7CB5E8 url('${thumb}') center/50%  no-repeat;
-                border-radius: 100px;
-                border: 3px solid white;
-              }
-              
-              .scrollbar-svg::-webkit-scrollbar-thumb:hover {
-                background-color: #6BA5D8;
-              }
-              
-              .scrollbar-svg::-webkit-scrollbar-button {
-                display: none;
-              }
-            `}</style>
-        <div className="flex flex-col w-full">
+        <div className={styles.usersList}>
           {followers.users.map((user) => (
             <div
+              key={user.id}
               onClick={() => {
                 if (selectedUsers.find((u) => u.id === user.id))
                   setSelectedUsers(
@@ -169,18 +138,14 @@ const InviteList = () => {
                   );
                 else setSelectedUsers([...selectedUsers, user]);
               }}
-              className="flex justify-between border bg-white border-black rounded-xl p-4 mt-4 items-center"
+              className={styles.userCard}
             >
-              <div className="flex gap-4 items-center">
-                <div className="relative">
-                  <img
-                    className="w-16 h-16 rounded-full border-1 border-black"
-                    src={""}
-                    alt="profile"
-                  />
+              <div className={styles.userInfo}>
+                <div className={styles.profileImageContainer}>
+                  <img className={styles.profileImage} src={""} alt="profile" />
                   <img
                     className={cn(
-                      "absolute right-0 bottom-0",
+                      styles.checkedIcon,
                       selectedUsers.find((u) => u.id === user.id)
                         ? "block"
                         : "hidden"
@@ -189,7 +154,7 @@ const InviteList = () => {
                     alt=""
                   />
                 </div>
-                <p className="font-semibold text-xl">{user.username}</p>
+                <p className={styles.username}>{user.username}</p>
               </div>
             </div>
           ))}
