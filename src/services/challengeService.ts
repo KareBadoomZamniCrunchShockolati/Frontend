@@ -1,6 +1,9 @@
 // src/services/challengeService.ts
-
+import type { Payload } from "@/types/payloadChallengeService";
 import { getData, postData, putData, deleteData } from "./services";
+import { getUserById } from "./userService";
+
+export const createChallenge = async (payload: Payload) => {
 import CustomToast from "@/components/Custom/CustomToast";
 import type { ChallengeCategoryType } from "@/types/challengeCreateTypes";
 
@@ -166,6 +169,10 @@ export const inviteMultipleUsersToChallenge = async (
   challengeId: number | string,
   userIds: (number | string)[]
 ) => {
+  console.log("challengeId: ", challengeId);
+
+  console.log("ids: ", userIds);
+
   const promises = userIds.map((userId) =>
     inviteUserToChallenge(challengeId, userId).catch((err) => ({
       userId,
@@ -232,6 +239,62 @@ export const leaveChallenge = async (challengeId: number) => {
   }
 };
 
+export const showRequestingUsers = async (challengeId: number) => {
+  try {
+    const response = await getData({
+      endPoint: `/api/v1/challenges/${challengeId}/requests`,
+    });
+    console.log("data: ", response.data);
+
+    const userIds = response.data
+      .filter((req) => req.Status == "pending")
+      .map((req) => [req.RequesterID, req.ID]);
+    const users = [];
+    for (let [reqester, req] of userIds) {
+      const user = await getUserById(reqester);
+      users.push({ user: user, requestId: req });
+    }
+    console.log("users: ", users);
+    return users;
+  } catch (error) {
+    throw Error("could not join the challenge");
+  }
+};
+
+export const acceptReq = async (requestId: number) => {
+  try {
+    const response = await postData({
+      endPoint: `/api/v1/challenges/requests/${requestId}/accept`,
+      data: {},
+    });
+    return response.data;
+  } catch (error) {
+    throw Error("could not join the challenge");
+  }
+};
+export const deleteReq = async (requestId: number) => {
+  try {
+    const response = await postData({
+      endPoint: `/api/v1/challenges/requests/${requestId}/decline`,
+      data: {},
+    });
+    return response.data;
+  } catch (error) {
+    throw Error("could not join the challenge");
+  }
+};
+
+// export const fetchChallengeById = async (challengeId: string | number) => {
+//   try {
+//     const response = await getData({
+//       endPoint: `/api/v1/challenges/${challengeId}`,
+//     });
+//     return response.data; // اطلاعات کامل چالش
+//   } catch (error) {
+//     console.error("Failed to fetch challenge:", error);
+//     throw error;
+//   }
+// };
 export const dateLocationDefaultValues = {
   startDate: "",
   startTime: "",
