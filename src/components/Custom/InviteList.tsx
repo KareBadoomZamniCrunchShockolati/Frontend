@@ -4,7 +4,10 @@ import TopBackText from "./TopBackText";
 import checked from "@/assets/Img/Icon/checked.svg";
 import userI from "@/assets/Img/Icon/User.svg";
 import { cn } from "@/lib/utils";
-import { inviteMultipleUsersToChallenge } from "@/services/challengeService";
+import {
+  fetchChallengeById,
+  inviteMultipleUsersToChallenge,
+} from "@/services/challengeService";
 import {
   getFollowersService,
   getUserProfileService,
@@ -25,7 +28,17 @@ const InviteList = () => {
     count: 0,
   });
   const [selectedUsers, setSelectedUsers] = useState<UserIvite[]>([]);
+  const [participants, setParticipants] = useState<Number[]>([]);
   const { challengeId } = useParams<{ challengeId: string }>();
+
+  useEffect(() => {
+    const fetch = async () => {
+      const challenge = await fetchChallengeById(String(challengeId));
+      setParticipants(challenge.participants.map((p) => p.user_id));
+    };
+    fetch();
+  }, []);
+  useEffect(() => console.log(participants), [participants]);
   useEffect(() => {
     loadUser();
   }, []);
@@ -33,7 +46,6 @@ const InviteList = () => {
   useEffect(() => {
     if (user) {
       loadFollowers();
-      console.log(user);
     }
   }, [user]);
 
@@ -47,7 +59,6 @@ const InviteList = () => {
       setUser(Number(user.id));
     }
   };
-
   const loadFollowers = async () => {
     const followers: { users: UserIvite[]; count: number } =
       await getFollowersService(String(user));
@@ -89,7 +100,7 @@ const InviteList = () => {
 
   const inviteUsers = async () => {
     const ids = selectedUsers.map((u) => u.id);
-    const data = await inviteMultipleUsersToChallenge(3, ids);
+    const data = await inviteMultipleUsersToChallenge(challengeId, ids);
   };
 
   return (
@@ -128,36 +139,43 @@ const InviteList = () => {
         }
       >
         <div className={styles.usersList}>
-          {followers.users.map((user) => (
-            <div
-              key={user.id}
-              onClick={() => {
-                if (selectedUsers.find((u) => u.id === user.id))
-                  setSelectedUsers(
-                    selectedUsers.filter((u) => u.id !== user.id)
-                  );
-                else setSelectedUsers([...selectedUsers, user]);
-              }}
-              className={styles.userCard}
-            >
-              <div className={styles.userInfo}>
-                <div className={styles.profileImageContainer}>
-                  <img className={styles.profileImage} src={""} alt="profile" />
-                  <img
-                    className={cn(
-                      styles.checkedIcon,
-                      selectedUsers.find((u) => u.id === user.id)
-                        ? "block"
-                        : "hidden"
-                    )}
-                    src={checked}
-                    alt=""
-                  />
+          {followers &&
+            followers.users
+              .filter((user) => !participants.includes(user.id))
+              .map((user) => (
+                <div
+                  key={user.id}
+                  onClick={() => {
+                    if (selectedUsers.find((u) => u.id === user.id))
+                      setSelectedUsers(
+                        selectedUsers.filter((u) => u.id !== user.id)
+                      );
+                    else setSelectedUsers([...selectedUsers, user]);
+                  }}
+                  className={styles.userCard}
+                >
+                  <div className={styles.userInfo}>
+                    <div className={styles.profileImageContainer}>
+                      <img
+                        className={styles.profileImage}
+                        src={""}
+                        alt="profile"
+                      />
+                      <img
+                        className={cn(
+                          styles.checkedIcon,
+                          selectedUsers.find((u) => u.id === user.id)
+                            ? "block"
+                            : "hidden"
+                        )}
+                        src={checked}
+                        alt=""
+                      />
+                    </div>
+                    <p className={styles.username}>{user.username}</p>
+                  </div>
                 </div>
-                <p className={styles.username}>{user.username}</p>
-              </div>
-            </div>
-          ))}
+              ))}
         </div>
       </div>
     </div>
