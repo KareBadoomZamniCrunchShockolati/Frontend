@@ -50,7 +50,10 @@ const PostComments = () => {
   if (loading) return <div>Loading comments...</div>; //need to make skeleton for this instead ------------------------------------
   if (error) return <div>{error}</div>;
 
-  const handleSubmitComment = async (values: { commentText: string },{ resetForm }: FormikHelpers<{ commentText: string }>) => {
+  const handleSubmitComment = async (
+    values: { commentText: string },
+    { resetForm }: FormikHelpers<{ commentText: string }>
+  ) => {
     console.log("Submitting comment with values:", values);
     const response: CommentResponse = await CommentService({
       entity_type: "post",
