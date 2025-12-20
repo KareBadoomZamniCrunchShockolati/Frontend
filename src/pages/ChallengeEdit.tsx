@@ -10,6 +10,7 @@ import TitleAndDescriptionInput from "@/components/ChallengeManagement/edit/Titl
 import DateAndLocationInput from "@/components/ChallengeManagement/edit/DateAndLocationInput";
 import CategorySelectEdit from "@/components/ChallengeManagement/edit/categorySelectEdit";
 import CustomToast from "@/components/Custom/CustomToast";
+import LoadingPage from "@/components/Custom/LoadingPage";
 import useUserStore from "@/store/userStore/userStore";
 import type { UserProfile } from "@/types/userTypes";
 
@@ -86,7 +87,6 @@ const ChallengeEdit: React.FC = () => {
         setEndDate(data.end_time.split("T")[0]);
         setEndTime(data.end_time.split("T")[1]?.slice(0, 5) || "18:00");
 
-        // دسته‌بندی فعلی
         if (data.category_name) {
           setSelectedCategoryName(data.category_name);
         }
@@ -191,16 +191,7 @@ const ChallengeEdit: React.FC = () => {
   );
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-lg font-medium text-neutral-gray-bold">
-            در حال بارگذاری چالش...
-          </p>
-        </div>
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   if (!challenge || !isCreator) return null;
@@ -239,7 +230,6 @@ const ChallengeEdit: React.FC = () => {
             onLocationChange={setChallengeLocation}
           />
 
-          {/* دسته‌بندی چالش — دقیقاً مثل صفحه ساخت */}
           <CategorySelectEdit
             categories={categories}
             loading={loadingCategories}
