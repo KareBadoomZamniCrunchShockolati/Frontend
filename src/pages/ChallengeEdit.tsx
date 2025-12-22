@@ -25,6 +25,9 @@ import type { ChallengeData } from "@/types/challengeCreateTypes";
 
 import { DEFAULT_IMG } from "@/data/mockImages";
 
+// Make sure this import points to your actual map component file
+import LocationMapPicker from "@/components/Custom/LocationMap"; // ← Keep your current path if it works
+
 const ChallengeEdit: React.FC = () => {
   const { challengeId } = useParams<{ challengeId: string }>();
   const navigate = useNavigate();
@@ -34,7 +37,6 @@ const ChallengeEdit: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isCreator, setIsCreator] = useState(false);
 
-  // فرم فیلدها
   const [image, setImage] = useState<string>(DEFAULT_IMG);
   const [challengeTitle, setChallengeTitle] = useState("");
   const [challengeDescription, setChallengeDescription] = useState("");
@@ -44,17 +46,20 @@ const ChallengeEdit: React.FC = () => {
   const [endTime, setEndTime] = useState("");
   const [challengeLocation, setChallengeLocation] = useState("");
 
-  // دسته‌بندی
+  // We no longer try to read from data.location — we just set a default pin
+  const [selectedCoordinates, setSelectedCoordinates] = useState<{
+    lat: number;
+    lng: number;
+  } | null>({ lat: 35.6892, lng: 51.389 }); // Default: Tehran
+
   const [categories, setCategories] = useState<ChallengeCategoryType[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
 
-  // شرکت‌کنندگان
   const [participants, setParticipants] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  // بارگذاری چالش
   useEffect(() => {
     const loadChallenge = async () => {
       if (!challengeId || !token || !userId) {
@@ -75,7 +80,6 @@ const ChallengeEdit: React.FC = () => {
         setIsCreator(true);
         setChallenge(data);
 
-        // پر كردن فرم
         setChallengeTitle(data.title);
         setChallengeDescription(data.description || "");
         setImage(data.image_url || DEFAULT_IMG);
@@ -86,10 +90,12 @@ const ChallengeEdit: React.FC = () => {
         setEndDate(data.end_time.split("T")[0]);
         setEndTime(data.end_time.split("T")[1]?.slice(0, 5) || "18:00");
 
-        // دسته‌بندی فعلی
         if (data.category_name) {
           setSelectedCategoryName(data.category_name);
         }
+
+        // REMOVED: No longer parsing data.location
+        // We keep the default coordinates (Tehran pin)
 
         const others = data.participants.filter(
           (p) => p.user_id !== Number(userId)
@@ -106,7 +112,6 @@ const ChallengeEdit: React.FC = () => {
     loadChallenge();
   }, [challengeId, token, userId, navigate]);
 
-  // بارگذاری دسته‌بندی‌ها
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -145,13 +150,20 @@ const ChallengeEdit: React.FC = () => {
     }
   };
 
-  const handleSave = async () => {
-    if (typeof window.forceValidateDateLocation === "function") {
-      window.forceValidateDateLocation();
-    }
+  const handleLocationSelect = (lat: number, lng: number) => {
+    setSelectedCoordinates({ lat, lng });
+    console.log("موقعیت جدید انتخاب شد:", { lat, lng });
+  };
 
-    if (!challengeTitle.trim()) return;
-    if (!startDate || !startTime || !endDate || !endTime) return;
+  const handleSave = async () => {
+    if (!challengeTitle.trim()) {
+      CustomToast("عنوان چالش نمی‌تواند خالی باشد", "error");
+      return;
+    }
+    if (!startDate || !startTime || !endDate || !endTime) {
+      CustomToast("تاریخ و ساعت شروع و پایان الزامی است", "error");
+      return;
+    }
     if (!selectedCategoryName) {
       CustomToast("لطفاً دسته‌بندی چالش را انتخاب کنید", "error");
       return;
@@ -239,7 +251,18 @@ const ChallengeEdit: React.FC = () => {
             onLocationChange={setChallengeLocation}
           />
 
-          {/* دسته‌بندی چالش — دقیقاً مثل صفحه ساخت */}
+          {/* Map with DEFAULT PIN always visible on load */}
+          <div className="space-y-3">
+            <LocationMapPicker
+              onLocationSelect={handleLocationSelect}
+              initialPosition={
+                selectedCoordinates
+                  ? [selectedCoordinates.lat, selectedCoordinates.lng]
+                  : null
+              }
+            />
+          </div>
+
           <CategorySelectEdit
             categories={categories}
             loading={loadingCategories}
@@ -247,7 +270,6 @@ const ChallengeEdit: React.FC = () => {
             onCategoryChange={setSelectedCategoryName}
           />
 
-          {/* شرکت‌کنندگان */}
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-4 text-right">
               شرکت‌کنندگان ({participants.length} نفر)

@@ -19,7 +19,7 @@ export default function CustomSelect({
   icon = <ChevronDown className="w-5 h-5" />,
   onIconClick,
   width = "",
-  error: propError, // ← prop جدید برای دریافت خطا از بیرون
+  error: propError,
 }: CustomSelectProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [isRTL, setIsRTL] = useState(true);
@@ -35,7 +35,6 @@ export default function CustomSelect({
         const hasValue = field.value?.length > 0;
         const isFloating = isFocused || hasValue;
 
-        // اولویت با propError (اگر از بیرون پاس داده شد)، در غیر این صورت از meta.error
         const displayError =
           propError ?? (meta.touched && meta.error ? meta.error : undefined);
 
@@ -81,7 +80,7 @@ export default function CustomSelect({
         return (
           <div className={`flex flex-col ${width}`} ref={dropdownRef}>
             <div className="relative">
-              {/* ────────────────────── CLICKABLE TRIGGER ────────────────────── */}
+              {/* CLICKABLE TRIGGER */}
               <div
                 onClick={toggleOpen}
                 className={`
@@ -106,7 +105,6 @@ export default function CustomSelect({
                   }
                 `}
               >
-                {/* TEXT – flush to the right, space for icon on left */}
                 <span
                   className={`
                     block truncate
@@ -119,7 +117,6 @@ export default function CustomSelect({
                   {hasValue ? selectedLabel : ""}
                 </span>
 
-                {/* ICON – left side in RTL, right side in LTR */}
                 {icon && (
                   <div
                     className={`
@@ -134,7 +131,7 @@ export default function CustomSelect({
                 )}
               </div>
 
-              {/* ────────────────────── FLOATING LABEL ────────────────────── */}
+              {/* FLOATING LABEL */}
               <label
                 className={`
                   absolute pointer-events-none transition-all duration-200 ease-in-out font-bold
@@ -149,15 +146,15 @@ export default function CustomSelect({
                 {label}
               </label>
 
-              {/* ────────────────────── DROPDOWN MENU ────────────────────── */}
+              {/* SCROLLABLE DROPDOWN MENU – کوتاه‌تر و اسکرول‌بار کاملاً نامرئی (بدون کلاس خارجی) */}
               {isOpen && openName === name && (
                 <div
                   className={`
                     absolute top-full mt-1 w-full
                     border !border-[var(--borderDefault)]
-                    shadow-[0px_1px_0px_var(--borderDefault)]
                     bg-white rounded-primary-radius
                     overflow-hidden z-50
+                    shadow-lg
                     animate-in fade-in slide-in-from-top-1 duration-200
                   `}
                   style={{
@@ -165,24 +162,40 @@ export default function CustomSelect({
                       "0px 4px 6px -1px rgba(0,0,0,0.1), 0px 1px 0px var(--borderDefault)",
                   }}
                 >
-                  {options.map((opt) => (
-                    <div
-                      key={opt.value}
-                      onClick={() => selectOption(opt.value)}
-                      className={`
-                        px-4 py-2 text-right cursor-pointer transition-colors
-                        hover:bg-neutral-gray
-                        ${field.value === opt.value ? "bg-neutral-gray font-medium" : ""}
-                      `}
-                    >
-                      {opt.label}
-                    </div>
-                  ))}
+                  <div
+                    className="max-h-40 overflow-y-auto py-1"
+                    style={{
+                      // مخفی کردن اسکرول‌بار در همه مرورگرها بدون نیاز به کلاس خارجی
+                      msOverflowStyle: "none",      /* IE و Edge */
+                      scrollbarWidth: "none",       /* Firefox */
+                    }}
+                  >
+                    {/* برای Chrome, Safari و Opera */}
+                    <style jsx>{`
+                      div::-webkit-scrollbar {
+                        display: none;
+                      }
+                    `}</style>
+
+                    {options.map((opt) => (
+                      <div
+                        key={opt.value}
+                        onClick={() => selectOption(opt.value)}
+                        className={`
+                          px-4 py-2 text-right cursor-pointer transition-colors
+                          hover:bg-neutral-gray
+                          ${field.value === opt.value ? "bg-neutral-gray font-medium" : ""}
+                        `}
+                      >
+                        {opt.label}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* ────────────────────── ERROR MESSAGE ────────────────────── */}
+            {/* ERROR MESSAGE */}
             {displayError && (
               <p className="mt-1 text-sm text-error text-right">
                 {displayError}
