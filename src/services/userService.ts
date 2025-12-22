@@ -49,6 +49,23 @@ export const getPopularChallengesService = async (): Promise<Challenge[]> => {
   return response.data; // فقط آرایه
 };
 
+export const getTopCreatorsListService = async (): Promise<
+  Array<{
+    id: number;
+    username: string;
+    challenge_count: number;
+    total_likes: number;
+    total_participants: number;
+  }>
+> => {
+  const response = await getData({
+    endPoint: `/api/v1/creators/top`,
+  });
+  
+  return response.data;
+};
+
+
 // گرفتن چالش‌ها بر اساس نوع (برای صفحه اصلی)
 export const getChallengesByTypeService = async (type: string): Promise<Challenge[]> => {
   let endPoint = '';

@@ -12,6 +12,7 @@ import {
   getPublicChallengesService,
   getParticipatingChallengesService,
   getPopularChallengesService,
+  getTopCreatorsListService, // اضافه کردن سرویس جدید
 } from "@/services/userService";
 import { useNavigate } from "react-router-dom";
 import { convertToJalali } from "@/components/Custom/ConvertToJalali";
@@ -70,6 +71,8 @@ function CategoryGrid({
   );
 }
 
+// ... کدهای قبلی بدون تغییر
+
 export default function HomeScreen() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -77,6 +80,7 @@ export default function HomeScreen() {
   const [popularChallenges, setPopularChallenges] = useState<any[]>([]);
   const [nearbyChallenges, setNearbyChallenges] = useState<any[]>([]);
   const [followingChallenges, setFollowingChallenges] = useState<any[]>([]);
+  const [topCreators, setTopCreators] = useState<any[]>([]); // حالت جدید برای سازندگان برتر
 
   const [allChallenges, setAllChallenges] = useState<any[]>([]);
   const [visibleChallenges, setVisibleChallenges] = useState<any[]>([]);
@@ -86,6 +90,7 @@ export default function HomeScreen() {
     nearby: true,
     following: true,
     all: true,
+    topCreators: true, // اضافه کردن loading state جدید
   });
 
   const [activeFilters, setActiveFilters] = useState<{
@@ -108,6 +113,40 @@ export default function HomeScreen() {
     ],
     []
   );
+
+  // فچ کردن سازندگان برتر
+  const fetchTopCreators = async () => {
+    try {
+      setLoadingStates((prev) => ({ ...prev, topCreators: true }));
+      const response = await getTopCreatorsListService();
+      // ساختار سازندگان برای نمایش در کارت
+      const formattedCreators =
+        response.map((creator: any, index: number) => ({
+          id: creator.id,
+          username: creator.username,
+          avatar: "", // اگر API آواتار دارد، از creator.avatar استفاده کنید
+          rank: index + 1, // یا از داده‌های دیگری برای رتبه استفاده کنید
+          stats: {
+            // اضافه کردن آمار برای نمایش احتمالی
+            challengeCount: creator.challenge_count,
+            totalLikes: creator.total_likes,
+            totalParticipants: creator.total_participants,
+          },
+        })) || [];
+
+      setTopCreators(formattedCreators);
+    } catch (error) {
+      console.error("Error fetching top creators:", error);
+      // داده‌های نمونه در صورت خطا
+      setTopCreators([
+        { id: 1, username: "mahditd", avatar: "/images/mahditd.jpg", rank: 1 },
+        { id: 2, username: "emadme", avatar: "/images/emadme.jpg", rank: 2 },
+        { id: 3, username: "samankh", avatar: "/images/samankh.jpg", rank: 3 },
+      ]);
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, topCreators: false }));
+    }
+  };
 
   // فچ کردن چالش‌های محبوب
   const fetchPopularChallenges = async () => {
@@ -201,13 +240,11 @@ export default function HomeScreen() {
     fetchNearbyChallenges();
     fetchFollowingChallenges();
     fetchAllChallenges();
+    fetchTopCreators(); // فراخوانی سرویس جدید
   }, []);
 
-  const creators = [
-    { id: 1, username: "mahditd", avatar: "/images/ahditd.jpg", rank: 3 },
-    { id: 2, username: "emadme", avatar: "/images/emadme.jpg", rank: 2 },
-    { id: 3, username: "samankh", avatar: "/images/samankh.jpg", rank: 1 },
-  ];
+  // حذف آرایه creators ثابت از کد (استفاده از داده‌های API)
+  // const creators = [ ... ];
 
   const handleSearchFilter = () => {
     setIsFilterModalOpen(true);
@@ -254,7 +291,6 @@ export default function HomeScreen() {
       setActiveFilters((prev) => (prev ? { ...prev, sortBy: "newest" } : null));
     }
   };
-  console.log(visibleChallenges);
 
   return (
     <>
@@ -345,16 +381,31 @@ export default function HomeScreen() {
                   {/* بخش برترین سازندگان */}
                   <SectionHeader
                     title="برترین سازندگان"
-                    onMore={() => console.log("more creators")}
+                    onMore={() => navigate("/creators")} // یا مسیر دلخواه
                   />
-                  <HorizontalScroller>
-                    {creators
-                      .slice()
-                      .sort((a, b) => a.rank - b.rank)
-                      .map((c) => (
-                        <CreatorCard key={c.id} creator={c} />
-                      ))}
-                  </HorizontalScroller>
+                  {loadingStates.topCreators ? (
+                    <div className="p-4 text-center">
+                      در حال بارگذاری سازندگان برتر...
+                    </div>
+                  ) : (
+                    <HorizontalScroller>
+                      {topCreators
+                        .slice() // کپی برای عدم تغییر آرایه اصلی
+                        .sort((a, b) => a.rank - b.rank)
+                        .map((c) => (
+                          <CreatorCard
+                            key={c.id}
+                            creator={c}
+                            // میتوانید اطلاعات اضافی را هم پاس دهید
+                            additionalInfo={
+                              c.stats
+                                ? `چالش‌ها: ${c.stats.challengeCount}`
+                                : ""
+                            }
+                          />
+                        ))}
+                    </HorizontalScroller>
+                  )}
 
                   {/* بخش چالش‌های دنبال‌شوندگان */}
                   <div>

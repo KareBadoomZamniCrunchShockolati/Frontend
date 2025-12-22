@@ -9,6 +9,7 @@ import Step1BasicInfo from "@/components/ChallengeManagement/create/CreationStep
 import Step2Details from "@/components/ChallengeManagement/create/CreationStepTwo";
 import Step3Members from "@/components/ChallengeManagement/create/CreationStepThree";
 import CustomToast from "@/components/Custom/CustomToast";
+import LoadingPage from "@/components/Custom/LoadingPage";
 import useUserStore from "@/store/userStore/userStore";
 import type { UserProfile } from "@/types/userTypes";
 import { fetchUsers } from "@/services/followerFollowingService";
@@ -23,7 +24,6 @@ import {
   step2Schema,
   step3Schema,
 } from "@/schemas/challengeSchema";
-
 import type { createFormValues } from "@/types/challengeCreateTypes";
 
 const ChallengeCreate: React.FC = () => {
@@ -185,6 +185,10 @@ const ChallengeCreate: React.FC = () => {
     }
   };
 
+  if (loadingCategories) {
+    return <LoadingPage />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col p-4 items-center bg-white">
       <div className="flex justify-center items-center w-full max-w-xl mb-10 mt-4">
@@ -250,7 +254,7 @@ const ChallengeCreate: React.FC = () => {
               {currentStep === 2 && (
                 <Step2Details
                   categories={categories}
-                  loadingCategories={loadingCategories}
+                  loadingCategories={loadingCategories} // now always false here
                   values={values}
                   setFieldValue={setFieldValue}
                   setFieldTouched={setFieldTouched}
@@ -304,12 +308,12 @@ const ChallengeCreate: React.FC = () => {
                       ? () => handleNext(values, setTouched, setErrors)
                       : undefined
                   }
-                  disabled={isSubmitting || loadingCategories}
+                  disabled={isSubmitting}
                   className={`w-full max-w-xl rounded-primary-radius p-5 text-lg transition-all text-white flex items-center justify-center gap-3
-    ${currentStep === 3 ? "bg-primary" : "bg-secondary"}
-    ${isSubmitting || loadingCategories ? "opacity-70 cursor-not-allowed" : ""}`}
+                    ${currentStep === 3 ? "bg-primary" : "bg-secondary"}
+                    ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
                 >
-                  {(isSubmitting || loadingCategories) && (
+                  {isSubmitting && (
                     <div
                       className="inline-block h-5 w-5 animate-spin rounded-full border-3 border-solid border-white border-r-transparent"
                       role="status"
@@ -322,11 +326,9 @@ const ChallengeCreate: React.FC = () => {
 
                   {isSubmitting
                     ? "در حال ثبت..."
-                    : loadingCategories
-                      ? "در حال بارگذاری..."
-                      : currentStep === 3
-                        ? "ثبت چالش"
-                        : "بعدی"}
+                    : currentStep === 3
+                      ? "ثبت چالش"
+                      : "بعدی"}
                 </CustomButton>
               </div>
             </Form>

@@ -6,4 +6,7 @@ export interface CommentCardProps {
   depth?: number;
   parentUsername?: string;
   parentUserId?: number;
+  isOpenFirstReplies?: boolean;
+  // openFirstReplies?:() => void;
+  // closeFirstReplies?: () => void;
 }
