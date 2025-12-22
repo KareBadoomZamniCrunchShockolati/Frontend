@@ -25,8 +25,8 @@ import type { ChallengeData } from "@/types/challengeCreateTypes";
 
 import { DEFAULT_IMG } from "@/data/mockImages";
 
-// Make sure this import points to your actual map component file
-import LocationMapPicker from "@/components/Custom/LocationMap"; // ← Keep your current path if it works
+// Use the correct fixed map component
+import LocationMapPicker from "@/components/Custom/LocationMap";
 
 const ChallengeEdit: React.FC = () => {
   const { challengeId } = useParams<{ challengeId: string }>();
@@ -45,12 +45,8 @@ const ChallengeEdit: React.FC = () => {
   const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
   const [challengeLocation, setChallengeLocation] = useState("");
-
-  // We no longer try to read from data.location — we just set a default pin
-  const [selectedCoordinates, setSelectedCoordinates] = useState<{
-    lat: number;
-    lng: number;
-  } | null>({ lat: 35.6892, lng: 51.389 }); // Default: Tehran
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
 
   const [categories, setCategories] = useState<ChallengeCategoryType[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
@@ -83,7 +79,9 @@ const ChallengeEdit: React.FC = () => {
         setChallengeTitle(data.title);
         setChallengeDescription(data.description || "");
         setImage(data.image_url || DEFAULT_IMG);
-        setChallengeLocation(data.location || "");
+        setChallengeLocation(data.address || ""); // ← Use address from backend
+        setLatitude(data.latitude ?? null);
+        setLongitude(data.longitude ?? null);
 
         setStartDate(data.start_time.split("T")[0]);
         setStartDateTime(data.start_time.split("T")[1]?.slice(0, 5) || "09:00");
@@ -93,9 +91,6 @@ const ChallengeEdit: React.FC = () => {
         if (data.category_name) {
           setSelectedCategoryName(data.category_name);
         }
-
-        // REMOVED: No longer parsing data.location
-        // We keep the default coordinates (Tehran pin)
 
         const others = data.participants.filter(
           (p) => p.user_id !== Number(userId)
@@ -151,8 +146,8 @@ const ChallengeEdit: React.FC = () => {
   };
 
   const handleLocationSelect = (lat: number, lng: number) => {
-    setSelectedCoordinates({ lat, lng });
-    console.log("موقعیت جدید انتخاب شد:", { lat, lng });
+    setLatitude(lat);
+    setLongitude(lng);
   };
 
   const handleSave = async () => {
@@ -178,7 +173,9 @@ const ChallengeEdit: React.FC = () => {
       title: challengeTitle.trim(),
       description: challengeDescription.trim() || null,
       image_url: image !== DEFAULT_IMG ? image : null,
-      location: challengeLocation.trim() || null,
+      address: challengeLocation.trim() || null, // ← Use address field
+      latitude: latitude ?? null,
+      longitude: longitude ?? null,
       start_time: `${startDate}T${startTime}:00Z`,
       end_time: `${endDate}T${endTime}:59Z`,
       timezone: "UTC",
@@ -190,7 +187,12 @@ const ChallengeEdit: React.FC = () => {
       CustomToast("چالش با موفقیت بروزرسانی شد!", "success");
       navigate(`/challenge/${challengeId}`, { replace: true });
     } catch (err: any) {
-      CustomToast(err.message || "ذخیره تغییرات ناموفق بود", "error");
+      const message =
+        err?.response?.data?.message ||
+        err?.response?.data?.details?.details ||
+        err.message ||
+        "ذخیره تغییرات ناموفق بود";
+      CustomToast(message, "error");
     } finally {
       setIsSaving(false);
     }
@@ -251,14 +253,12 @@ const ChallengeEdit: React.FC = () => {
             onLocationChange={setChallengeLocation}
           />
 
-          {/* Map with DEFAULT PIN always visible on load */}
+          {/* Map with initial position from backend, editable */}
           <div className="space-y-3">
             <LocationMapPicker
               onLocationSelect={handleLocationSelect}
               initialPosition={
-                selectedCoordinates
-                  ? [selectedCoordinates.lat, selectedCoordinates.lng]
-                  : null
+                latitude && longitude ? [latitude, longitude] : null
               }
             />
           </div>

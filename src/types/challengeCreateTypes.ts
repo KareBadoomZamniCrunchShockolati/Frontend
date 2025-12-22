@@ -93,7 +93,9 @@ export interface createFormValues {
   startTime: string;
   endDate: string;
   endTime: string;
-  challengeLocation: string;
+  challengeLocation: string; 
+  latitude?: number | null;   
+  longitude?: number | null;  
   challengeType: "عمومی" | "شخصی";
   isCommentsEnabled: boolean;
   memberCount: string;

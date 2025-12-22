@@ -1,11 +1,13 @@
 // components/ChallengeManagement/create/CreationStepTwo.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // ← Add useEffect
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomSelect from "@/components/Custom/CustomDropList";
 import CustomCheckbox from "@/components/Custom/CustomCheckbox";
 import { Field } from "formik";
 import type { FieldProps } from "formik";
 import type { Step2DetailsProps } from "@/types/challengeCreateTypes";
+
+// Use the correct fixed map component
 import LocationMapPicker from "@/components/Custom/LocationMap";
 
 const Step2Details: React.FC<Step2DetailsProps> = ({
@@ -16,15 +18,21 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
   errors,
   touched,
 }) => {
-
   const [selectedCoordinates, setSelectedCoordinates] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
 
+  // Sync map selection → Formik latitude/longitude
+  useEffect(() => {
+    if (selectedCoordinates) {
+      setFieldValue("latitude", selectedCoordinates.lat);
+      setFieldValue("longitude", selectedCoordinates.lng);
+    }
+  }, [selectedCoordinates, setFieldValue]);
+
   const handleLocationSelect = (lat: number, lng: number) => {
     setSelectedCoordinates({ lat, lng });
-    console.log({ lat, lng });
   };
 
   if (loadingCategories) {
@@ -57,7 +65,6 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
 
       {/* زمان شروع و پایان */}
       <div className="space-y-6">
-        {/* شروع */}
         <div>
           <div className="grid grid-cols-2 gap-4">
             <Field name="startDate">
@@ -73,7 +80,6 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
           </div>
         </div>
 
-        {/* پایان */}
         <div>
           <div className="grid grid-cols-2 gap-4">
             <Field name="endDate">
@@ -92,20 +98,29 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
 
       {/* مکان چالش */}
       <div className="space-y-4">
+        {/* Address input */}
         <Field name="challengeLocation">
           {({ field, meta }: FieldProps) => (
             <CustomInput
               {...field}
-              label="مکان چالش (اختیاری)"
+              label="نام مکان (اختیاری)"
               error={meta.touched && meta.error}
             />
           )}
         </Field>
 
         <div>
-          <LocationMapPicker onLocationSelect={handleLocationSelect} />
-          
+          <LocationMapPicker
+            onLocationSelect={handleLocationSelect}
+            initialPosition={
+              values.latitude && values.longitude
+                ? [values.latitude, values.longitude]
+                : null
+            }
+            height="h-50"
+          />
         </div>
+
       </div>
 
       {/* نوع چالش */}
@@ -115,7 +130,7 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
           label="نوع چالش"
           options={[
             { value: "عمومی", label: "عمومی" },
-            { value: "شخصی", label: "شخصی" },
+            { value: "شخصی", label: "خصوصی" },
           ]}
         />
       </div>

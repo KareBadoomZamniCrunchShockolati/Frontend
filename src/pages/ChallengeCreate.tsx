@@ -70,7 +70,10 @@ const ChallengeCreate: React.FC = () => {
     loadCategories();
   }, []);
 
-  const initialValues: createFormValues = {
+  const initialValues: createFormValues & {
+    latitude?: number | null;
+    longitude?: number | null;
+  } = {
     title: "",
     description: "",
     image: null,
@@ -80,6 +83,8 @@ const ChallengeCreate: React.FC = () => {
     endDate: "",
     endTime: "",
     challengeLocation: "",
+    latitude: null,
+    longitude: null,
     challengeType: "عمومی",
     isCommentsEnabled: true,
     memberCount: "",
@@ -87,7 +92,7 @@ const ChallengeCreate: React.FC = () => {
   };
 
   const handleNext = async (
-    values: createFormValues,
+    values: any,
     setTouched: (touched: any) => void,
     setErrors: (errors: any) => void
   ) => {
@@ -119,67 +124,84 @@ const ChallengeCreate: React.FC = () => {
   };
 
   const handleSubmit = async (
-    values: createFormValues,
-    { setSubmitting }: FormikHelpers<createFormValues>
+    values: createFormValues & { latitude?: number | null; longitude?: number | null },
+    { setSubmitting }: FormikHelpers<any>
   ) => {
     if (!token) {
       CustomToast("لطفاً وارد حساب کاربری شوید", "error");
       return;
     }
 
+    if (!values.selectedCategory) {
+      CustomToast("لطفاً یک دسته‌بندی انتخاب کنید", "error");
+      setSubmitting(false);
+      return;
+    }
+
     setSubmitting(true);
+
     try {
       const start_time = `${values.startDate}T${values.startTime}:00Z`;
       const end_time = `${values.endDate}T${values.endTime}:59Z`;
 
-      let category_id = 1;
-      if (values.selectedCategory) {
-        const found = categories.find(
-          (c) => c.name === values.selectedCategory
-        );
-        category_id = found?.id || 1;
+      const selectedCat = categories.find((c) => c.name === values.selectedCategory);
+      if (!selectedCat) {
+        throw new Error("دسته‌بندی معتبر یافت نشد");
       }
 
       const payload = {
         title: values.title.trim(),
-        description: values.description.trim(),
-        category_id,
-        max_participants: values.memberCount
-          ? parseInt(values.memberCount)
-          : null,
-        visibility: values.challengeType === "شخصی" ? "private" : "public",
-        rule: "none",
+        description: values.description.trim() || null,
+        category_id: selectedCat.id,
+        max_participants: values.memberCount ? parseInt(values.memberCount, 10) : null,
+        visibility: values.challengeType === "خصوصی" ? "private" : "public",
+        rule: "Participate actively",
         comments_enabled: values.isCommentsEnabled,
         start_time,
         end_time,
         timezone: "UTC",
-        image_url: values.image,
+        image_url: values.image || "",
+        latitude: values.latitude ?? null,
+        longitude: values.longitude ?? null,
+        address: values.challengeLocation.trim() || null,
       };
 
-      const { data: challenge } = await createChallenge(payload);
-      const challengeId = challenge?.ID;
+      console.log("Sending payload:", payload);
 
-      if (!challengeId) throw new Error("چالش ساخته نشد");
+      const response = await createChallenge(payload);
+      const challengeId = response?.data?.ID;
+
+      if (!challengeId) {
+        throw new Error("چالش ساخته نشد — پاسخ نامعتبر");
+      }
 
       CustomToast("چالش با موفقیت ساخته شد!", "success");
 
       if (values.selectedUsers.length > 0) {
-        const results = await inviteMultipleUsersToChallenge(
-          challengeId,
-          values.selectedUsers.map((u) => u.id)
-        );
-        const failed = results.filter((r) => !r.success).length;
-        CustomToast(
-          failed === 0
-            ? "دعوت‌ها با موفقیت ارسال شد"
-            : `${failed} دعوت ناموفق بود`,
-          failed === 0 ? "success" : "warning"
-        );
+        const userIds = values.selectedUsers.map((u) => u.id);
+        try {
+          const results = await inviteMultipleUsersToChallenge(challengeId, userIds);
+          const failed = results.filter((r: any) => !r.success).length;
+          CustomToast(
+            failed === 0
+              ? "همه دعوت‌ها با موفقیت ارسال شد"
+              : `${failed} دعوت ناموفق بود`,
+            failed === 0 ? "success" : "warning"
+          );
+        } catch (inviteErr) {
+          CustomToast("خطا در ارسال برخی دعوت‌ها", "warning");
+        }
       }
 
       navigate(`/challenge/${challengeId}`, { replace: true });
     } catch (err: any) {
-      CustomToast(err.message || "خطا در ثبت چالش", "error");
+      console.error("Challenge creation failed:", err);
+      const message =
+        err?.response?.data?.message ||
+        err?.response?.data?.details?.details ||
+        err.message ||
+        "خطا در ساخت چالش — لطفاً ورودی‌ها را بررسی کنید";
+      CustomToast(message, "error");
     } finally {
       setSubmitting(false);
     }
@@ -219,16 +241,12 @@ const ChallengeCreate: React.FC = () => {
             .filter(
               (u) =>
                 u.username.toLowerCase().includes(userSearch.toLowerCase()) ||
-                (u.full_name
-                  ?.toLowerCase()
-                  .includes(userSearch.toLowerCase()) ??
-                  false)
+                (u.full_name?.toLowerCase().includes(userSearch.toLowerCase()) ?? false)
             );
 
           const canAddMore =
             !values.memberCount ||
-            values.selectedUsers.length <
-              parseInt(values.memberCount || "0", 10);
+            values.selectedUsers.length < parseInt(values.memberCount || "0", 10);
 
           return (
             <Form className="flex-1 flex flex-col mt-10 justify-start items-center w-full">
@@ -255,14 +273,12 @@ const ChallengeCreate: React.FC = () => {
                   setFieldValue={setFieldValue}
                   setFieldTouched={setFieldTouched}
                   errors={{
-                    selectedCategory:
-                      touched.selectedCategory && errors.selectedCategory,
+                    selectedCategory: touched.selectedCategory && errors.selectedCategory,
                     startDate: touched.startDate && errors.startDate,
                     startTime: touched.startTime && errors.startTime,
                     endDate: touched.endDate && errors.endDate,
                     endTime: touched.endTime && errors.endTime,
-                    challengeLocation:
-                      touched.challengeLocation && errors.challengeLocation,
+                    challengeLocation: touched.challengeLocation && errors.challengeLocation,
                   }}
                   touched={touched}
                 />
@@ -286,10 +302,7 @@ const ChallengeCreate: React.FC = () => {
                       CustomToast("حداکثر تعداد عضو پر شده", "warning");
                       return;
                     }
-                    setFieldValue("selectedUsers", [
-                      ...values.selectedUsers,
-                      user,
-                    ]);
+                    setFieldValue("selectedUsers", [...values.selectedUsers, user]);
                   }}
                   canAddMore={canAddMore}
                   loadingUsers={loadingUsers}
@@ -306,8 +319,8 @@ const ChallengeCreate: React.FC = () => {
                   }
                   disabled={isSubmitting || loadingCategories}
                   className={`w-full max-w-xl rounded-primary-radius p-5 text-lg transition-all text-white flex items-center justify-center gap-3
-    ${currentStep === 3 ? "bg-primary" : "bg-secondary"}
-    ${isSubmitting || loadingCategories ? "opacity-70 cursor-not-allowed" : ""}`}
+                    ${currentStep === 3 ? "bg-primary" : "bg-secondary"}
+                    ${isSubmitting || loadingCategories ? "opacity-70 cursor-not-allowed" : ""}`}
                 >
                   {(isSubmitting || loadingCategories) && (
                     <div

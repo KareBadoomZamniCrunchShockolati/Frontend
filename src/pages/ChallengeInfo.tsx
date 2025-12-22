@@ -19,7 +19,7 @@ import { mockChallenges } from "@/data/mockChallenges";
 import { OverlappingCards } from "@/components/Custom/OverlappingCards";
 import { cn } from "@/lib/utils";
 
-// Use the FIXED LocationMapPicker (with className="" for visible orange pin)
+// Use the correct fixed map component
 import LocationMapPicker from "@/components/Custom/LocationMap";
 
 import {
@@ -33,6 +33,8 @@ import {
   getFollowingService,
   getUserById,
 } from "@/services/userService";
+
+import CustomToast from "@/components/Custom/CustomToast";
 
 const DEFAULT_CHALLENGE_IMG =
   "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
@@ -61,6 +63,7 @@ const ChallengeInfo: React.FC = () => {
   const { challengeId } = useParams<{ challengeId: string }>();
   const challenge_Id = Number(challengeId);
 
+  // Fallback from navigation state (kept for backward compatibility)
   const payload: ChallengeDataDetails =
     (location.state?.challenge as ChallengeDataDetails) ?? defaultChallenge;
 
@@ -68,27 +71,20 @@ const ChallengeInfo: React.FC = () => {
     ? payload.Img
     : DEFAULT_CHALLENGE_IMG;
 
-  const [challenge, setChallenge] = useState<ChallengeDataDetails>(payload);
+  const [challenge, setChallenge] = useState<ChallengeDataDetails | any>(payload);
   const [participants, setParticipants] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isParticipated, setIsParticipated] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
 
-  // Coordinates for the fixed pin
+  // Use real backend latitude/longitude for the map
   const displayCoordinates = useMemo<[number, number] | null>(() => {
-    if (
-      challenge.location &&
-      /^\d+\.\d+,\s*\d+\.\d+$/.test(challenge.location.trim())
-    ) {
-      const [latStr, lngStr] = challenge.location.split(",");
-      const lat = parseFloat(latStr.trim());
-      const lng = parseFloat(lngStr.trim());
-      if (!isNaN(lat) && !isNaN(lng)) {
-        return [lat, lng];
-      }
+    if (challenge?.latitude && challenge?.longitude) {
+      return [challenge.latitude, challenge.longitude];
     }
-    return [35.6892, 51.389]; // Default: Tehran
-  }, [challenge.location]);
+    return [35.6892, 51.389]; // Tehran fallback
+  }, [challenge?.latitude, challenge?.longitude]);
 
   const filteredUsers = useMemo(() => {
     return participants.filter(
@@ -111,7 +107,7 @@ const ChallengeInfo: React.FC = () => {
   };
 
   const handleLike = () =>
-    setChallenge((prev) => ({
+    setChallenge((prev: any) => ({
       ...prev,
       like_count: (prev.like_count || 0) + 1,
     }));
@@ -131,6 +127,9 @@ const ChallengeInfo: React.FC = () => {
         setChallenge(fetched);
       } catch (err) {
         console.error("Failed to fetch challenge:", err);
+        CustomToast("خطا در بارگذاری چالش", "error");
+      } finally {
+        setLoading(false);
       }
     };
     fetchChallenge();
@@ -176,8 +175,9 @@ const ChallengeInfo: React.FC = () => {
         await joinPrivateChallenge(challenge_Id);
       }
       setIsParticipated(true);
+      CustomToast("با موفقیت به چالش پیوستید!", "success");
     } catch (e) {
-      console.error("Join error:", e);
+      CustomToast("خطا در پیوستن به چالش", "error");
     }
   };
 
@@ -185,17 +185,29 @@ const ChallengeInfo: React.FC = () => {
     try {
       await leaveChallenge(challenge_Id);
       setIsParticipated(false);
+      CustomToast("چالش را ترک کردید", "success");
     } catch (e) {
-      console.error("Leave error:", e);
+      CustomToast("خطا در ترک چالش", "error");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-lg">در حال بارگذاری چالش...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col justify-between p-4">
       <div className="flex-1 flex flex-col items-center">
         <BackButtonAndMenu onMenuClick={handleMenu} />
 
-        <ImageAndBadgeContainer imageUrl={challenge.Img ?? undefined} />
+        <ImageAndBadgeContainer imageUrl={challenge.Img ?? challenge.image_url ?? undefined} />
 
         <LikeAndSaveButtons
           onLike={handleLike}
@@ -210,16 +222,16 @@ const ChallengeInfo: React.FC = () => {
 
         <DateAndLocation
           dateRange={`${challenge.start_time} - ${challenge.end_time}`}
-          location={challenge.location}
+          location={challenge.address || challenge.location || "مکان مشخص نشده"}
         />
 
-        {/* INTERACTIVE MAP — Users can pan/zoom, but CANNOT move the pin */}
+        {/* INTERACTIVE READ-ONLY MAP — Pin fixed, pan/zoom allowed */}
         <div className="w-full max-w-xl mt-6">
           <LocationMapPicker
-            onLocationSelect={() => {}} // Required, but ignored
+            onLocationSelect={() => {}} // Required but ignored
             initialPosition={displayCoordinates}
             height="h-50"
-            readOnly={true} // ← This disables pin movement
+            readOnly={true}
           />
         </div>
 
