@@ -106,15 +106,6 @@ export default function Login() {
                     icon={showPassword ? <EyeClosed /> : <Eye />}
                     onIconClick={() => setShowPassword(!showPassword)}
                   />
-                  <CustomCheckbox
-                    name="loginAcceptTerms"
-                    labelText="قوانین و مقررات را خوانده و می پذیرم"
-                    textTransparentOnChecked={false}
-                    classNames={{
-                      label: "text-sm text-gray-600 font-extrabold",
-                      checkbox: "",
-                    }}
-                  />
                   <CustomBtn
                     disabled={isSubmitting}
                     color="#fff"
@@ -128,7 +119,7 @@ export default function Login() {
               </Form>
             )}
           </Formik>
-          <div className="flex justify-end items-center">
+          <div className="flex pt-5 justify-end items-center">
             <Link to="/signup" className="text-secondary mr-1">
               ثبت نام
             </Link>

@@ -22,12 +22,15 @@ const FollowerFollowingPage: React.FC = () => {
   const { userId } = useParams();
   const selectedUser = userId ? Number(userId) : 0;
 
-
   const [followers, setFollowers] = useState<FollowerFollowingUser[]>([]);
   const [followings, setFollowings] = useState<FollowerFollowingUser[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<FollowerFollowingUser[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<FollowerFollowingUser[]>(
+    []
+  );
 
-  const [activeTab, setActiveTab] = useState<"followers" | "followings">("followers");
+  const [activeTab, setActiveTab] = useState<"followers" | "followings">(
+    "followers"
+  );
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<{
     id: string;
@@ -108,15 +111,23 @@ const FollowerFollowingPage: React.FC = () => {
 
         if (response) {
           if (activeTab === "followers") {
-            setFollowers((prev) => prev.filter((user) => user.id !== userToDelete.id));
+            setFollowers((prev) =>
+              prev.filter((user) => user.id !== userToDelete.id)
+            );
           } else {
-            setFollowings((prev) => prev.filter((user) => user.id !== userToDelete.id));
+            setFollowings((prev) =>
+              prev.filter((user) => user.id !== userToDelete.id)
+            );
           }
-          setFilteredUsers((prev) => prev.filter((user) => user.id !== userToDelete.id));
+          setFilteredUsers((prev) =>
+            prev.filter((user) => user.id !== userToDelete.id)
+          );
           setShowDeleteModal(false);
           setUserToDelete(null);
         } else {
-          setError(`Failed to remove ${activeTab.slice(0, -1)}. Please try again.`);
+          setError(
+            `Failed to remove ${activeTab.slice(0, -1)}. Please try again.`
+          );
         }
       } catch (error) {
         console.error("Error deleting user:", error);
@@ -152,7 +163,7 @@ const FollowerFollowingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start p-4">
+    <div className="min-h-screen flex flex-col items-center justify-start p-4 w-full">
       <BackButtonWithUsername
         username={fullName}
         onBackClick={() => navigate(`/dashboard/${selectedUser}`)}
@@ -176,6 +187,7 @@ const FollowerFollowingPage: React.FC = () => {
                 handleSearch(e.target.value);
               }}
               onBlur={handleBlur}
+              classname="w-full"
             />
             {loading ? (
               <p className="font-semibold text-primary text-2xl">
