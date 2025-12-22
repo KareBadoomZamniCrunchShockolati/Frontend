@@ -22,11 +22,12 @@ const CommentCard = ({
   parentUsername,
   parentUserId,
   isOpenFirstReplies = false,
+  entityType,
   // openFirstReplies,
   // closeFirstReplies,
 }: CommentCardProps) => {
   const { id } = useParams();
-  const postId = Number(id);
+  const entityId = Number(id);
   const [openReplySection, setOpenReplySection] = useState(false);
   const replyColor = openReplySection ? "text-neutral-gray" : "text-primary";
   const pasokhColor = openReplySection ? "text-neutral-gray" : "text-black";
@@ -60,8 +61,8 @@ const CommentCard = ({
   const handleSubmitReply = async (values: { commentText: string }) => {
     console.log("Submitting comment with values:", values);
     const response: CommentResponse = await CommentService({
-      entity_type: "post",
-      entity_id: postId,
+      entity_type: entityType,
+      entity_id: entityId,
       content: values.commentText,
       parent_id: comment.id,
     });
@@ -260,6 +261,7 @@ const CommentCard = ({
                     ? false
                     : isOpenFirstReplies
                 }
+                entityType={entityType}
               />
             ))}
           </div>
