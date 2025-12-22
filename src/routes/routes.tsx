@@ -21,11 +21,10 @@ import Challenge from "@/pages/ChallengeInfo";
 import ChallengeEdit from "@/pages/ChallengeEdit";
 import ChallengeCreate from "@/pages/ChallengeCreate";
 import ProgressCalendar from "@/components/ProgressCalendar";
-import PostComments from "@/pages/PostComments";
 import ChallengePosts from "@/pages/ChallengePosts";
 import AcceptList from "@/components/Custom/AcceptList";
 import InviteList from "@/components/Custom/InviteList";
-import ChallengeComments from "@/pages/ChallengeComments";
+import Comments from "@/pages/Comments";
 
 export const router = createBrowserRouter([
   {
@@ -103,7 +102,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/post/:id/comments",
-        element: <PostComments />,
+        element: <Comments entityType="post" />,
       },
       {
         path: "/editChallenge/:challengeId",
@@ -123,7 +122,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/challenge/:id/comments",
-        element: <ChallengeComments />,
+        element: <Comments entityType="challenge" />,
       },
     ],
   },

@@ -39,8 +39,11 @@ export interface ImageContainerWithShadowProps {
 
 export interface LikeSaveButtonsProps {
   likeCount: number;
+  commentCount:number;
   onLike: () => void;
   onSave: () => void;
+  isLiked:boolean;
+
 }
 
 export interface ChallengeSlideshowProps {

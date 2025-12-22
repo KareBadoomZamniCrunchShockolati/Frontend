@@ -14,9 +14,12 @@ import { ThumbsUp } from "lucide-react";
 import TertiaryCustomButton from "@/components/Custom/TertiaryCustomButton";
 import CommentCard from "@/components/Custom/CommentCard";
 
-const ChallengeComments = () => {
+interface props{
+  entityType:"challenge"|"post";
+}
+const Comments = ({entityType}:props) => {
   const { id } = useParams();
-  const challengeId = Number(id);
+  const entityId = Number(id);
   const [comments, setComments] = useState<CommentResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -30,8 +33,8 @@ const ChallengeComments = () => {
   const fetchComments = async () => {
     try {
       const data = await GetCommentsService({
-        entity_type: "challenge",
-        entity_id: challengeId,
+        entity_type: entityType,
+        entity_id: entityId,
       });
 
       setComments(data);
@@ -45,7 +48,7 @@ const ChallengeComments = () => {
   useEffect(() => {
     fetchComments();
     console.log("comments:", comments);
-  }, [challengeId]);
+  }, [entityId]);
 
   if (loading) return <div>Loading comments...</div>; //need to make skeleton for this instead ------------------------------------
   if (error) return <div>{error}</div>;
@@ -56,8 +59,8 @@ const ChallengeComments = () => {
   ) => {
     console.log("Submitting comment with values:", values);
     const response: CommentResponse = await CommentService({
-      entity_type: "challenge",
-      entity_id: challengeId,
+      entity_type: entityType,
+      entity_id: entityId,
       content: values.commentText,
     });
     CustomToast("نظر با موفقیت ایجاد شد!", "success");
@@ -71,13 +74,13 @@ const ChallengeComments = () => {
         <div className="flex items-center justify-between">
           <button
             className="p-2 border-2 border-primary rounded-xl hover:bg-primary-hover transition-colors"
-            onClick={() => navigate(`/challenge/${challengeId}`)}
+            onClick={() => navigate(`/${entityType}/${entityId}`)}
           >
             <ArrowLeft className="w-8 h-8 text-primary" />
           </button>
 
           <p className="text-center font-bold text-title text-primary">
-            نظرات چالش
+            نظرات {entityType === "challenge" ? "چالش" : "پست"}
           </p>
         </div>
 
@@ -114,7 +117,7 @@ const ChallengeComments = () => {
             key={comment.id}
             comment={comment}
             refreshComments={fetchComments}
-            entityType="challenge"
+            entityType={entityType}
           />
         ))}
         {/* <CommentCard isFirstLevel={true} id={1} />
@@ -124,4 +127,4 @@ const ChallengeComments = () => {
   );
 };
 
-export default ChallengeComments;
+export default Comments;

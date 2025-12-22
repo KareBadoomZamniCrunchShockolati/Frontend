@@ -183,6 +183,7 @@ const ProfileChallenges = () => {
       {!loading && filteredChallenges.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 m-2.5">
           {filteredChallenges.map((challenge) => (
+
             <ChallengeCard
               key={challenge.id}
               id={challenge.id}
@@ -212,7 +213,7 @@ const ProfileChallenges = () => {
                   "https://images.unsplash.com/photo-1502764613149-7f1d229e230f?auto=format&fit=crop&w=50&q=80",
               }}
             />
-          ))}
+))}
         </div>
       )}
 
