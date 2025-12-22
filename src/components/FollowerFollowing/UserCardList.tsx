@@ -16,7 +16,7 @@ const UserCardList: React.FC<UserCardListProps> = ({
     <div className="w-full max-w-md flex justify-center">
       {users.length > 0 ? (
         <div
-          className="overflow-auto max-h-96"
+          className="overflow-auto max-h-96 w-full"
           style={{
             scrollbarWidth: "none", // Firefox: make the scrollbar invisible
             msOverflowStyle: "none", // Internet Explorer: make scrollbar invisible
