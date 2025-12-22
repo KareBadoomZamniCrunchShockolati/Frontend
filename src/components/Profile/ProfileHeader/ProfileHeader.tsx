@@ -42,55 +42,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const initials = getUserInitials(fullName);
   useEffect(() => {
     if (!userId) return;
-
-    // async function fetchUserData() {
-    //   console.log(userId);
-
-    //   // اطلاعات پروفایل
-    //   try {
-    //     // <<<<<<< HEAD
-    //     const userData = await getUserProfileService(userId);
-    //     if (userData?.fullName) setFullName(userData.fullName);
-    //     else if (userData?.username) setFullName(userData.username);
-
-    //     const followersRes = await getFollowersService(userId);
-    //     if (followersRes?.count !== undefined)
-    //       setFollowersCount(followersRes.count);
-
-    //     const followingRes = await getFollowingService(userId);
-    //     if (followingRes?.count !== undefined)
-    //       setFollowingCount(followingRes.count);
-    //     // =======
-    //     // const userRes = await getUserProfileService(userId);
-    //     // if (userRes) {
-    //     //   setFullName(userRes.username || "User");
-    //     //   setProfilePicture(userRes.profile_picture || "");
-    //     //   setBio(userRes.bio || "null");
-    //     // }
-    //     // >>>>>>> develop
-    //   } catch (err) {
-    //     console.error("Error fetching user profile:", err);
-    //   }
-
-    //   // تعداد فالوورها
-    //   try {
-    //     const followersRes = await getFollowersService(userId);
-    //     if (followersRes?.count !== undefined)
-    //       setFollowersCount(followersRes.count);
-    //     // console.log(followersCount)
-    //   } catch (err) {
-    //     console.error("Error fetching followers:", err);
-    //   }
-
-    //   // تعداد فالووینگ‌ها
-    //   try {
-    //     const followingRes = await getFollowingService(userId);
-    //     if (followingRes?.count !== undefined)
-    //       setFollowingCount(followingRes.count);
-    //   } catch (err) {
-    //     console.error("Error fetching following:", err);
-    //   }
-    // }
     async function fetchUserData() {
       // اطلاعات پروفایل
       try {
@@ -104,13 +55,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         console.error("Error fetching user profile:", err);
       }
 
-      // تعداد فالوورها
       try {
         const followersRes = await getFollowersService(userId);
         if (followersRes?.count !== undefined)
           setFollowersCount(followersRes.count);
-        // console.log(followersCount)
-        // console.log(followersCount)
       } catch (err) {
         console.error("Error fetching followers:", err);
       }
@@ -179,7 +127,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         followingCount={followingCount}
         bio={bio}
       />
-      <div className="mt-10">{isOwner ? <OwnerButton /> : <ViewButton />}</div>
+      <div className="mt-10 px-2 ">
+        {isOwner ? <OwnerButton /> : <ViewButton />}
+      </div>
     </>
   );
 };

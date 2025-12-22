@@ -106,15 +106,6 @@ export default function Login() {
                     icon={showPassword ? <EyeClosed /> : <Eye />}
                     onIconClick={() => setShowPassword(!showPassword)}
                   />
-                  <CustomCheckbox
-                    name="loginAcceptTerms"
-                    labelText="قوانین و مقررات را خوانده و می پذیرم"
-                    textTransparentOnChecked={false}
-                    classNames={{
-                      label: "text-sm text-gray-600 font-extrabold",
-                      checkbox: "",
-                    }}
-                  />
                   <CustomBtn
                     disabled={isSubmitting}
                     color="#fff"
