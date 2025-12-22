@@ -128,7 +128,7 @@ export default function Login() {
               </Form>
             )}
           </Formik>
-          <div className="flex justify-end items-center">
+          <div className="flex pt-5 justify-end items-center">
             <Link to="/signup" className="text-secondary mr-1">
               ثبت نام
             </Link>
