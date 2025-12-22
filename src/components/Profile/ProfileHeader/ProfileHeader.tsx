@@ -6,6 +6,7 @@ import ViewButton from "../ViewButton";
 import {
   getFollowersService,
   getFollowingService,
+  getUserById,
   getUserProfileService,
 } from "@/services/userService";
 import styles from "./ProfileHeader.module.css";
@@ -93,7 +94,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     async function fetchUserData() {
       // اطلاعات پروفایل
       try {
-        const userRes = await getUserProfileService(userId);
+        const userRes = await getUserById(userId);
         if (userRes) {
           setFullName(userRes.username || "User");
           setProfilePicture(userRes.profile_picture || "");
