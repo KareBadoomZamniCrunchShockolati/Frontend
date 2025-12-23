@@ -25,6 +25,7 @@ import PostComments from "@/pages/PostComments";
 import ChallengePosts from "@/pages/ChallengePosts";
 import AcceptList from "@/components/Custom/AcceptList";
 import InviteList from "@/components/Custom/InviteList";
+import BadgePage from "@/pages/BadgePage";
 
 export const router = createBrowserRouter([
   {
@@ -101,8 +102,8 @@ export const router = createBrowserRouter([
         element: <PostPage />,
       },
       {
-      path: "/post/:id/comments", 
-      element: <PostComments/>,
+        path: "/post/:id/comments",
+        element: <PostComments />,
       },
       {
         path: "/editChallenge/:challengeId",
@@ -119,6 +120,10 @@ export const router = createBrowserRouter([
       {
         path: "/challenge/:id/posts",
         element: <ChallengePosts />,
+      },
+      {
+        path: "/fuck",
+        element: <BadgePage />,
       },
     ],
   },
