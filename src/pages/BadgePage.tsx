@@ -4,68 +4,91 @@ import bdg1 from "@/assets/Img/Icon/bdg1.svg";
 import bdg2 from "@/assets/Img/Icon/bdg2.svg";
 import bdg3 from "@/assets/Img/Icon/bdg3.svg";
 import { useEffect, useState } from "react";
-import { set } from "react-hook-form";
+import convertToPersianDigits from "@/utils/convertToPersianDigits";
+import TopBackText from "@/components/Custom/TopBackText";
 
+type bdg = {
+  ImgSrc: string;
+  title: string;
+  description: string;
+  done: number;
+  goal: number;
+};
 const BadgePage = () => {
-  const [selectedBadge, setSelectedBadge] = useState<number | null>(null);
+  const [selectedBadge, setSelectedBadge] = useState<bdg | null>(null);
   const [add, setAdd] = useState<number | null>(null);
   const [images, setImages] = useState<(number | null)[]>([null, null, null]);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const data = [
+  const data: bdg[] = [
     {
       ImgSrc: bdg1,
       title: "مالی",
       description: "۵۰ چالش در دسته‌بندی مالی رو به پایان رسوندی!",
+      done: 20,
+      goal: 30,
     },
     {
       ImgSrc: bdg2,
       title: "تناسب اندام",
       description: "۲۵ چالش در دسته‌بندی تناسب اندام رو به پایان رسوندی!",
+      done: 15,
+      goal: 40,
     },
     {
       ImgSrc: bdg3,
       title: "سلامت",
       description: "۱۰ چالش در دسته‌بندی سلامت رو به پایان رسوندی!",
+      done: 5,
+      goal: 20,
     },
     {
       ImgSrc: bdg1,
       title: "مالی",
       description: "۵۰ چالش در دسته‌بندی مالی رو به پایان رسوندی!",
+      done: 20,
+      goal: 30,
     },
     {
       ImgSrc: bdg2,
       title: "تناسب اندام",
       description: "۲۵ چالش در دسته‌بندی تناسب اندام رو به پایان رسوندی!",
+      done: 15,
+      goal: 40,
     },
     {
       ImgSrc: bdg3,
       title: "سلامت",
       description: "۱۰ چالش در دسته‌بندی سلامت رو به پایان رسوندی!",
+      done: 5,
+      goal: 20,
     },
     {
       ImgSrc: bdg1,
       title: "مالی",
       description: "۵۰ چالش در دسته‌بندی مالی رو به پایان رسوندی!",
+      done: 20,
+      goal: 30,
     },
     {
       ImgSrc: bdg2,
       title: "تناسب اندام",
       description: "۲۵ چالش در دسته‌بندی تناسب اندام رو به پایان رسوندی!",
+      done: 15,
+      goal: 40,
     },
     {
       ImgSrc: bdg3,
       title: "سلامت",
       description: "۱۰ چالش در دسته‌بندی سلامت رو به پایان رسوندی!",
+      done: 5,
+      goal: 20,
     },
   ];
 
   return (
     <div className="p-2">
-      <BackButtonAndMenu
-        onMenuClick={() => {
-          console.log("fuck");
-        }}
-      />
+      <TopBackText text="نشان ها" />
       <div className=" rounded-[8px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-secondary flex flex-col items-center text-xl font-extrabold text-white">
         <div className="flex gap-5 justify-center items-center relative w-full max-w-xl mb-4  pb-20 pt-15">
           <div className="w-1/4 translate-y-[-30px]" onClick={() => setAdd(1)}>
@@ -119,6 +142,9 @@ const BadgePage = () => {
                   setImages(imagesCopy);
                   setAdd(null);
                 }
+              } else {
+                setSelectedBadge(data);
+                setIsOpen(true);
               }
             }}
           >
@@ -127,7 +153,83 @@ const BadgePage = () => {
           </div>
         ))}
       </div>
+
+      {/* Modal Overlay */}
+      {isOpen && selectedBadge && (
+        <>
+          {/* Dark Background */}
+          <div
+            onClick={() => setIsOpen(false)}
+            className="fixed inset-0  z-40  bg-black/80 transition-opacity"
+          />
+
+          {/* Modal Content - Slides from Bottom */}
+          <div
+            className="border-2 border-black fixed bottom-0 left-0 right-0 bg-white rounded-t-md shadow-2xl z-50 animate-slide-up px-8 h-[70vh]"
+            style={{
+              animation: "slideUp 0.3s ease-out",
+            }}
+          >
+            <div className="h-2/3 flex flex-col gap-3 py-8 justify-center items-center border-3 border-primary rounded-lg mt-8 ">
+              <img
+                src={selectedBadge.ImgSrc}
+                alt="selected image"
+                className="h-3/4" // why height does not work in here?
+              />
+              <p className="font-bold">{selectedBadge.title}</p>
+              <p>{selectedBadge.description}</p>
+            </div>
+            <div className="flex flex-col gap-2 justify-evenly mt-5 rounded-lg h-1/5 border-3 border-secondary pt-4">
+              <CustomSlider value={selectedBadge.done / selectedBadge.goal} />
+
+              <Fraction up={selectedBadge.done} down={selectedBadge.goal} />
+            </div>
+          </div>
+          <style>{`
+            @keyframes slideUp {
+              from {
+                transform: translateY(100%);
+              }
+              to {
+                transform: translateY(0);
+              }
+            }
+          `}</style>
+        </>
+      )}
     </div>
   );
 };
 export default BadgePage;
+
+function CustomSlider({ value }: { value?: number }) {
+  value = value ? value * 100 : 0;
+  return (
+    <div className="w-full max-w-md bg-white rounded-lg ">
+      {/* Slider */}
+      <div className="relative w-4/5 h-5 rounded-lg overflow-hidden m-auto border-2 border-black">
+        <div
+          className="h-full rounded-lg"
+          style={{
+            width: `${value}%`,
+            backgroundColor: "#8E8E93",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+interface DatFractionProps {
+  up: number;
+  down: number;
+}
+const Fraction = ({ up, down }: DatFractionProps) => {
+  return (
+    <div className="flex justify-center px-2 py-0.5 ">
+      <div className=" mr-2 text-2xl">{convertToPersianDigits(String(up))}</div>
+      <div className="mt-2 mr-2">
+        {"/  " + convertToPersianDigits(String(down))}
+      </div>
+    </div>
+  );
+};

@@ -26,6 +26,7 @@ import ChallengePosts from "@/pages/ChallengePosts";
 import AcceptList from "@/components/Custom/AcceptList";
 import InviteList from "@/components/Custom/InviteList";
 import BadgePage from "@/pages/BadgePage";
+import ChallengeInfo from "@/pages/ChallengeInfo";
 
 export const router = createBrowserRouter([
   {
