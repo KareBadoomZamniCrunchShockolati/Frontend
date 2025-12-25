@@ -6,13 +6,16 @@ import type { LikeSaveButtonsProps } from "@/types/challengeElementsTypes";
 
 const LikeAndSaveButtons: React.FC<LikeSaveButtonsProps> = ({
   likeCount,
-  commentCount = 0,
+  // commentCount = 0,
   onLike,
   onSave,
-  isLiked = true,
+  // isLiked = true,
 }) => {
   console.log(likeCount);
-
+  
+  const isLiked = true;
+  const commentCount = 0;
+  
   const colorThumbsup = isLiked ? "text-secondary" : "text-primary";
   const colorBorderThumbsup = isLiked ? "border-neutral-gray" : "border-primary";
   const shadowThumbsup = isLiked ? "shadow-neutral-gray" : "shadow-primary";

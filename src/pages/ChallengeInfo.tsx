@@ -52,6 +52,7 @@ const defaultChallenge: ChallengeDataDetails = {
   Img: DEFAULT_CHALLENGE_IMG,
   participants: [],
   like_count: 0,
+  comment_count: 0, //------------------------------this just added and its type
   start_time: "28 اردیبهشت",
   end_time: "8شهریور",
   visibility: "public",
@@ -62,6 +63,7 @@ const ChallengeInfo: React.FC = () => {
   const navigate = useNavigate();
   const { challengeId } = useParams();
   const challenge_Id = Number(challengeId);
+
   const payload: ChallengeDataDetails =
     (location.state?.challenge as ChallengeDataDetails) ?? defaultChallenge;
 

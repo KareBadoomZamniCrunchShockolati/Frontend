@@ -20,14 +20,13 @@ import {
   getChallengesWithIdService,
   getParticipatingChallengesService,
   getPostService,
-  LikeService,
-  UnlikeService,
 } from "@/services/postService";
 import { set } from "react-hook-form";
 import type { ChallengePreview, PostResponse } from "@/types/postTypes";
 import { timeAgo } from "@/utils/timeAgoDiff";
 import { Skeleton } from "@/components/ui/skeleton";
 import CustomBtn from "@/components/Custom/CustomBtn";
+import { LikePostService, UnlikePostService } from "@/services/likeService";
 
 const PostPage = () => {
   const { id } = useParams();
@@ -58,9 +57,11 @@ const PostPage = () => {
       try {
         const post = await getPostService(postId);
         setPostData(post);
-
+        // console.log("postdata:"+postData);//-------
         setIsLiked(post.is_liked);
         setLikeCount(post.like_count);
+        // console.log("isliked:"+isLiked);//-------
+        // console.log("like count"+likeCount);//-------
       } catch (err) {
         console.error(err);
       } finally {
@@ -75,12 +76,12 @@ const PostPage = () => {
     try {
       if (isLiked) {
         // Unlike
-        await UnlikeService({ entity_type: "post", entity_id: postData.id });
+        await UnlikePostService(postData.id);
         setIsLiked(false);
         setLikeCount((prev) => prev - 1);
       } else {
         // Like
-        await LikeService({ entity_type: "post", entity_id: postData.id });
+        await LikePostService(postData.id);
         setIsLiked(true);
         setLikeCount((prev) => prev + 1);
       }
@@ -174,18 +175,18 @@ const PostPage = () => {
                 <Skeleton className="w-full h-[1px] mb-3" />
 
                 {/* Caption */}
-                <div className="flex justify-end mt-3 mb-[5px]">
-                  <div className="flex items-center gap-2" dir="rtl">
+                {/* <div className="flex justify-end mt-3 mb-[5px]"> */}
+                  {/* <div className="flex items-center gap-2" dir="rtl"> */}
                     {/* Overlapping avatars */}
-                    <div className="flex -space-x-2">
+                    {/* <div className="flex -space-x-2">
                       <Skeleton className="h-8 w-8 rounded-full" />
                       <Skeleton className="h-8 w-8 rounded-full" />
                       <Skeleton className="h-8 w-8 rounded-full" />
-                    </div>
+                    </div> */}
 
-                    <Skeleton className="h-4 w-28" />
-                  </div>
-                </div>
+                    {/* <Skeleton className="h-4 w-28" /> */}
+                  {/* </div> */}
+                {/* </div> */}
 
                 {/* Description text */}
                 <div dir="rtl" className="flex flex-col gap-2 mt-3">
@@ -336,39 +337,40 @@ const PostPage = () => {
               </div>
               {/* the gray line */}
               <div className="w-full h-[0.5px] bg-neutral-gray absolute right-0 left-0 translate-y-[-10px]"></div>
-              {/* Caption */}
-              <div className="flex justify-end mt-3 mb-[5px]">
-                <div className="flex items-center gap-2" dir="rtl">
+              {/* Caption ----------------------------------------this is the mutal------------------------------------ */}
+              {/* <div className="flex justify-end mt-3 mb-[5px]"> */}
+                {/* <div className="flex items-center gap-2" dir="rtl"> */}
                   {/* Avatars, overlapped */}
-                  <div className="flex -space-x-2">
-                    {activeProfiles.slice(0, 3).map((profile, index) => (
-                      <Avatar
-                        key={profile.id}
-                        className="relative h-8 w-8 border border-secondry rounded-full overflow-hidden shadow-sm"
-                        style={{ zIndex: activeProfiles.length - index }}
-                      >
-                        <AvatarImage src={profile.image} />
-                        <AvatarFallback>{profile.fallback}</AvatarFallback>
-                      </Avatar>
-                    ))}
+                  {/* <div className="flex -space-x-2"> */}
+                    {/* {activeProfiles.slice(0, 3).map((profile, index) => ( */}
+                      {/* <Avatar */}
+                        {/* key={profile.id} */}
+                        {/* className="relative h-8 w-8 border border-secondry rounded-full overflow-hidden shadow-sm" */}
+                        {/* style={{ zIndex: activeProfiles.length - index }} */}
+                      {/* > */}
+                        {/* <AvatarImage src={profile.image} /> */}
+                        {/* <AvatarFallback>{profile.fallback}</AvatarFallback> */}
+                      {/* </Avatar> */}
+                    {/* ))} */}
 
-                    {activeProfiles.length > 3 && (
-                      <Avatar className="relative h-8 w-8 border border-secondry bg-muted text-black text-xs flex items-center justify-center shadow-sm rounded-full">
-                        +{activeProfiles.length - 3}
-                      </Avatar>
-                    )}
-                  </div>
+                    {/* {activeProfiles.length > 3 && ( */}
+                      {/* <Avatar className="relative h-8 w-8 border border-secondry bg-muted text-black text-xs flex items-center justify-center shadow-sm rounded-full "> */}
+                        {/* +{activeProfiles.length - 3} */}
+                      {/* </Avatar> */}
+                    {/* )} */}
+                  {/* </div> */}
 
                   {/* Text – now aligned center with the avatars */}
-                  <p className="text-sm">
-                    {textLabel}{" "}
-                    <span className="font-medium">
-                      {activeProfiles[0].fallback}
-                    </span>{" "}
-                    و غیره
-                  </p>
-                </div>
-              </div>
+                  {/* <p className="text-sm"> */}
+                    {/* {textLabel}{" "} */}
+                    {/* <span className="font-medium"> */}
+                      {/* {activeProfiles[0].fallback} */}
+                    {/* </span>{" "} */}
+                    {/* و غیره */}
+                  {/* </p> */}
+                {/* </div> */}
+              {/* </div> */}
+              {/* -------------------------------------------------end mutual-------------------------------------------------------- */}
 
               {postData?.description &&
               postData.description.length > maxChars ? (

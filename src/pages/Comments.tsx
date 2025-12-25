@@ -1,4 +1,3 @@
-import { CommentService, GetCommentsService } from "@/services/commentService";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { mockComments } from "@/data/mockComments";
@@ -13,11 +12,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ThumbsUp } from "lucide-react";
 import TertiaryCustomButton from "@/components/Custom/TertiaryCustomButton";
 import CommentCard from "@/components/Custom/CommentCard";
+import {
+  CommentChallengeService,
+  CommentPostService,
+  GetCommentsChallengeService,
+  GetCommentsPostService,
+} from "@/services/commentService";
 
-interface props{
-  entityType:"challenge"|"post";
+interface props {
+  entityType: "challenge" | "post";
 }
-const Comments = ({entityType}:props) => {
+const Comments = ({ entityType }: props) => {
   const { id } = useParams();
   const entityId = Number(id);
   const [comments, setComments] = useState<CommentResponse[]>([]);
@@ -32,12 +37,14 @@ const Comments = ({entityType}:props) => {
 
   const fetchComments = async () => {
     try {
-      const data = await GetCommentsService({
-        entity_type: entityType,
-        entity_id: entityId,
-      });
-
-      setComments(data);
+      if (entityType === "challenge") {
+        const data = await GetCommentsChallengeService(entityId);
+        setComments(data.data);
+      } else {
+        const data = await GetCommentsPostService(entityId);
+        setComments(data);
+      }
+      // console.log(comments);
     } catch (err) {
       console.error(err);
       setError("Failed to load comments");
@@ -58,13 +65,22 @@ const Comments = ({entityType}:props) => {
     { resetForm }: FormikHelpers<{ commentText: string }>
   ) => {
     console.log("Submitting comment with values:", values);
-    const response: CommentResponse = await CommentService({
-      entity_type: entityType,
-      entity_id: entityId,
-      content: values.commentText,
-    });
+    if (entityType === "challenge") {
+      const response: CommentResponse = await CommentChallengeService({
+        entity_type: entityType,
+        entity_id: entityId,
+        content: values.commentText,
+      });
+      console.log("Comment submitted:", response);
+    } else {
+      const response: CommentResponse = await CommentPostService({
+        entity_type: entityType,
+        entity_id: entityId,
+        content: values.commentText,
+      });
+      console.log("Comment submitted:", response);
+    }
     CustomToast("نظر با موفقیت ایجاد شد!", "success");
-    console.log("Comment submitted:", response);
     fetchComments();
     resetForm();
   };

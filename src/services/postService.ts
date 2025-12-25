@@ -52,26 +52,27 @@ export const getChallengesWithIdService = async (id: number) => {
   return res.data;
 };
 
-export const LikeService = async ({
-  entity_type,
-  entity_id
-}: LikeRequest) => {
-  const data = await postData({
-    endPoint: `${PROTECTED_BASE}/likes`,
-    data: { entity_type, entity_id },
-  });
-  return data;
-};
 
-export const UnlikeService = async ({
-  entity_type,
-  entity_id
-}: LikeRequest) => {
-  return await deleteData({
-    endPoint: `${PROTECTED_BASE}/likes`,
-    data: { entity_type, entity_id },
-  });
-};
+// export const LikeService = async ({
+//   entity_type,
+//   entity_id
+// }: LikeRequest) => {
+//   const data = await postData({
+//     endPoint: `${PROTECTED_BASE}/likes`,
+//     data: { entity_type, entity_id },
+//   });
+//   return data;
+// };
+
+// export const UnlikeService = async ({
+//   entity_type,
+//   entity_id
+// }: LikeRequest) => {
+//   return await deleteData({
+//     endPoint: `${PROTECTED_BASE}/likes`,
+//     data: { entity_type, entity_id },
+//   });
+// };
 
 export const getUserPostsService = async (id: number) => {
   return await getData({
@@ -82,6 +83,12 @@ export const getUserPostsService = async (id: number) => {
 export const getChallengePostsService = async (id: number) => {
   return await getData({
     endPoint: `${PROTECTED_BASE}/posts/challenge/${id}`,
+  });
+};
+
+export const getFollowingPostsService = async () => {
+  return await getData({
+    endPoint: `${PROTECTED_BASE}/posts/feed`,
   });
 };
 

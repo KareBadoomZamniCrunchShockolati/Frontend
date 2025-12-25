@@ -25,6 +25,7 @@ import ChallengePosts from "@/pages/ChallengePosts";
 import AcceptList from "@/components/Custom/AcceptList";
 import InviteList from "@/components/Custom/InviteList";
 import Comments from "@/pages/Comments";
+import FollowingPosts from "@/pages/FollowingPosts";
 
 export const router = createBrowserRouter([
   {
@@ -99,6 +100,10 @@ export const router = createBrowserRouter([
       {
         path: "/post/:id",
         element: <PostPage />,
+      },
+      {
+        path: "/following/posts",
+        element: <FollowingPosts />,
       },
       {
         path: "/post/:id/comments",

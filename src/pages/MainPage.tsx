@@ -30,6 +30,7 @@ import SocialIcon from "@/assets/Icon/Social.svg";
 
 import { CreatorCard } from "@/components/Custom/CreatorCard";
 import BottomNav from "@/components/Custom/BottomNav";
+import { OverlappingCards } from "@/components/Custom/OverlappingCards";
 
 function CategoryGrid({
   categories,
@@ -438,6 +439,49 @@ export default function HomeScreen() {
             }}
           </Formik>
           <BottomNav />
+                <div
+        className="w-full mt-[var(--top-page)] p-4"
+        onClick={() => {
+          setTimeout(() => {
+            navigate(`/following/posts`);
+          }, 200);
+        }}
+      >
+        <div
+        dir="ltr"
+          className="
+                relative
+                flex
+                items-center
+                justify-between
+                rounded-2xl
+                border-2
+                shadow-shadow-strong
+                border-black
+                px-10
+                py-8
+                active:shadow-none
+                active:translate-y-[3px]
+                active:translate-x-[3px]
+                transition-all duration-25
+              "
+          style={{
+            background: "linear-gradient(135deg, var(--secondary), var(--secondary-hover) 80%)",
+          }}
+        >
+          <div className="text-white text-right">
+            <h2 className="text-2xl font-bold mb-2">پست‌های افراد دنبال‌شده</h2>
+
+            <p className="text-sm opacity-90">
+دیدن پست‌های افرادی که دنبال می‌کنید
+            </p>
+          </div>
+
+          <div className="relative">
+            <OverlappingCards hasProfiles={true}/>
+          </div>
+        </div>
+      </div>
         </div>
       </div>
 

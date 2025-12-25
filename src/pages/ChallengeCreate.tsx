@@ -161,7 +161,9 @@ const ChallengeCreate: React.FC = () => {
 
       if (!challengeId) throw new Error("چالش ساخته نشد");
 
-      CustomToast("چالش با موفقیت ساخته شد!", "success");
+      setTimeout(() => {
+        CustomToast("چالش با موفقیت ساخته شد!", "success");
+      }, 1000);
 
       if (values.selectedUsers.length > 0) {
         const results = await inviteMultipleUsersToChallenge(
