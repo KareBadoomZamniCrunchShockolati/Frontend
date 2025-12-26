@@ -31,6 +31,46 @@ import SocialIcon from "@/assets/Icon/Social.svg";
 import { CreatorCard } from "@/components/Custom/CreatorCard";
 import BottomNav from "@/components/Custom/BottomNav";
 
+function CategoryGrid({
+  categories,
+}: {
+  categories: Array<{ id: string; title: string; icon: string }>;
+}) {
+  const navigate = useNavigate();
+
+  return (
+    <div className="px-4 pt-4">
+      <div className="mb-3 mt-5 text-base font-bold text-slate-900">
+        دسته‌بندی‌ها
+      </div>
+
+      <div className="grid grid-cols-4 gap-3">
+        {categories.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            onClick={() => navigate(`/category/${c.id}`)}
+            className="flex flex-col cursor-pointer items-center gap-2 rounded-2xl border-2 border-black bg-white py-3 shadow-shadow-light active:scale-[0.98]"
+          >
+            <div>
+              <img
+                src={c.icon}
+                alt={c.title}
+                className="h-6 w-6"
+                loading="lazy"
+              />
+            </div>
+
+            <span className="text-xs font-medium text-slate-700">
+              {c.title}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ... کدهای قبلی بدون تغییر
 
 export default function HomeScreen() {
@@ -80,18 +120,20 @@ export default function HomeScreen() {
       setLoadingStates((prev) => ({ ...prev, topCreators: true }));
       const response = await getTopCreatorsListService();
       // ساختار سازندگان برای نمایش در کارت
-      const formattedCreators = response.map((creator: any, index: number) => ({
-        id: creator.id,
-        username: creator.username,
-        avatar: "", // اگر API آواتار دارد، از creator.avatar استفاده کنید
-        rank: index + 1, // یا از داده‌های دیگری برای رتبه استفاده کنید
-        stats: { // اضافه کردن آمار برای نمایش احتمالی
-          challengeCount: creator.challenge_count,
-          totalLikes: creator.total_likes,
-          totalParticipants: creator.total_participants,
-        }
-      })) || [];
-      
+      const formattedCreators =
+        response.map((creator: any, index: number) => ({
+          id: creator.id,
+          username: creator.username,
+          avatar: "", // اگر API آواتار دارد، از creator.avatar استفاده کنید
+          rank: index + 1, // یا از داده‌های دیگری برای رتبه استفاده کنید
+          stats: {
+            // اضافه کردن آمار برای نمایش احتمالی
+            challengeCount: creator.challenge_count,
+            totalLikes: creator.total_likes,
+            totalParticipants: creator.total_participants,
+          },
+        })) || [];
+
       setTopCreators(formattedCreators);
     } catch (error) {
       console.error("Error fetching top creators:", error);
@@ -283,7 +325,7 @@ export default function HomeScreen() {
                   </div>
 
                   <Banner />
-                  {/* <CategoryGrid categories={categories} /> */}
+                  <CategoryGrid categories={categories} />
 
                   {/* بخش محبوب‌ترین چالش‌ها */}
                   <SectionHeader
@@ -351,11 +393,15 @@ export default function HomeScreen() {
                         .slice() // کپی برای عدم تغییر آرایه اصلی
                         .sort((a, b) => a.rank - b.rank)
                         .map((c) => (
-                          <CreatorCard 
-                            key={c.id} 
-                            creator={c} 
+                          <CreatorCard
+                            key={c.id}
+                            creator={c}
                             // میتوانید اطلاعات اضافی را هم پاس دهید
-                            additionalInfo={c.stats ? `چالش‌ها: ${c.stats.challengeCount}` : ''}
+                            additionalInfo={
+                              c.stats
+                                ? `چالش‌ها: ${c.stats.challengeCount}`
+                                : ""
+                            }
                           />
                         ))}
                     </HorizontalScroller>
