@@ -70,10 +70,7 @@ const ChallengeCreate: React.FC = () => {
     loadCategories();
   }, []);
 
-  const initialValues: createFormValues & {
-    latitude?: number | null;
-    longitude?: number | null;
-  } = {
+  const initialValues: createFormValues = {
     title: "",
     description: "",
     image: null,
@@ -124,7 +121,10 @@ const ChallengeCreate: React.FC = () => {
   };
 
   const handleSubmit = async (
-    values: createFormValues & { latitude?: number | null; longitude?: number | null },
+    values: createFormValues & {
+      latitude?: number | null;
+      longitude?: number | null;
+    },
     { setSubmitting }: FormikHelpers<any>
   ) => {
     if (!token) {
@@ -144,7 +144,9 @@ const ChallengeCreate: React.FC = () => {
       const start_time = `${values.startDate}T${values.startTime}:00Z`;
       const end_time = `${values.endDate}T${values.endTime}:59Z`;
 
-      const selectedCat = categories.find((c) => c.name === values.selectedCategory);
+      const selectedCat = categories.find(
+        (c) => c.name === values.selectedCategory
+      );
       if (!selectedCat) {
         throw new Error("دسته‌بندی معتبر یافت نشد");
       }
@@ -153,7 +155,9 @@ const ChallengeCreate: React.FC = () => {
         title: values.title.trim(),
         description: values.description.trim() || null,
         category_id: selectedCat.id,
-        max_participants: values.memberCount ? parseInt(values.memberCount, 10) : null,
+        max_participants: values.memberCount
+          ? parseInt(values.memberCount, 10)
+          : null,
         visibility: values.challengeType === "خصوصی" ? "private" : "public",
         rule: "Participate actively",
         comments_enabled: values.isCommentsEnabled,
@@ -180,7 +184,10 @@ const ChallengeCreate: React.FC = () => {
       if (values.selectedUsers.length > 0) {
         const userIds = values.selectedUsers.map((u) => u.id);
         try {
-          const results = await inviteMultipleUsersToChallenge(challengeId, userIds);
+          const results = await inviteMultipleUsersToChallenge(
+            challengeId,
+            userIds
+          );
           const failed = results.filter((r: any) => !r.success).length;
           CustomToast(
             failed === 0
@@ -245,12 +252,16 @@ const ChallengeCreate: React.FC = () => {
             .filter(
               (u) =>
                 u.username.toLowerCase().includes(userSearch.toLowerCase()) ||
-                (u.full_name?.toLowerCase().includes(userSearch.toLowerCase()) ?? false)
+                (u.full_name
+                  ?.toLowerCase()
+                  .includes(userSearch.toLowerCase()) ??
+                  false)
             );
 
           const canAddMore =
             !values.memberCount ||
-            values.selectedUsers.length < parseInt(values.memberCount || "0", 10);
+            values.selectedUsers.length <
+              parseInt(values.memberCount || "0", 10);
 
           return (
             <Form className="flex-1 flex flex-col mt-10 justify-start items-center w-full">
@@ -277,12 +288,14 @@ const ChallengeCreate: React.FC = () => {
                   setFieldValue={setFieldValue}
                   setFieldTouched={setFieldTouched}
                   errors={{
-                    selectedCategory: touched.selectedCategory && errors.selectedCategory,
+                    selectedCategory:
+                      touched.selectedCategory && errors.selectedCategory,
                     startDate: touched.startDate && errors.startDate,
                     startTime: touched.startTime && errors.startTime,
                     endDate: touched.endDate && errors.endDate,
                     endTime: touched.endTime && errors.endTime,
-                    challengeLocation: touched.challengeLocation && errors.challengeLocation,
+                    challengeLocation:
+                      touched.challengeLocation && errors.challengeLocation,
                   }}
                   touched={touched}
                 />
@@ -306,7 +319,10 @@ const ChallengeCreate: React.FC = () => {
                       CustomToast("حداکثر تعداد عضو پر شده", "warning");
                       return;
                     }
-                    setFieldValue("selectedUsers", [...values.selectedUsers, user]);
+                    setFieldValue("selectedUsers", [
+                      ...values.selectedUsers,
+                      user,
+                    ]);
                   }}
                   canAddMore={canAddMore}
                   loadingUsers={loadingUsers}

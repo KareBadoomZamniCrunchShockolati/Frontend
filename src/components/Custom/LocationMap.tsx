@@ -3,28 +3,8 @@ import React from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-
-const orangeMarkerIcon = L.divIcon({
-  className: "", // Removes default white background
-  html: `
-    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#f97316" stroke="#000" stroke-width="2">
-      <path d="M12 2a8 8 0 0 0-8 8c0 5.4 8 12 8 12s8-6.6 8-12a8 8 0 0 0-8-8z"/>
-      <circle cx="12" cy="10" r="3" fill="white"/>
-    </svg>
-  `,
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-  popupAnchor: [0, -40],
-});
-
-interface LocationMapPickerProps {
-  onLocationSelect: (lat: number, lng: number) => void;
-  defaultCenter?: [number, number];
-  initialPosition?: [number, number] | null;
-  height?: string;
-  /** If true, map is interactive but clicking does NOT move the pin */
-  readOnly?: boolean;
-}
+import type { LocationMapPickerProps } from "@/types/challengeCreateTypes";
+import orangeMarkerIcon from "./orangeMarkerIcon";
 
 function MapClickHandler({ onClick }: { onClick: (lat: number, lng: number) => void }) {
   useMapEvents({
@@ -39,15 +19,14 @@ function MapClickHandler({ onClick }: { onClick: (lat: number, lng: number) => v
 
 const LocationMapPicker: React.FC<LocationMapPickerProps> = ({
   onLocationSelect,
-  defaultCenter = [35.6892, 51.3890],
+  defaultCenter = [35.6892, 51.3890], // Tehran
   initialPosition = null,
   height = "h-50",
-  readOnly = false, // Default: editable
+  readOnly = false,
 }) => {
   const [position, setPosition] = React.useState<[number, number] | null>(initialPosition);
 
   const handleClick = (lat: number, lng: number) => {
-    // Only allow changing position if NOT read-only
     if (!readOnly) {
       setPosition([lat, lng]);
       onLocationSelect(lat, lng);
@@ -69,10 +48,10 @@ const LocationMapPicker: React.FC<LocationMapPickerProps> = ({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* Only add click handler in editable mode */}
+        {/* Click handler only in editable mode */}
         {!readOnly && <MapClickHandler onClick={handleClick} />}
 
-        {/* Always show the marker if position exists */}
+        {/* Show marker if position is set */}
         {position && <Marker position={position} icon={orangeMarkerIcon} />}
       </MapContainer>
     </div>

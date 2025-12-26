@@ -101,3 +101,11 @@ export interface createFormValues {
   memberCount: string;
   selectedUsers: UserProfile[];
 }
+
+export interface LocationMapPickerProps {
+  onLocationSelect: (lat: number, lng: number) => void;
+  defaultCenter?: [number, number];
+  initialPosition?: [number, number] | null;
+  height?: string;
+  readOnly?: boolean;
+}

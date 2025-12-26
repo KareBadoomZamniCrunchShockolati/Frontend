@@ -36,8 +36,10 @@ import {
 
 import CustomToast from "@/components/Custom/CustomToast";
 
-const DEFAULT_CHALLENGE_IMG =
-  "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
+import { DEFAULT_CHALLENGE_IMG } from "@/data/mockImages";
+
+// ← ADD THIS IMPORT
+import { Spinner } from "@/components/ui/spinner";
 
 const defaultChallenge: ChallengeDataDetails = {
   commentsEnabled: false,
@@ -191,11 +193,12 @@ const ChallengeInfo: React.FC = () => {
     }
   };
 
+  // ← UPDATED LOADING STATE WITH SPINNER
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          <Spinner className="size-12 text-primary" />
           <p className="text-lg">در حال بارگذاری چالش...</p>
         </div>
       </div>
@@ -224,7 +227,6 @@ const ChallengeInfo: React.FC = () => {
           dateRange={`${challenge.start_time} - ${challenge.end_time}`}
           location={challenge.address || challenge.location || "مکان مشخص نشده"}
         />
-
 
         <div className="w-full max-w-xl mt-6">
           <LocationMapPicker
