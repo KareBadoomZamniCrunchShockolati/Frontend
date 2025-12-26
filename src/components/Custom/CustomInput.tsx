@@ -62,7 +62,7 @@ export default function CustomInput({
 
         return (
           <div className={"flex flex-col " + width}>
-            <div className="relative">
+            <div className="relative w-full">
               {as === "textarea" ? (
                 <textarea
                   {...field}
@@ -92,7 +92,7 @@ export default function CustomInput({
                   dir={isRTL ? "rtl" : "ltr"}
                   className={`border !border-[var(--borderDefault)] shadow-[0px_1px_0px_var(--borderDefault)] focus:!border-[var(--borderFoucus)] focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)] focus:!ring-0 focus-visible:!ring-0 p-0 rounded-primary-radius h-10 w-full
                     ${isRTL ? "text-right pr-4" : "text-left pl-4"}
-                    ${icon ? "pl-12"  : ""}
+                    ${icon ? "pl-12" : ""}
                     transition-all duration-200 ease-in-out
                     ${
                       hasError

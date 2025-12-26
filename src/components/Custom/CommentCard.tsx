@@ -21,6 +21,9 @@ const CommentCard = ({
   depth = 0,
   parentUsername,
   parentUserId,
+  isOpenFirstReplies = false,
+  // openFirstReplies,
+  // closeFirstReplies,
 }: CommentCardProps) => {
   const { id } = useParams();
   const postId = Number(id);
@@ -34,6 +37,9 @@ const CommentCard = ({
   const [showAllReplies, setShowAllReplies] = useState(false);
   const cardIndent = depth === 0 ? "px-4" : depth === 1 ? "pr-12 pl-0" : "px-0";
   const navigate = useNavigate();
+
+  isOpenFirstReplies = depth === 0 ? showAllReplies : isOpenFirstReplies;
+
   const handleLikeToggle = async () => {
     try {
       if (isLiked) {
@@ -79,25 +85,52 @@ const CommentCard = ({
           comment.replies.length > 0 && (
             <span
               className="
+        absolute
+        top-[calc(var(--profpic)+8px)]
+        right-[39px]
+        h-[95px]
+        w-[3px]
+        bg-primary
+      "
+            />
+          )}
+
+        {depth === 1 && isOpenFirstReplies && (
+          <span
+            className="
       absolute
-      top-[calc(var(--profpic)+8px)]
-      bottom-[146px]
-      right-[39px]
+      top-[-118px]
+      bottom-[-22px]
+      right-[23px]
       w-[3px]
       bg-primary
     "
-            />
-          )}
+          />
+        )}
+
+        {/* {depth > 1 && isOpenFirstReplies && (
+          <span
+            className="
+      absolute
+      top-[-100px]
+      bottom-[0px]
+      right-[-25px]
+      w-[3px]
+      bg-primary
+    "
+          />
+        )} */}
+
         {depth === 1 && (
           <span
             className="
       absolute
-      top-[calc(var(--profpic)-35px)]   /* align with avatar center */
+      top-[calc(var(--profpic)-115px)]   /* align with avatar center */
       right-[23px]                    /* horizontal distance to vertical line */
       w-[28px]                        /* width of the horizontal line */
-      h-[20px]                        /* height of the vertical line */
+      h-[100px]                        /* height of the vertical line */
       border-r-3 border-b-3           /* right + bottom borders only */
-      border-primary                  /* color */
+      border-primary                 /* color */
       rounded-br-lg                   /* curve at bottom-right corner */
     "
           />
@@ -106,7 +139,7 @@ const CommentCard = ({
         {/* Top Row: Avatar + Username + Timestamp */}
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          <Avatar className="w-[var(--profpic)] h-[var(--profpic)] bg-primary">
+          <Avatar className="relative z-10 w-[var(--profpic)] h-[var(--profpic)] bg-primary">
             <AvatarImage src={undefined} /> {/* Replace with actual avatar */}
             <AvatarFallback className="bg-primary/20 text-primary font-bold flex items-center justify-center">
               S
@@ -115,7 +148,10 @@ const CommentCard = ({
 
           {/* Username and Time stacked vertically */}
           <div className="flex gap-[10px] items-center">
-            <p className="font-semibold text-sm" onClick={() => navigate(`/dashboard/${comment.user_id}`)}>
+            <p
+              className="font-semibold text-sm"
+              onClick={() => navigate(`/dashboard/${comment.user_id}`)}
+            >
               {/* {username} */}
               {comment.username}
             </p>
@@ -139,7 +175,7 @@ const CommentCard = ({
             </p>
           )}
 
-          <p className="text-gray-text font-medium text-sm">
+          <p className="text-gray-text font-medium text-sm break-words whitespace-pre-wrap">
             {comment.content}
           </p>
 
@@ -193,6 +229,7 @@ const CommentCard = ({
             </div>
           )}
         </div>
+
         {comment.replies &&
           showAllReplies === false &&
           comment.replies.length > 0 && (
@@ -207,9 +244,10 @@ const CommentCard = ({
               </span>
             </p>
           )}
+
         {comment.replies && showAllReplies && comment.replies.length > 0 && (
           <div className="mt-4 flex flex-col">
-            {comment.replies.map((reply) => (
+            {comment.replies.map((reply, index) => (
               <CommentCard
                 key={reply.id}
                 comment={reply}
@@ -217,10 +255,16 @@ const CommentCard = ({
                 depth={depth + 1}
                 parentUsername={comment.username}
                 parentUserId={comment.user_id}
+                isOpenFirstReplies={
+                  depth === 0 && index + 1 === comment.replies?.length
+                    ? false
+                    : isOpenFirstReplies
+                }
               />
             ))}
           </div>
         )}
+
         {comment.replies && showAllReplies === true && (
           <p
             className="mt-4 text-sm text-neutral-gray font-medium mr-[calc(var(--profpic)+12px)]"
