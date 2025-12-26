@@ -6,7 +6,10 @@ import { Field } from "formik";
 import type { FieldProps } from "formik";
 import type { Step2DetailsProps } from "@/types/challengeCreateTypes";
 import LocationMapPicker from "@/components/Custom/LocationMap";
-import { Spinner } from "@/components/ui/spinner"; // ← ایمپورت اسپینر جدید
+import { Spinner } from "@/components/ui/spinner";
+
+// ← ایمپورت جدید
+import { CHALLENGE_VISIBILITY_OPTIONS } from "@/data/challengeTypeOptions";
 
 const Step2Details: React.FC<Step2DetailsProps> = ({
   categories,
@@ -21,7 +24,6 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
     lng: number;
   } | null>(null);
 
-  // Sync map selection → Formik latitude/longitude
   useEffect(() => {
     if (selectedCoordinates) {
       setFieldValue("latitude", selectedCoordinates.lat);
@@ -62,6 +64,7 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
           error={touched.selectedCategory && errors.selectedCategory}
         />
       </div>
+
       {/* زمان شروع و پایان */}
       <div className="space-y-6">
         <div>
@@ -113,9 +116,9 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
           </div>
         </div>
       </div>
+
       {/* مکان چالش */}
       <div className="space-y-4">
-        {/* Address input */}
         <Field name="challengeLocation">
           {({ field, meta }: FieldProps) => (
             <CustomInput
@@ -137,17 +140,16 @@ const Step2Details: React.FC<Step2DetailsProps> = ({
           />
         </div>
       </div>
-      {/* نوع چالش */}
+
+      {/* نوع چالش — حالا از داده‌های خارجی استفاده می‌کنه */}
       <div className="mt-6">
         <CustomSelect
           name="challengeType"
           label="نوع چالش"
-          options={[
-            { value: "عمومی", label: "عمومی" },
-            { value: "شخصی", label: "خصوصی" },
-          ]}
+          options={CHALLENGE_VISIBILITY_OPTIONS}
         />
       </div>
+
       {/* چک‌باکس کامنت‌ها */}
       <div className="mt-6 flex justify-end">
         <CustomCheckbox
