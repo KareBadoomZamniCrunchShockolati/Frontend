@@ -146,7 +146,6 @@ export default function CustomSelect({
                 {label}
               </label>
 
-              {/* SCROLLABLE DROPDOWN MENU – کوتاه‌تر و اسکرول‌بار کاملاً نامرئی (بدون کلاس خارجی) */}
               {isOpen && openName === name && (
                 <div
                   className={`
@@ -165,9 +164,8 @@ export default function CustomSelect({
                   <div
                     className="max-h-40 overflow-y-auto py-1"
                     style={{
-                      // مخفی کردن اسکرول‌بار در همه مرورگرها بدون نیاز به کلاس خارجی
-                      msOverflowStyle: "none",      /* IE و Edge */
-                      scrollbarWidth: "none",       /* Firefox */
+
+                      scrollbarWidth: "none",       
                     }}
                   >
                     {/* برای Chrome, Safari و Opera */}

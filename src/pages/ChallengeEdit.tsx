@@ -79,7 +79,7 @@ const ChallengeEdit: React.FC = () => {
         setChallengeTitle(data.title);
         setChallengeDescription(data.description || "");
         setImage(data.image_url || DEFAULT_IMG);
-        setChallengeLocation(data.address || ""); // ← Use address from backend
+        setChallengeLocation(data.address || ""); 
         setLatitude(data.latitude ?? null);
         setLongitude(data.longitude ?? null);
 
@@ -253,7 +253,6 @@ const ChallengeEdit: React.FC = () => {
             onLocationChange={setChallengeLocation}
           />
 
-          {/* Map with initial position from backend, editable */}
           <div className="space-y-3">
             <LocationMapPicker
               onLocationSelect={handleLocationSelect}

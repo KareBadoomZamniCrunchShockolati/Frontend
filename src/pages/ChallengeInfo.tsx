@@ -225,7 +225,7 @@ const ChallengeInfo: React.FC = () => {
           location={challenge.address || challenge.location || "مکان مشخص نشده"}
         />
 
-        {/* INTERACTIVE READ-ONLY MAP — Pin fixed, pan/zoom allowed */}
+
         <div className="w-full max-w-xl mt-6">
           <LocationMapPicker
             onLocationSelect={() => {}} // Required but ignored

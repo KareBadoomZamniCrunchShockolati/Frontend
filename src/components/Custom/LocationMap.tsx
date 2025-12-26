@@ -57,7 +57,7 @@ const LocationMapPicker: React.FC<LocationMapPickerProps> = ({
   const mapCenter: [number, number] = position ?? defaultCenter;
 
   return (
-    <div className={`${height} w-full rounded-xl overflow-hidden border-2 border-black`}>
+    <div className={`${height} w-full rounded-primary-radius overflow-hidden border-2 border-black`}>
       <MapContainer
         center={mapCenter}
         zoom={13}
