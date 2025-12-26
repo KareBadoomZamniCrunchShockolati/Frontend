@@ -1,5 +1,6 @@
 import CustomButton from "@/components/Custom/CustomButton";
 import CustomToast from "@/components/Custom/CustomToast";
+import LoadingPage from "@/components/Custom/LoadingPage";
 import useUserStore from "@/store/userStore/userStore";
 import { ArrowLeft, ArrowRight, Upload, FileX } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -32,7 +33,10 @@ const EditPost = () => {
 
   useEffect(() => {
     const fetchPostData = async () => {
-      if (!postId) return;
+      if (!postId) {
+        setLoading(false);
+        return;
+      }
 
       try {
         console.log("Fetching post data for postId:", postId);
@@ -68,7 +72,8 @@ const EditPost = () => {
 
         setChallenges(simpleChallenges);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching challenges:", err);
+        CustomToast("خطا در بارگذاری چالش‌ها", "error");
       }
     };
 
@@ -80,7 +85,6 @@ const EditPost = () => {
       const newFiles = Array.from(e.target.files);
       const newURLs = newFiles.map((file) => URL.createObjectURL(file));
 
-      // محدودیت حداکثر 5 تصویر
       if (images.length + newFiles.length > 5) {
         CustomToast("حداکثر ۵ تصویر مجاز است", "error");
         return;
@@ -109,7 +113,7 @@ const EditPost = () => {
       return;
     }
 
-    if (images.length > 5) {
+    if (imageURLs.length > 5) {
       CustomToast("حداکثر ۵ تصویر مجاز است", "error");
       return;
     }
@@ -135,22 +139,18 @@ const EditPost = () => {
   };
 
   if (!token) {
-    CustomToast("You need to login first!", "error");
-    return <div>you need to login first!</div>;
+    CustomToast("ابتدا باید وارد حساب کاربری شوید!", "error");
+    return <div className="text-center mt-10">ابتدا باید وارد حساب کاربری شوید!</div>;
   }
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        در حال بارگذاری...
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   if (!initialData) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        پست یافت نشد
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl text-gray-text">پست یافت نشد</p>
       </div>
     );
   }
@@ -179,7 +179,7 @@ const EditPost = () => {
       >
         {({ values, setFieldValue }) => (
           <Form>
-            {/* پیش نمایش تصاویر */}
+            {/* Image Preview */}
             <div className="flex flex-col items-center gap-2 mr-5 ml-5 mt-4">
               <label className="w-full h-64 border-2 border-gray-400 rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden">
                 {imageURLs.length > 0 ? (
@@ -194,6 +194,7 @@ const EditPost = () => {
                             className="absolute top-2 right-2 w-6 h-6 text-destructive cursor-pointer z-20 bg-white rounded-full p-1"
                             onClick={(e) => {
                               e.preventDefault();
+                              e.stopPropagation();
                               handleDeleteImage(index);
                             }}
                           />
@@ -214,7 +215,7 @@ const EditPost = () => {
                   </Carousel>
                 ) : (
                   <span className="text-neutral-gray font-bold text-center">
-                    پیش‌نمایه
+                    پیش‌نمایش
                   </span>
                 )}
               </label>
@@ -234,12 +235,12 @@ const EditPost = () => {
                 <p className="text-center text-base">
                   {imageURLs.length >= 5 ? "حداکثر تصویر رسیده" : "افزودن تصویر"}
                 </p>
-                <Upload className="absolute right-5 !w-6 !h-6 " />
+                <Upload className="absolute right-5 !w-6 !h-6" />
               </CustomButton>
               <p className="text-xs text-neutral-gray">{imageURLs.length}/5 تصویر</p>
             </div>
 
-            {/* توضیحات */}
+            {/* Description */}
             <div className="mr-5 ml-5 mt-4">
               <CustomInput
                 name="description"
@@ -250,7 +251,7 @@ const EditPost = () => {
               />
             </div>
 
-            {/* انتخاب چالش */}
+            {/* Challenge Selection */}
             <div className="mr-5 ml-5 mt-2">
               <p className="text-right text-xl font-bold mb-2">
                 چالش مربوطه (اختیاری)
@@ -267,7 +268,7 @@ const EditPost = () => {
               />
             </div>
 
-            {/* دکمه ذخیره */}
+            {/* Save Button */}
             <div className="mt-10 mr-5 ml-5">
               <CustomButton
                 type="submit"
