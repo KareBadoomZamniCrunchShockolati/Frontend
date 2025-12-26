@@ -33,11 +33,18 @@ export const UnlikeService = async ({
   });
 };
 
-// گرفتن لیست چالش‌هایی که کاربر در آنها شرکت کرده
-export const getParticipatingChallengesService = async (): Promise<Challenge[]> => {
-  const response = await getData({ endPoint: `/api/v1/challenges/participating` });
-  return response.data; // فقط آرایه
+export const getParticipatingChallengesService = async (
+  page: number = 1,
+  pageSize: number = 20
+): Promise<Challenge[]> => {
+  const response = await getData({
+    endPoint: `/api/v1/challenges/participating`,
+    params: { page, pageSize },
+  });
+
+  return response.data || response || [];
 };
+
 
 export const getPublicChallengesService = async (): Promise<Challenge[]> => {
   const response = await getData({ endPoint: `/api/v1/challenges/public` });

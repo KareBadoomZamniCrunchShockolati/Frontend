@@ -71,7 +71,6 @@ function CategoryGrid({
   );
 }
 
-// ... کدهای قبلی بدون تغییر
 
 export default function HomeScreen() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
