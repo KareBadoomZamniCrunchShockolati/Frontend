@@ -1,6 +1,6 @@
 /*  ChallengeInfo.tsx  */
 import React, { useState, useMemo, useEffect } from "react";
-import { data, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomButton from "@/components/Custom/CustomButton";
 import BackButtonAndMenu from "@/components/ChallengeManagement/info/BackButtonAndMenu";
 import ImageAndBadgeContainer from "@/components/ChallengeManagement/info/ImageAndBadgeContainer";
@@ -11,14 +11,17 @@ import SearchBar from "@/components/ChallengeManagement/public/SearchBar";
 import UserCardList from "@/components/ChallengeManagement/public/UserCardsList";
 import ChallengeSlideshow from "@/components/ChallengeManagement/info/SlideShow";
 import type { UserProfile } from "@/types/userTypes";
-import type {
-  ChallengeData,
-  ChallengeDataDetails,
-} from "@/types/challengeElementsTypes";
-import { mockUsers } from "@/data/mockUsers";
+import type { ChallengeDataDetails } from "@/types/challengeElementsTypes";
+
+// Keep your mocks!
 import { mockChallenges } from "@/data/mockChallenges";
-import { ArrowLeft } from "lucide-react";
+
 import { OverlappingCards } from "@/components/Custom/OverlappingCards";
+import { cn } from "@/lib/utils";
+
+// Use the correct fixed map component
+import LocationMapPicker from "@/components/Custom/LocationMap";
+
 import {
   fetchChallengeById,
   joinPrivateChallenge,
@@ -29,92 +32,69 @@ import {
   getFollowersService,
   getFollowingService,
   getUserById,
-  getUserProfileService,
 } from "@/services/userService";
-import { getParticipatingChallengesService } from "@/services/postService";
-import { cn } from "@/lib/utils";
-import { set } from "react-hook-form";
 
-const DEFAULT_CHALLENGE_IMG =
-  "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
+import CustomToast from "@/components/Custom/CustomToast";
+import { DEFAULT_CHALLENGE_IMG } from "@/data/mockImages";
+import { Spinner } from "@/components/ui/spinner";
+import { defaultChallengeData } from "@/data/mockChallenges";
 
-const defaultChallenge: ChallengeDataDetails = {
-  commentsEnabled: false,
-  categories: [],
-  type: "عمومی",
-  memberCount: "0",
-  title: "عنوان چالش",
-  description:
-    "این چالش برای آزمایش استقامت و مهارت‌های حل مسئله شما طراحی شده است. سفر شامل پیمودن زمین‌های سخت و غلبه بر موانع مختلف است. آیا آماده‌اید تا این ماجراجویی را شروع کنید و مرزهای خود را بسنجید؟",
-
-  dateRange: "از 28 اردیبهشت تا 8 شهریور - سه روز در هفته",
-  location: "قله کوه اورست",
-  Img: DEFAULT_CHALLENGE_IMG,
-  participants: [],
-  like_count: 0,
-  start_time: "28 اردیبهشت",
-  end_time: "8شهریور",
-  visibility: "public",
-};
+const defaultChallenge = defaultChallengeData
 
 const ChallengeInfo: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { challengeId } = useParams();
+  const { challengeId } = useParams<{ challengeId: string }>();
   const challenge_Id = Number(challengeId);
+
+  // Fallback from navigation state (kept for backward compatibility)
   const payload: ChallengeDataDetails =
     (location.state?.challenge as ChallengeDataDetails) ?? defaultChallenge;
 
-  const {
-    Img,
-    title,
-    description,
-    dateRange,
-    location: challengeLocation,
-  } = payload;
+  const safeImageUrl = payload.Img?.trim()
+    ? payload.Img
+    : DEFAULT_CHALLENGE_IMG;
 
-  const safeImageUrl = Img && Img.trim() !== "" ? Img : DEFAULT_CHALLENGE_IMG;
-
-  const [challenge, setChallenge] = useState<ChallengeDataDetails>(
-    payload as ChallengeDataDetails
-  );
+  const [challenge, setChallenge] = useState<ChallengeDataDetails | any>(payload);
   const [participants, setParticipants] = useState<UserProfile[]>([]);
-  // const [challengeId, setChallengeId] = useState<string | undefined>(
-  //   useParams().challengeId
-  // );
   const [searchTerm, setSearchTerm] = useState("");
-  const [likeCount, setLikeCount] = useState(10);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isParticipated, setIsParticipated] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+
+  // Use real backend latitude/longitude for the map
+  const displayCoordinates = useMemo<[number, number] | null>(() => {
+    if (challenge?.latitude && challenge?.longitude) {
+      return [challenge.latitude, challenge.longitude];
+    }
+    return [35.6892, 51.389]; // Tehran fallback
+  }, [challenge?.latitude, challenge?.longitude]);
 
   const filteredUsers = useMemo(() => {
-    if (participants) {
-      return participants.filter((u) =>
-        u.username.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    } else return null;
+    return participants.filter(
+      (u) =>
+        u.username?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false
+    );
   }, [participants, searchTerm]);
 
-  const handleDelete = (id: string, username: string) => {
-    console.log(`${username} (id:${id}) removed`);
-  };
-
   const handleMenu = () => {
-    const editPayload: ChallengeData = {
-      ...payload,
-      Img: safeImageUrl,
-      members: participants,
-      memberCount: participants.length.toString(),
-    };
-
     navigate("/editChallenge", {
-      state: { challenge: editPayload },
+      state: {
+        challenge: {
+          ...challenge,
+          Img: safeImageUrl,
+          members: participants,
+          memberCount: participants.length.toString(),
+        },
+      },
     });
   };
 
   const handleLike = () =>
-    setChallenge((c) => ({ ...c, like_count: c.like_count + 1 }));
-  const handleSave = () => console.log("Challenge saved!");
+    setChallenge((prev: any) => ({
+      ...prev,
+      like_count: (prev.like_count || 0) + 1,
+    }));
 
   const nextSlide = () =>
     setCurrentSlide((i) => (i + 1) % mockChallenges.length);
@@ -124,112 +104,100 @@ const ChallengeInfo: React.FC = () => {
     );
 
   useEffect(() => {
-    console.log("mewww: ", challenge);
-  }, [challenge]);
-  useEffect(() => {
     const fetchChallenge = async () => {
-      const fetchedChallenge = await fetchChallengeById(String(challenge_Id));
-      setChallenge(fetchedChallenge);
+      if (!challenge_Id) return;
+      try {
+        const fetched = await fetchChallengeById(String(challenge_Id));
+        setChallenge(fetched);
+      } catch (err) {
+        console.error("Failed to fetch challenge:", err);
+        CustomToast("خطا در بارگذاری چالش", "error");
+      } finally {
+        setLoading(false);
+      }
     };
-
     fetchChallenge();
   }, [challenge_Id]);
+
   useEffect(() => {
     const fetchUsers = async () => {
-      let users = [];
-      console.log("pppp: ", challenge.participants);
-      if (!challenge.participants) return;
-      for (let user of challenge.participants) {
-        console.log("user: ", user);
-
-        const recievedUser = await getUserById(user.user_id);
-        const followerData: any = await getFollowersService(user.user_id);
-        const followingData: any = await getFollowingService(user.user_id);
-        users.push({
-          ...recievedUser,
-          followersCount: followerData.count,
-          followingCount: followingData.count,
-        }); // there is no user summary type
-
-        console.log("recievedUser: ", recievedUser);
+      if (!challenge.participants?.length) {
+        setParticipants([]);
+        return;
       }
-      users = users.map((x) => convertUserType(x));
+
+      const users: UserProfile[] = [];
+      for (const p of challenge.participants) {
+        try {
+          const user = await getUserById(p.user_id);
+          const followers = await getFollowersService(p.user_id);
+          const following = await getFollowingService(p.user_id);
+
+          users.push({
+            id: user.id,
+            username: user.username,
+            imagePath: user.profile_picture || "",
+            bio: user.bio || "",
+            followersCount: followers.count || 0,
+            followingCount: following.count || 0,
+            doneChallengesCount: 0,
+          });
+        } catch (err) {
+          console.error("Error fetching participant:", err);
+        }
+      }
       setParticipants(users);
     };
     fetchUsers();
   }, [challenge.participants]);
-  useEffect(() => console.log(challenge), [challenge]);
-  const convertUserType = (user: any) => {
-    return {
-      id: user.id,
-      username: user.username,
-      imagePath: user.profile_pricture,
-      bio: user.bio,
-      followersCount: user.followersCount, // does not matter. I dont use these three properties here
-      followingCount: user.followingCount,
-      doneChallengesCount: 0,
-    };
-  };
-  // useEffect(() => {
-  //   const checkChallengeList = async () => {
-  //     const list = await getParticipatingChallengesService();
-  //     console.log("list: ", list);
 
-  //     for (let x of list) {
-  //       if (x.id == challengeId) {
-  //         setIsParticipated(true);
-  //         break;
-  //       }
-  //     }
-  //   };
-  //   checkChallengeList();
-  // }, [isParticipated]);
-  // useEffect(() => {
-  //   console.log("is participated: ", isParticipated);
-  // }, [isParticipated]);
   const joinChallengeHandler = async () => {
-    if (challenge.visibility == "public") {
-      if (challenge_Id) {
-        try {
-          const data = await joinPublicChallenge(Number(challenge_Id));
-          console.log(data);
-        } catch (e) {
-          console.log("error: ", e);
-        }
+    try {
+      if (challenge.visibility === "public") {
+        await joinPublicChallenge(challenge_Id);
+      } else {
+        await joinPrivateChallenge(challenge_Id);
       }
-    } else if (challenge.visibility == "private") {
-      if (challenge_Id) {
-        try {
-          const data = await joinPrivateChallenge(Number(challenge_Id));
-          console.log(data);
-        } catch (e) {
-          console.log("error: ", e);
-        }
-      }
+      setIsParticipated(true);
+      CustomToast("با موفقیت به چالش پیوستید!", "success");
+    } catch (e) {
+      CustomToast("خطا در پیوستن به چالش", "error");
     }
   };
+
   const leaveChallengeHandler = async () => {
-    if (challenge_Id) {
-      try {
-        const data = await leaveChallenge(Number(challenge_Id));
-        setIsParticipated(false);
-        console.log(data);
-      } catch (e) {
-        console.log("error: ", e);
-      }
+    try {
+      await leaveChallenge(challenge_Id);
+      setIsParticipated(false);
+      CustomToast("چالش را ترک کردید", "success");
+    } catch (e) {
+      CustomToast("خطا در ترک چالش", "error");
     }
   };
+
+  // ← UPDATED LOADING STATE WITH SPINNER
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Spinner className="size-12 text-primary" />
+          <p className="text-lg">در حال بارگذاری چالش...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col justify-between p-4">
       <div className="flex-1 flex flex-col items-center">
         <BackButtonAndMenu onMenuClick={handleMenu} />
 
-        <ImageAndBadgeContainer imageUrl={challenge.Img ?? undefined} />
+        <ImageAndBadgeContainer imageUrl={challenge.Img ?? challenge.image_url ?? undefined} />
 
         <LikeAndSaveButtons
           onLike={handleLike}
-          onSave={handleSave}
-          likeCount={challenge.like_count}
+          onSave={() => console.log("Challenge saved!")}
+          likeCount={challenge.like_count || 0}
         />
 
         <TitleAndDescription
@@ -238,54 +206,64 @@ const ChallengeInfo: React.FC = () => {
         />
 
         <DateAndLocation
-          dateRange={challenge.start_time + " - " + challenge.end_time}
-          location={challengeLocation}
+          dateRange={`${challenge.start_time} - ${challenge.end_time}`}
+          location={challenge.address || challenge.location || "مکان مشخص نشده"}
         />
 
+        <div className="w-full max-w-xl mt-6">
+          <LocationMapPicker
+            onLocationSelect={() => {}} // Required but ignored
+            initialPosition={displayCoordinates}
+            height="h-50"
+            readOnly={true}
+          />
+        </div>
+
+        {/* Action Buttons */}
         <CustomButton
           onClick={joinChallengeHandler}
           className={cn(
-            "mt-6 w-full sm:w-full md:w-full max-w-xl bg-primary rounded-2xl p-5 text-lg hover:bg-primary",
+            "mt-6 w-full max-w-xl bg-primary rounded-2xl p-5 text-lg",
             isParticipated && "hidden"
           )}
         >
           پیوستن
         </CustomButton>
+
         <CustomButton
-          //onClick={navigate("/X")}
           className={cn(
-            "mt-6 w-full sm:w-full md:w-full max-w-xl bg-secondary rounded-2xl p-5 text-lg hover:bg-secondary",
-            isParticipated || "hidden"
+            "mt-6 w-full max-w-xl bg-secondary rounded-2xl p-5 text-lg",
+            !isParticipated && "hidden"
           )}
         >
           مشاهده پیشرفت
         </CustomButton>
 
         <CustomButton
-          // onClick={leaveChallengeHandler}
+          onClick={leaveChallengeHandler}
           className={cn(
-            "mt-6 w-full sm:w-full md:w-full max-w-xl bg-red-main rounded-2xl p-5 text-lg hover:bg-primary",
-            isParticipated || "hidden"
+            "mt-6 w-full max-w-xl bg-red-main rounded-2xl p-5 text-lg",
+            !isParticipated && "hidden"
           )}
         >
           ترک چالش
         </CustomButton>
 
+        {/* Participants */}
         <div className="w-full max-w-2xl mt-8" dir="rtl">
           <h2 className="text-xl font-semibold mb-4">شرکت‌کنندگان</h2>
-
           <SearchBar
             searchTerm={searchTerm}
             onSearchTermChange={setSearchTerm}
           />
-
           <UserCardList
             users={filteredUsers}
-            onDelete={handleDelete}
+            onDelete={() => {}}
             isOwner={false}
           />
         </div>
 
+        {/* Related Challenges Slideshow — MOCKS KEPT! */}
         <div className="w-full max-w-2xl mt-10" dir="rtl">
           <h2 className="text-xl font-semibold mb-4 flex items-center">
             <img
@@ -303,9 +281,10 @@ const ChallengeInfo: React.FC = () => {
             prevSlide={prevSlide}
           />
         </div>
-        {/* this from saman */}
+
+        {/* View Posts Button */}
         <div
-          className="w-full mt-[var(--top-page)]"
+          className="w-full mt-12"
           onClick={() => {
             setTimeout(() => {
               navigate(`/challenge/${challenge_Id}/posts`);
@@ -314,33 +293,21 @@ const ChallengeInfo: React.FC = () => {
         >
           <div
             className="
-          relative
-          flex
-          items-center
-          justify-between
-          rounded-2xl
-          border-2
-          shadow-shadow-strong
-          border-black
-          px-10
-          py-8
-          active:shadow-none
-          active:translate-y-[3px]
-          active:translate-x-[3px]
-          transition-all duration-25
-        "
+              relative flex items-center justify-between rounded-2xl
+              border-2 shadow-shadow-strong border-black px-10 py-8
+              active:shadow-none active:translate-y-[3px] active:translate-x-[3px]
+              transition-all duration-25
+            "
             style={{
               background: "linear-gradient(135deg, var(--primary), #ff8f33)",
             }}
           >
             <div className="text-white text-right">
               <h2 className="text-2xl font-bold mb-2">مشاهده پست‌های چالش</h2>
-
               <p className="text-sm opacity-90">
                 دیدن تمام پست‌های ثبت شده توسط شرکت‌کنندگان
               </p>
             </div>
-
             <div className="relative">
               <OverlappingCards />
             </div>
