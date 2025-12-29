@@ -85,7 +85,6 @@ const ProfileChallenges = () => {
 
         setError(null);
 
-        // ⛔ جلوگیری از fetch تکراری
         if (isLoadMore && lastFetchedPage.current === pageNum) return;
         lastFetchedPage.current = pageNum;
 
@@ -200,7 +199,7 @@ const ProfileChallenges = () => {
         </div>
       </div>
 
-      {/* لیست مجازی */}
+      {/* لیست چالش‌ها */}
       {loading && challenges.length === 0 ? (
         <SkeletonChallengeCard />
       ) : (

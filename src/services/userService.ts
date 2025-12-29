@@ -35,7 +35,7 @@ export const UnlikeService = async ({
 
 export const getParticipatingChallengesService = async (
   page: number = 1,
-  pageSize: number = 20
+  pageSize: number = 5
 ): Promise<Challenge[]> => {
   const response = await getData({
     endPoint: `/api/v1/challenges/participating`,
@@ -46,13 +46,29 @@ export const getParticipatingChallengesService = async (
 };
 
 
-export const getPublicChallengesService = async (): Promise<Challenge[]> => {
-  const response = await getData({ endPoint: `/api/v1/challenges/public` });
+export const getPublicChallengesService = async (
+  page?: number,
+  pageSize?: number
+): Promise<Challenge[]> => {
+  const params =
+    page !== undefined || pageSize !== undefined ? { page, pageSize } : undefined;
+  const response = await getData({
+    endPoint: `/api/v1/challenges/public`,
+    params,
+  });
   return response.data; // فقط آرایه
 };
 
-export const getPopularChallengesService = async (): Promise<Challenge[]> => {
-  const response = await getData({ endPoint: `/api/v1/challenges/like-count` });
+export const getPopularChallengesService = async (
+  page?: number,
+  pageSize?: number
+): Promise<Challenge[]> => {
+  const params =
+    page !== undefined || pageSize !== undefined ? { page, pageSize } : undefined;
+  const response = await getData({
+    endPoint: `/api/v1/challenges/like-count`,
+    params,
+  });
   return response.data; // فقط آرایه
 };
 
@@ -74,7 +90,11 @@ export const getTopCreatorsListService = async (): Promise<
 
 
 // گرفتن چالش‌ها بر اساس نوع (برای صفحه اصلی)
-export const getChallengesByTypeService = async (type: string): Promise<Challenge[]> => {
+export const getChallengesByTypeService = async (
+  type: string,
+  page?: number,
+  pageSize?: number
+): Promise<Challenge[]> => {
   let endPoint = '';
   
   switch(type) {
@@ -93,15 +113,22 @@ export const getChallengesByTypeService = async (type: string): Promise<Challeng
       endPoint = '/api/v1/challenges/public';
   }
   
-  const response = await getData({ endPoint });
+  const params =
+    page !== undefined || pageSize !== undefined ? { page, pageSize } : undefined;
+  const response = await getData({ endPoint, params });
   return response.data || [];
 };
 
 export const getChallengesByCategoryService = async (
-  categoryName: string
+  categoryName: string,
+  page?: number,
+  pageSize?: number
 ): Promise<Challenge[]> => {
+  const params =
+    page !== undefined || pageSize !== undefined ? { page, pageSize } : undefined;
   const response = await getData({ 
-    endPoint: `/api/v1/challenges/category-name/${categoryName}` 
+    endPoint: `/api/v1/challenges/category-name/${categoryName}`,
+    params,
   });
   console.log(response);
   return response.data;
@@ -119,13 +146,20 @@ export const getCreatedChallengesService = async (creatorId: number): Promise<Ch
 };
 
 // جستجوی چالش‌ها با API بک‌اند
-export const searchChallengesService = async (query: string): Promise<{ data: Challenge[] }> => {
+export const searchChallengesService = async (
+  query: string,
+  page?: number,
+  pageSize?: number
+): Promise<{ data: Challenge[] }> => {
   if (!query.trim()) {
     throw new Error("Search query is required");
   }
   
+  const params =
+    page !== undefined || pageSize !== undefined ? { page, pageSize } : undefined;
   const response = await getData({
     endPoint: `/api/v1/challenges/search?query=${encodeURIComponent(query)}`,
+    params,
   });
   
   return {

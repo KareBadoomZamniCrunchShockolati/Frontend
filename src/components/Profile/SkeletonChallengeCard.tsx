@@ -1,7 +1,6 @@
 // src/components/SkeletonChallengeCard.tsx
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Lock, LockOpen, Bookmark } from "lucide-react";
 
 export default function SkeletonChallengeCard() {
   return (

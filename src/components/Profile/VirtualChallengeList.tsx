@@ -30,7 +30,6 @@ export const VirtualChallengeList = ({
 
   const safeChallenges = Array.isArray(challenges) ? challenges : [];
 
-  // 🔹 اسکرول روی window
   useEffect(() => {
     if (!hasMore) return;
 
@@ -43,7 +42,7 @@ export const VirtualChallengeList = ({
 
       if (documentHeight - (scrollTop + windowHeight) < LOAD_MORE_OFFSET) {
         loadTriggeredRef.current = true;
-        setUiLoadingMore(true); // ⭐ اسکلتون فوراً ظاهر می‌شه
+        setUiLoadingMore(true);
 
         setTimeout(() => {
           onLoadMore();
@@ -55,11 +54,10 @@ export const VirtualChallengeList = ({
     return () => window.removeEventListener("scroll", onScroll);
   }, [loadingMore, hasMore, onLoadMore]);
 
-  // 🔹 بعد از لود شدن دیتا اجازه‌ی لود بعدی بده
   useEffect(() => {
     if (!loadingMore) {
       loadTriggeredRef.current = false;
-      setUiLoadingMore(false); // ⭐ اسکلتون مخفی
+      setUiLoadingMore(false);
     }
   }, [loadingMore]);
 
@@ -80,7 +78,8 @@ export const VirtualChallengeList = ({
               challenge.mutualFollowers?.map((user: any) => ({
                 id: user.id,
                 name: user.username,
-                avatar: user.avatar_url,
+                avatar: user.avatar_url ?? user.image ?? "",
+                image: user.avatar_url ?? user.image ?? "",
               })) ?? []
             }
             initialLikes={challenge.like_count}
