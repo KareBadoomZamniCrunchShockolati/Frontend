@@ -80,6 +80,8 @@ const ChallengeCreate: React.FC = () => {
     endDate: "",
     endTime: "",
     challengeLocation: "",
+    latitude: null,
+    longitude: null,
     challengeType: "عمومی",
     isCommentsEnabled: true,
     memberCount: "",
@@ -87,7 +89,7 @@ const ChallengeCreate: React.FC = () => {
   };
 
   const handleNext = async (
-    values: createFormValues,
+    values: any,
     setTouched: (touched: any) => void,
     setErrors: (errors: any) => void
   ) => {
@@ -119,67 +121,94 @@ const ChallengeCreate: React.FC = () => {
   };
 
   const handleSubmit = async (
-    values: createFormValues,
-    { setSubmitting }: FormikHelpers<createFormValues>
+    values: createFormValues & {
+      latitude?: number | null;
+      longitude?: number | null;
+    },
+    { setSubmitting }: FormikHelpers<any>
   ) => {
     if (!token) {
       CustomToast("لطفاً وارد حساب کاربری شوید", "error");
       return;
     }
 
+    if (!values.selectedCategory) {
+      CustomToast("لطفاً یک دسته‌بندی انتخاب کنید", "error");
+      setSubmitting(false);
+      return;
+    }
+
     setSubmitting(true);
+
     try {
       const start_time = `${values.startDate}T${values.startTime}:00Z`;
       const end_time = `${values.endDate}T${values.endTime}:59Z`;
 
-      let category_id = 1;
-      if (values.selectedCategory) {
-        const found = categories.find(
-          (c) => c.name === values.selectedCategory
-        );
-        category_id = found?.id || 1;
+      const selectedCat = categories.find(
+        (c) => c.name === values.selectedCategory
+      );
+      if (!selectedCat) {
+        throw new Error("دسته‌بندی معتبر یافت نشد");
       }
 
       const payload = {
         title: values.title.trim(),
-        description: values.description.trim(),
-        category_id,
+        description: values.description.trim() || null,
+        category_id: selectedCat.id,
         max_participants: values.memberCount
-          ? parseInt(values.memberCount)
+          ? parseInt(values.memberCount, 10)
           : null,
-        visibility: values.challengeType === "شخصی" ? "private" : "public",
-        rule: "none",
+        visibility: values.challengeType === "خصوصی" ? "private" : "public",
+        rule: "Participate actively",
         comments_enabled: values.isCommentsEnabled,
         start_time,
         end_time,
         timezone: "UTC",
-        image_url: values.image,
+        image_url: values.image || "",
+        latitude: values.latitude ?? null,
+        longitude: values.longitude ?? null,
+        address: values.challengeLocation.trim() || null,
       };
 
-      const { data: challenge } = await createChallenge(payload);
-      const challengeId = challenge?.ID;
+      console.log("Sending payload:", payload);
 
-      if (!challengeId) throw new Error("چالش ساخته نشد");
+      const response = await createChallenge(payload);
+      const challengeId = response?.data?.ID;
+
+      if (!challengeId) {
+        throw new Error("چالش ساخته نشد — پاسخ نامعتبر");
+      }
 
       CustomToast("چالش با موفقیت ساخته شد!", "success");
 
       if (values.selectedUsers.length > 0) {
-        const results = await inviteMultipleUsersToChallenge(
-          challengeId,
-          values.selectedUsers.map((u) => u.id)
-        );
-        const failed = results.filter((r) => !r.success).length;
-        CustomToast(
-          failed === 0
-            ? "دعوت‌ها با موفقیت ارسال شد"
-            : `${failed} دعوت ناموفق بود`,
-          failed === 0 ? "success" : "warning"
-        );
+        const userIds = values.selectedUsers.map((u) => u.id);
+        try {
+          const results = await inviteMultipleUsersToChallenge(
+            challengeId,
+            userIds
+          );
+          const failed = results.filter((r: any) => !r.success).length;
+          CustomToast(
+            failed === 0
+              ? "همه دعوت‌ها با موفقیت ارسال شد"
+              : `${failed} دعوت ناموفق بود`,
+            failed === 0 ? "success" : "warning"
+          );
+        } catch (inviteErr) {
+          CustomToast("خطا در ارسال برخی دعوت‌ها", "warning");
+        }
       }
 
       navigate(`/challenge/${challengeId}`, { replace: true });
     } catch (err: any) {
-      CustomToast(err.message || "خطا در ثبت چالش", "error");
+      console.error("Challenge creation failed:", err);
+      const message =
+        err?.response?.data?.message ||
+        err?.response?.data?.details?.details ||
+        err.message ||
+        "خطا در ساخت چالش — لطفاً ورودی‌ها را بررسی کنید";
+      CustomToast(message, "error");
     } finally {
       setSubmitting(false);
     }
