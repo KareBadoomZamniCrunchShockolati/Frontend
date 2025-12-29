@@ -5,25 +5,37 @@ import ChallengeCard from "../Custom/ChallangeCard";
 import CustomInput from "../Custom/CustomInput";
 import CustomDropdown from "../Custom/CustomDropdown";
 import { useNavigate } from "react-router-dom";
+import { baseURL } from "@/services/services";
+import useUserStore from "@/store/userStore/userStore";
 
 import {
   getParticipatingChallengesService,
   getMutualFollowersService,
+  getUserProfileService,
   searchChallengesService,
 } from "@/services/userService";
 
 import type { Challenge } from "@/types/challengeTypes";
 import { convertToJalali } from "../Custom/ConvertToJalali";
 
+const normalizeUrl = (value?: string) => {
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith("/")) return `${baseURL}${value}`;
+  return `${baseURL}/${value}`;
+};
+
 const ProfileChallenges = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserAvatar, setCurrentUserAvatar] = useState("");
   const [checkedCategories, setCheckedCategories] = useState<{
     [key: number]: boolean;
   }>({});
   const [searchQuery, setSearchQuery] = useState("");
 
+  const { userId } = useUserStore();
   const navigate = useNavigate();
 
   const categories = [
@@ -99,6 +111,20 @@ const ProfileChallenges = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        const profileRes = await getUserProfileService(userId);
+        const profile = profileRes?.data ?? profileRes;
+        setCurrentUserAvatar(normalizeUrl(profile?.profile_picture || ""));
+      } catch (profileError) {
+        console.error("Error fetching profile picture:", profileError);
+      }
+    };
+
+    fetchProfilePicture();
+  }, [userId]);
+
   // ----- منطق چک‌باکس دسته‌بندی‌ها (مثل کد خودت) -----
   const handleCategoryChange = (newChecked: { [key: number]: boolean }) => {
     if (newChecked[0] && !checkedCategories[0]) {
@@ -115,8 +141,12 @@ const ProfileChallenges = () => {
     } else setCheckedCategories(newChecked);
   };
 
-  // ✅ طبق خواسته تو سرچ/لیست از بک میاد و روی فرانت فیلتر/سورت انجام نمی‌دیم
+  // ----- فیلتر چالش‌ها بر اساس دسته‌بندی‌های انتخاب شده -----
   const filteredChallenges = challenges;
+  const resolveAvatarUrl = (user: any) =>
+    normalizeUrl(
+      user?.profile_picture || user?.avatar_url || user?.avatar || user?.image || ""
+    );
 
   if (error) {
     return (
@@ -194,14 +224,16 @@ const ProfileChallenges = () => {
               profiles={
                 challenge.mutualFollowers?.map((user: any) => ({
                   id: user.id,
-                  name: user.username,
-                  avatar: user.avatar_url,
+                  name: user.username || user.name || "",
+                  avatar: resolveAvatarUrl(user),
+                  image: resolveAvatarUrl(user),
                 })) || []
               }
               initialLikes={challenge.like_count}
               initialComments={challenge.comment_count}
               coverImage={
-                challenge.image_url ||
+                normalizeUrl(challenge.cover_image || "") ||
+                normalizeUrl(challenge.image_url) ||
                 "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=800&q=80"
               }
               isPrivate={challenge.visibility === "private"}
@@ -209,7 +241,13 @@ const ProfileChallenges = () => {
               creator={{
                 name: challenge.creator_username,
                 avatar:
-                  "https://images.unsplash.com/photo-1502764613149-7f1d229e230f?auto=format&fit=crop&w=50&q=80",
+                  challenge.creator_id === userId
+                    ? currentUserAvatar
+                    : normalizeUrl(
+                        challenge.creator_profile_picture ||
+                          challenge.creator_avatar_url ||
+                          ""
+                      ),
               }}
             />
           ))}

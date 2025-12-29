@@ -1,4 +1,4 @@
-import { getData, putData, postData, deleteData } from "./services";
+import { getData, putData, postData, deleteData, postImageData } from "./services";
 import type { FollowStats, UserSummary } from "@/types/userTypes";
 import type { PutUserProfileParams } from "@/types/putUserProfileTypes";
 import type { Challenge, LikeRequest } from "@/types/challengeTypes";
@@ -150,6 +150,18 @@ export const putUserProfileService = async ({
   return await putData({
     endPoint: `/api/v1/users/profile`,
     data,
+  });
+};
+
+export const uploadProfilePictureService = async (file: File) => {
+  if (!file) throw new Error("Profile picture file is required");
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  return await postImageData({
+    endPoint: `/api/v1/users/profile/picture`,
+    data: formData,
   });
 };
 

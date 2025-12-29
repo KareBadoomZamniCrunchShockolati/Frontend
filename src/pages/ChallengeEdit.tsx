@@ -13,13 +13,16 @@ import CustomToast from "@/components/Custom/CustomToast";
 import LoadingPage from "@/components/Custom/LoadingPage";
 import useUserStore from "@/store/userStore/userStore";
 import type { UserProfile } from "@/types/userTypes";
+import { baseURL } from "@/services/services";
 
 import {
   fetchChallengeById,
   updateChallenge,
+  uploadChallengeCover,
   removeParticipantFromChallenge,
   fetchChallengeCategories,
 } from "@/services/challengeService";
+import type { UpdateChallengePayload } from "@/services/challengeService";
 
 import type { ChallengeCategoryType } from "@/types/challengeCreateTypes";
 import type { ChallengeData } from "@/types/challengeCreateTypes";
@@ -39,6 +42,7 @@ const ChallengeEdit: React.FC = () => {
   const [isCreator, setIsCreator] = useState(false);
 
   const [image, setImage] = useState<string>(DEFAULT_IMG);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [challengeTitle, setChallengeTitle] = useState("");
   const [challengeDescription, setChallengeDescription] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -56,6 +60,13 @@ const ChallengeEdit: React.FC = () => {
   const [participants, setParticipants] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  const normalizeUrl = (value?: string | null) => {
+    if (!value) return "";
+    if (/^https?:\/\//i.test(value)) return value;
+    if (value.startsWith("/")) return `${baseURL}${value}`;
+    return `${baseURL}/${value}`;
+  };
 
   useEffect(() => {
     const loadChallenge = async () => {
@@ -79,7 +90,9 @@ const ChallengeEdit: React.FC = () => {
 
         setChallengeTitle(data.title);
         setChallengeDescription(data.description || "");
-        setImage(data.image_url || DEFAULT_IMG);
+        const coverImage = normalizeUrl(data.cover_image);
+        const legacyImage = normalizeUrl(data.image_url);
+        setImage(coverImage || legacyImage || DEFAULT_IMG);
         setChallengeLocation(data.address || ""); 
         setLatitude(data.latitude ?? null);
         setLongitude(data.longitude ?? null);
@@ -126,6 +139,7 @@ const ChallengeEdit: React.FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setImage(reader.result as string);
       reader.readAsDataURL(file);
@@ -165,26 +179,84 @@ const ChallengeEdit: React.FC = () => {
       return;
     }
 
-    setIsSaving(true);
-
     const selectedCat = categories.find((c) => c.name === selectedCategoryName);
     const category_id = selectedCat?.id || null;
+    const nextStartTime = `${startDate}T${startTime}:00Z`;
+    const nextEndTime = `${endDate}T${endTime}:59Z`;
+    const currentStartTime = challenge?.start_time;
+    const startChanged = currentStartTime
+      ? new Date(currentStartTime).getTime() !==
+        new Date(nextStartTime).getTime()
+      : true;
+    const hasStarted = currentStartTime
+      ? new Date(currentStartTime).getTime() <= Date.now()
+      : false;
 
-    const payload = {
+    if (hasStarted && startChanged) {
+      CustomToast("زمان شروع چالش بعد از شروع قابل تغییر نیست", "error");
+      return;
+    }
+
+    setIsSaving(true);
+
+    const payload: UpdateChallengePayload = {
       title: challengeTitle.trim(),
       description: challengeDescription.trim() || null,
-      image_url: image !== DEFAULT_IMG ? image : null,
       address: challengeLocation.trim() || null, // ← Use address field
       latitude: latitude ?? null,
       longitude: longitude ?? null,
-      start_time: `${startDate}T${startTime}:00Z`,
-      end_time: `${endDate}T${endTime}:59Z`,
+      end_time: nextEndTime,
       timezone: "UTC",
       category_id,
     };
 
+    if (!hasStarted || startChanged) {
+      payload.start_time = nextStartTime;
+    }
+
     try {
       await updateChallenge(challengeId!, payload);
+      if (imageFile) {
+        try {
+          const uploadRes = await uploadChallengeCover(challengeId!, imageFile);
+          let uploadedUrl = normalizeUrl(
+            uploadRes?.cover_image ||
+              uploadRes?.data?.cover_image ||
+              uploadRes?.url ||
+              uploadRes?.data?.url ||
+              uploadRes?.image_url ||
+              uploadRes?.data?.image_url ||
+              ""
+          );
+
+          if (!uploadedUrl) {
+            try {
+              const refreshed = await fetchChallengeById(challengeId!);
+              setChallenge(refreshed);
+              uploadedUrl =
+                normalizeUrl(refreshed?.cover_image) ||
+                normalizeUrl(refreshed?.image_url);
+            } catch (refreshError) {
+              console.error("Failed to refresh challenge after upload:", refreshError);
+            }
+          }
+
+          if (uploadedUrl) {
+            setImage(uploadedUrl);
+          } else {
+            CustomToast("کاور چالش ذخیره نشد", "error");
+          }
+
+          setImageFile(null);
+        } catch (uploadError: any) {
+          const message =
+            uploadError?.response?.data?.message ||
+            uploadError?.response?.data?.details?.details ||
+            uploadError?.message ||
+            "خطا در آپلود کاور چالش";
+          CustomToast(message, "error");
+        }
+      }
       CustomToast("چالش با موفقیت بروزرسانی شد!", "success");
       navigate(`/challenge/${challengeId}`, { replace: true });
     } catch (err: any) {

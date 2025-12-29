@@ -15,6 +15,8 @@ import type { UserProfile } from "@/types/userTypes";
 import { fetchUsers } from "@/services/followerFollowingService";
 import {
   createChallenge,
+  fetchChallengeById,
+  uploadChallengeCover,
   inviteMultipleUsersToChallenge,
   fetchChallengeCategories,
 } from "@/services/challengeService";
@@ -35,6 +37,7 @@ const ChallengeCreate: React.FC = () => {
 
   const [categories, setCategories] = useState<ChallengeCategoryType[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const token = useUserStore((s) => s.token);
   const userId = useUserStore((s) => s.userId);
@@ -164,7 +167,6 @@ const ChallengeCreate: React.FC = () => {
         start_time,
         end_time,
         timezone: "UTC",
-        image_url: values.image || "",
         latitude: values.latitude ?? null,
         longitude: values.longitude ?? null,
         address: values.challengeLocation.trim() || null,
@@ -173,13 +175,36 @@ const ChallengeCreate: React.FC = () => {
       console.log("Sending payload:", payload);
 
       const response = await createChallenge(payload);
-      const challengeId = response?.data?.ID;
+      const challengeId =
+        response?.data?.ID ||
+        response?.data?.id ||
+        response?.ID ||
+        response?.id;
 
       if (!challengeId) {
         throw new Error("چالش ساخته نشد — پاسخ نامعتبر");
       }
 
       CustomToast("چالش با موفقیت ساخته شد!", "success");
+
+      let refreshedChallenge: any = null;
+      if (imageFile) {
+        try {
+          await uploadChallengeCover(challengeId, imageFile);
+          try {
+            refreshedChallenge = await fetchChallengeById(challengeId);
+          } catch (refreshError) {
+            console.error("Failed to refresh challenge after cover upload:", refreshError);
+          }
+        } catch (uploadError: any) {
+          const message =
+            uploadError?.response?.data?.message ||
+            uploadError?.response?.data?.details?.details ||
+            uploadError?.message ||
+            "خطا در آپلود کاور چالش";
+          CustomToast(message, "error");
+        }
+      }
 
       if (values.selectedUsers.length > 0) {
         const userIds = values.selectedUsers.map((u) => u.id);
@@ -200,7 +225,10 @@ const ChallengeCreate: React.FC = () => {
         }
       }
 
-      navigate(`/challenge/${challengeId}`, { replace: true });
+      navigate(`/challenge/${challengeId}`, {
+        replace: true,
+        state: refreshedChallenge ? { challenge: refreshedChallenge } : undefined,
+      });
     } catch (err: any) {
       console.error("Challenge creation failed:", err);
       const message =
@@ -273,6 +301,7 @@ const ChallengeCreate: React.FC = () => {
                   onTitleChange={(v) => setFieldValue("title", v)}
                   onDescriptionChange={(v) => setFieldValue("description", v)}
                   onImageChange={(img) => setFieldValue("image", img)}
+                  onImageFileChange={(file) => setImageFile(file)}
                   errors={{
                     title: touched.title && errors.title,
                     description: touched.description && errors.description,

@@ -21,9 +21,6 @@ export const PROTECTED_BASE = "/api/v1";
 const apiClient: AxiosInstance = axios.create({
 	baseURL,
 	timeout: 20000,
-	headers: {
-		"Content-Type": "application/json",
-	},
 });
 
 // const token = useUserStore.getState().token; // ✅ این درسته و باید جایگزین بشه
@@ -77,10 +74,10 @@ export const postData = async ({ endPoint, data, headers }: PostParams) => {
 };
 
 // ✅ POST image/form-data
-export const postImageData = async ({ endPoint, data }: PostParams) => {
+export const postImageData = async ({ endPoint, data, headers }: PostParams) => {
 	try {
 		const response: AxiosResponse = await apiClient.post(endPoint, data, {
-			headers: { "Content-Type": "multipart/form-data" },
+			headers,
 		});
 		return response.data;
 	} catch (error) {
