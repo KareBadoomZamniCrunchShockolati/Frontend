@@ -49,9 +49,9 @@ const ProfileChallenges = () => {
     { id: 0, name: "چالش‌های من" },
   ];
 
-  const [checkedCategories, setCheckedCategories] = useState<{
-    [key: number]: boolean;
-  }>({});
+  // const [checkedCategories, setCheckedCategories] = useState<{
+  //   [key: number]: boolean;
+  // }>({});
 
   const handleCategoryChange = (newChecked: { [key: number]: boolean }) => {
     if (newChecked[0] && !checkedCategories[0]) {
@@ -158,26 +158,30 @@ const ProfileChallenges = () => {
   }, [userId]);
 
   // ----- منطق چک‌باکس دسته‌بندی‌ها (مثل کد خودت) -----
-  const handleCategoryChange = (newChecked: { [key: number]: boolean }) => {
-    if (newChecked[0] && !checkedCategories[0]) {
-      setCheckedCategories({ 0: true });
-    } else if (
-      !newChecked[0] &&
-      Object.keys(newChecked).some(
-        (k) => Number(k) !== 0 && newChecked[Number(k)]
-      )
-    ) {
-      const updated = { ...newChecked };
-      delete updated[0];
-      setCheckedCategories(updated);
-    } else setCheckedCategories(newChecked);
-  };
+  // const handleCategoryChange = (newChecked: { [key: number]: boolean }) => {
+  //   if (newChecked[0] && !checkedCategories[0]) {
+  //     setCheckedCategories({ 0: true });
+  //   } else if (
+  //     !newChecked[0] &&
+  //     Object.keys(newChecked).some(
+  //       (k) => Number(k) !== 0 && newChecked[Number(k)]
+  //     )
+  //   ) {
+  //     const updated = { ...newChecked };
+  //     delete updated[0];
+  //     setCheckedCategories(updated);
+  //   } else setCheckedCategories(newChecked);
+  // };
 
   // ----- فیلتر چالش‌ها بر اساس دسته‌بندی‌های انتخاب شده -----
   const filteredChallenges = challenges;
   const resolveAvatarUrl = (user: any) =>
     normalizeUrl(
-      user?.profile_picture || user?.avatar_url || user?.avatar || user?.image || ""
+      user?.profile_picture ||
+        user?.avatar_url ||
+        user?.avatar ||
+        user?.image ||
+        ""
     );
 
   if (error) {
