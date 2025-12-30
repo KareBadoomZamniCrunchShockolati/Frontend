@@ -4,9 +4,10 @@ import { Form, Formik } from "formik";
 import { Search } from "lucide-react";
 import CustomInput from "../Custom/CustomInput";
 import CustomDropdown from "../Custom/CustomDropdown";
-import { useNavigate } from "react-router-dom";
 import { baseURL } from "@/services/services";
 import useUserStore from "@/store/userStore/userStore";
+import { VirtualChallengeList } from "./VirtualChallengeList";
+import SkeletonChallengeCard from "./SkeletonChallengeCard";
 
 import {
   getParticipatingChallengesService,
@@ -15,8 +16,6 @@ import {
   searchChallengesService,
 } from "@/services/userService";
 import type { Challenge } from "@/types/challengeTypes";
-import { VirtualChallengeList } from "./VirtualChallengeList";
-import SkeletonChallengeCard from "./SkeletonChallengeCard";
 
 const PAGE_SIZE = 5;
 
@@ -33,13 +32,15 @@ const ProfileChallenges = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentUserAvatar, setCurrentUserAvatar] = useState("");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [columnCount, setColumnCount] = useState(1);
   const [checkedCategories, setCheckedCategories] = useState<{
     [key: number]: boolean;
   }>({});
   const [searchQuery, setSearchQuery] = useState("");
 
   const { userId } = useUserStore();
-  const navigate = useNavigate();
 
   const categories = [
     { id: 1, name: "ورزشی" },
@@ -48,10 +49,6 @@ const ProfileChallenges = () => {
     { id: 4, name: "تفریحی" },
     { id: 0, name: "چالش‌های من" },
   ];
-
-  const [checkedCategories, setCheckedCategories] = useState<{
-    [key: number]: boolean;
-  }>({});
 
   const handleCategoryChange = (newChecked: { [key: number]: boolean }) => {
     if (newChecked[0] && !checkedCategories[0]) {
@@ -93,21 +90,25 @@ const ProfileChallenges = () => {
 
   const fetchChallenges = useCallback(
     async (pageNum: number, isLoadMore: boolean = false) => {
+      if (isLoadMore && lastFetchedPage.current === pageNum) {
+        return;
+      }
+
       try {
         if (!isLoadMore) setLoading(true);
         else setLoadingMore(true);
-
         setError(null);
 
-        if (isLoadMore && lastFetchedPage.current === pageNum) return;
-        lastFetchedPage.current = pageNum;
-
         let rawList: Challenge[] = [];
+        const isSearching = !!searchQuery.trim();
 
-        if (searchQuery.trim()) {
-          const response = await searchChallengesService(searchQuery);
+        if (isSearching) {
+          const response = await searchChallengesService(
+            searchQuery,
+            pageNum,
+            PAGE_SIZE
+          );
           rawList = response?.data ?? response ?? [];
-          setHasMore(false);
         } else {
           rawList = await getParticipatingChallengesService(pageNum, PAGE_SIZE);
         }
@@ -118,14 +119,16 @@ const ProfileChallenges = () => {
           isLoadMore ? [...prev, ...hydrated] : hydrated
         );
 
-        if (!searchQuery.trim()) {
-          if (rawList.length < PAGE_SIZE) {
-            setHasMore(false); // ✅ این آخرشه
-          } else {
-            setHasMore(true);
-            setPage((prev) => prev + 1);
-          }
+        if (isSearching) {
+          setHasMore(false);
+        } else if (rawList.length < PAGE_SIZE) {
+          setHasMore(false);
+        } else {
+          setHasMore(true);
+          setPage(pageNum + 1);
         }
+
+        lastFetchedPage.current = pageNum;
       } catch (err) {
         setError("خطا در دریافت چالش‌ها");
       } finally {
@@ -137,11 +140,27 @@ const ProfileChallenges = () => {
   );
 
   useEffect(() => {
-    const q = searchQuery.trim();
-    if (q) fetchSearchedChallenges(q);
-    else fetchParticipatingChallenges();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery]);
+    setChallenges([]);
+    setPage(1);
+    setHasMore(true);
+    lastFetchedPage.current = null;
+    fetchChallenges(1, false);
+  }, [fetchChallenges, searchQuery]);
+
+  useEffect(() => {
+    const getColumnCount = () => {
+      if (typeof window === "undefined") return 1;
+      if (window.innerWidth >= 1280) return 4;
+      if (window.innerWidth >= 1024) return 3;
+      if (window.innerWidth >= 640) return 2;
+      return 1;
+    };
+
+    setColumnCount(getColumnCount());
+    const handleResize = () => setColumnCount(getColumnCount());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchProfilePicture = async () => {
@@ -157,28 +176,7 @@ const ProfileChallenges = () => {
     fetchProfilePicture();
   }, [userId]);
 
-  // ----- منطق چک‌باکس دسته‌بندی‌ها (مثل کد خودت) -----
-  const handleCategoryChange = (newChecked: { [key: number]: boolean }) => {
-    if (newChecked[0] && !checkedCategories[0]) {
-      setCheckedCategories({ 0: true });
-    } else if (
-      !newChecked[0] &&
-      Object.keys(newChecked).some(
-        (k) => Number(k) !== 0 && newChecked[Number(k)]
-      )
-    ) {
-      const updated = { ...newChecked };
-      delete updated[0];
-      setCheckedCategories(updated);
-    } else setCheckedCategories(newChecked);
-  };
-
-  // ----- فیلتر چالش‌ها بر اساس دسته‌بندی‌های انتخاب شده -----
   const filteredChallenges = challenges;
-  const resolveAvatarUrl = (user: any) =>
-    normalizeUrl(
-      user?.profile_picture || user?.avatar_url || user?.avatar || user?.image || ""
-    );
 
   if (error) {
     return (
@@ -193,6 +191,8 @@ const ProfileChallenges = () => {
       </div>
     );
   }
+
+  const showSkeletons = loading && challenges.length === 0;
 
   return (
     <>
@@ -235,51 +235,28 @@ const ProfileChallenges = () => {
       </div>
 
       {/* نمایش چالش‌ها */}
-      {!loading && filteredChallenges.length > 0 && (
+      {showSkeletons && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 m-2.5">
-          {filteredChallenges.map((challenge) => (
-            <ChallengeCard
-              key={challenge.id}
-              id={challenge.id}
-              onClick={() => navigate(`/challenge/${challenge.id}`)}
-              title={challenge.title}
-              description={challenge.description}
-              startDate={convertToJalali(challenge.start_time)}
-              endDate={convertToJalali(challenge.end_time)}
-              profiles={
-                challenge.mutualFollowers?.map((user: any) => ({
-                  id: user.id,
-                  name: user.username || user.name || "",
-                  avatar: resolveAvatarUrl(user),
-                  image: resolveAvatarUrl(user),
-                })) || []
-              }
-              initialLikes={challenge.like_count}
-              initialComments={challenge.comment_count}
-              coverImage={
-                normalizeUrl(challenge.cover_image || "") ||
-                normalizeUrl(challenge.image_url) ||
-                "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=800&q=80"
-              }
-              isPrivate={challenge.visibility === "private"}
-              isJoined={challenge?.is_user_participating || true}
-              creator={{
-                name: challenge.creator_username,
-                avatar:
-                  challenge.creator_id === userId
-                    ? currentUserAvatar
-                    : normalizeUrl(
-                        challenge.creator_profile_picture ||
-                          challenge.creator_avatar_url ||
-                          ""
-                      ),
-              }}
-            />
-          ))}
+          {Array.from({ length: Math.min(columnCount * 2, 6) }).map(
+            (_, index) => (
+              <SkeletonChallengeCard key={`profile-skeleton-${index}`} />
+            )
+          )}
         </div>
       )}
 
-      {/* حالت خالی */}
+      {!loading && filteredChallenges.length > 0 && (
+        <VirtualChallengeList
+          challenges={filteredChallenges}
+          loadingMore={loadingMore}
+          columnCount={columnCount}
+          onLoadMore={() => fetchChallenges(page, true)}
+          hasMore={!searchQuery.trim() && hasMore}
+          currentUserId={userId}
+          currentUserAvatar={currentUserAvatar}
+        />
+      )}
+
       {!loading && !loadingMore && challenges.length === 0 && (
         <div className="flex justify-center items-center h-40">
           <p className="text-neutral-gray">

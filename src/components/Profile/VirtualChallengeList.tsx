@@ -5,6 +5,7 @@ import SkeletonChallengeCard from "./SkeletonChallengeCard";
 import type { Challenge } from "@/types/challengeTypes";
 import { convertToJalali } from "../Custom/ConvertToJalali";
 import { useNavigate } from "react-router-dom";
+import { baseURL } from "@/services/services";
 
 type VirtualChallengeListProps = {
   challenges: Challenge[];
@@ -12,10 +13,24 @@ type VirtualChallengeListProps = {
   columnCount: number;
   onLoadMore: () => void;
   hasMore?: boolean;
+  currentUserId?: number | null;
+  currentUserAvatar?: string;
 };
 
 const GAP = 12;
 const LOAD_MORE_OFFSET = 300; // px مانده به انتهای صفحه
+
+const normalizeUrl = (value?: string) => {
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith("/")) return `${baseURL}${value}`;
+  return `${baseURL}/${value}`;
+};
+
+const resolveAvatarUrl = (user: any) =>
+  normalizeUrl(
+    user?.profile_picture || user?.avatar_url || user?.avatar || user?.image || ""
+  );
 
 export const VirtualChallengeList = ({
   challenges = [],
@@ -23,6 +38,8 @@ export const VirtualChallengeList = ({
   columnCount,
   onLoadMore,
   hasMore = true,
+  currentUserId,
+  currentUserAvatar,
 }: VirtualChallengeListProps) => {
   const navigate = useNavigate();
   const loadTriggeredRef = useRef(false);
@@ -65,6 +82,19 @@ export const VirtualChallengeList = ({
     const items = [];
 
     safeChallenges.forEach((challenge) => {
+      const mutualList =
+        challenge.mutualFollowers ??
+        challenge.mutual_participants ??
+        [];
+      const creatorAvatar =
+        currentUserId &&
+        currentUserAvatar &&
+        challenge.creator_id === currentUserId
+          ? currentUserAvatar
+          : normalizeUrl(
+              challenge.creator_profile_picture || challenge.creator_avatar_url || ""
+            );
+
       items.push(
         <div key={challenge.id} className="challenge-card">
           <ChallengeCard
@@ -75,24 +105,26 @@ export const VirtualChallengeList = ({
             startDate={convertToJalali(challenge.start_time)}
             endDate={convertToJalali(challenge.end_time)}
             profiles={
-              challenge.mutualFollowers?.map((user: any) => ({
+              mutualList?.map((user: any) => ({
                 id: user.id,
-                name: user.username,
-                avatar: user.avatar_url ?? user.image ?? "",
-                image: user.avatar_url ?? user.image ?? "",
+                name: user.username || user.name || "",
+                avatar: resolveAvatarUrl(user),
+                image: resolveAvatarUrl(user),
               })) ?? []
             }
             initialLikes={challenge.like_count}
             initialComments={challenge.comment_count}
             coverImage={
-              challenge.image_url ||
-              "https://images.unsplash.com/photo-1555949963-aa79dcee981c"
+              normalizeUrl(challenge.cover_image || "") ||
+              normalizeUrl(challenge.image_url) ||
+              "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=800&q=80"
             }
             isPrivate={challenge.visibility === "private"}
             isJoined={challenge?.is_user_participating ?? false}
             creator={{
               name: challenge.creator_username,
               avatar:
+                creatorAvatar ||
                 "https://images.unsplash.com/photo-1502764613149-7f1d229e230f",
             }}
           />
@@ -111,7 +143,15 @@ export const VirtualChallengeList = ({
     }
 
     return items;
-  }, [safeChallenges, loadingMore, hasMore, columnCount, navigate]);
+  }, [
+    safeChallenges,
+    loadingMore,
+    hasMore,
+    columnCount,
+    navigate,
+    currentUserId,
+    currentUserAvatar,
+  ]);
 
   if (safeChallenges.length === 0 && !loadingMore) {
     return (
