@@ -1,11 +1,10 @@
-import ChallengeCard from "@/components/Custom/ChallangeCard";
-import CustomBtn from "@/components/Custom/CustomBtn";
 import CustomButton from "@/components/Custom/CustomButton";
 import TopBackText from "@/components/Custom/TopBackText";
-import TopProfile from "@/components/topProfile";
-import { divIcon } from "leaflet";
 import profileImg from "@/assets/Img/Icon/User.svg";
 import convertToPersianDigits from "@/utils/convertToPersianDigits";
+import happy from "@/assets/Img/Icon/emoji-happy.svg";
+import { Navigate, useNavigate } from "react-router-dom";
+
 const newData = [
   {
     type: "inviteChallenge",
@@ -25,6 +24,22 @@ const newData = [
   {
     type: "followed",
     username: "mina",
+    userId: "1",
+  },
+];
+const oldData = [
+  {
+    type: "inviteChallenge",
+    username: "sina",
+    challengeName: "first challenge",
+  },
+  {
+    type: "inviteChallenge",
+    username: "saman",
+    challengeName: "second challenge",
+  },
+  {
+    type: "progress",
   },
 ];
 
@@ -53,7 +68,11 @@ const NotificationPage = () => {
         </div>
         {newData.map((x) => {
           return x.type == "followed" ? (
-            <NotificationCard type={x.type} username={x.username} />
+            <NotificationCard
+              type={x.type}
+              username={x.username}
+              userId={x.userId}
+            />
           ) : (
             <NotificationCard
               type={x.type}
@@ -62,6 +81,7 @@ const NotificationPage = () => {
             />
           );
         })}
+        <ProgressCard message=" تونستی 5 روز پشت سر هم به چالش کوه‌نوردی روی دریا پایبند بمونی این خیلی عالیه" />
       </div>
     </div>
   );
@@ -72,11 +92,14 @@ const NotificationCard = ({
   type,
   username,
   challengeName,
+  userId,
 }: {
   type: string;
   username: string;
   challengeName?: string;
+  userId?: string;
 }) => {
+  const navigate = useNavigate();
   return (
     <>
       {type == "inviteChallenge" ? (
@@ -87,12 +110,25 @@ const NotificationCard = ({
       ) : (
         <div className="flex gap-4 rounded-2xl bg-white justify-between p-4 border-2 border-black">
           <CustomButton className="bg-primary  ">دنبال کردن</CustomButton>
-          <div className="flex flex-row-reverse w-6/7">
-            <img className="rounded-full" src={profileImg} alt="" />
+          <div className="flex gap-4 flex-row-reverse w-6/7">
+            <img
+              onClick={() => navigate(`/dashboard/${userId}`)}
+              className="rounded-full"
+              src={profileImg}
+              alt=""
+            />
             <p className="w-4/5 text-right">{username} شما را دنبال می‌کند</p>
           </div>
         </div>
       )}
     </>
+  );
+};
+const ProgressCard = ({ message }: { message: string }) => {
+  return (
+    <div className="flex gap-4 rounded-2xl bg-white justify-between p-4 border-2 border-black">
+      <p className="text-end">{`${message}`}</p>
+      <img src={happy} alt="" />
+    </div>
   );
 };
