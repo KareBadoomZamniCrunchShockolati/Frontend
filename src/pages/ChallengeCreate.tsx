@@ -219,7 +219,7 @@ const ChallengeCreate: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col p-4 items-center bg-white">
+    <div className="min-h-screen flex flex-col p-4 items-center bg-background text-foreground transition-colors duration-300">
       <div className="flex justify-center items-center w-full max-w-xl mb-10 mt-4">
         <BackButtonWithSteps
           onClick={() =>
@@ -283,7 +283,7 @@ const ChallengeCreate: React.FC = () => {
               {currentStep === 2 && (
                 <Step2Details
                   categories={categories}
-                  loadingCategories={loadingCategories} // now always false here
+                  loadingCategories={loadingCategories}
                   values={values}
                   setFieldValue={setFieldValue}
                   setFieldTouched={setFieldTouched}

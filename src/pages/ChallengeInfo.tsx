@@ -1,4 +1,4 @@
-/*  ChallengeInfo.tsx  */
+/* ChallengeInfo.tsx */
 import React, { useState, useMemo, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import CustomButton from "@/components/Custom/CustomButton";
@@ -39,7 +39,7 @@ import { DEFAULT_CHALLENGE_IMG } from "@/data/mockImages";
 import { Spinner } from "@/components/ui/spinner";
 import { defaultChallengeData } from "@/data/mockChallenges";
 
-const defaultChallenge = defaultChallengeData
+const defaultChallenge = defaultChallengeData;
 
 const ChallengeInfo: React.FC = () => {
   const location = useLocation();
@@ -47,7 +47,7 @@ const ChallengeInfo: React.FC = () => {
   const { challengeId } = useParams<{ challengeId: string }>();
   const challenge_Id = Number(challengeId);
 
-  // Fallback from navigation state (kept for backward compatibility)
+  // Fallback from navigation state
   const payload: ChallengeDataDetails =
     (location.state?.challenge as ChallengeDataDetails) ?? defaultChallenge;
 
@@ -62,7 +62,6 @@ const ChallengeInfo: React.FC = () => {
   const [isParticipated, setIsParticipated] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
 
-  // Use real backend latitude/longitude for the map
   const displayCoordinates = useMemo<[number, number] | null>(() => {
     if (challenge?.latitude && challenge?.longitude) {
       return [challenge.latitude, challenge.longitude];
@@ -175,20 +174,19 @@ const ChallengeInfo: React.FC = () => {
     }
   };
 
-  // ← UPDATED LOADING STATE WITH SPINNER
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <Spinner className="size-12 text-primary" />
-          <p className="text-lg">در حال بارگذاری چالش...</p>
+          <p className="text-lg text-foreground">در حال بارگذاری چالش...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between p-4">
+    <div className="min-h-screen flex flex-col justify-between p-4 bg-background text-foreground transition-colors duration-300">
       <div className="flex-1 flex flex-col items-center">
         <BackButtonAndMenu onMenuClick={handleMenu} />
 
@@ -212,7 +210,7 @@ const ChallengeInfo: React.FC = () => {
 
         <div className="w-full max-w-xl mt-6">
           <LocationMapPicker
-            onLocationSelect={() => {}} // Required but ignored
+            onLocationSelect={() => {}}
             initialPosition={displayCoordinates}
             height="h-50"
             readOnly={true}
@@ -223,7 +221,7 @@ const ChallengeInfo: React.FC = () => {
         <CustomButton
           onClick={joinChallengeHandler}
           className={cn(
-            "mt-6 w-full max-w-xl bg-primary rounded-2xl p-5 text-lg",
+            "mt-6 w-full max-w-xl bg-primary rounded-2xl p-5 text-lg text-primary-foreground",
             isParticipated && "hidden"
           )}
         >
@@ -232,7 +230,7 @@ const ChallengeInfo: React.FC = () => {
 
         <CustomButton
           className={cn(
-            "mt-6 w-full max-w-xl bg-secondary rounded-2xl p-5 text-lg",
+            "mt-6 w-full max-w-xl bg-secondary rounded-2xl p-5 text-lg text-secondary-foreground",
             !isParticipated && "hidden"
           )}
         >
@@ -242,7 +240,7 @@ const ChallengeInfo: React.FC = () => {
         <CustomButton
           onClick={leaveChallengeHandler}
           className={cn(
-            "mt-6 w-full max-w-xl bg-red-main rounded-2xl p-5 text-lg",
+            "mt-6 w-full max-w-xl bg-red-main rounded-2xl p-5 text-lg text-white",
             !isParticipated && "hidden"
           )}
         >
@@ -251,7 +249,7 @@ const ChallengeInfo: React.FC = () => {
 
         {/* Participants */}
         <div className="w-full max-w-2xl mt-8" dir="rtl">
-          <h2 className="text-xl font-semibold mb-4">شرکت‌کنندگان</h2>
+          <h2 className="text-xl font-semibold mb-4 text-foreground">شرکت‌کنندگان</h2>
           <SearchBar
             searchTerm={searchTerm}
             onSearchTermChange={setSearchTerm}
@@ -263,9 +261,9 @@ const ChallengeInfo: React.FC = () => {
           />
         </div>
 
-        {/* Related Challenges Slideshow — MOCKS KEPT! */}
+        {/* Related Challenges Slideshow */}
         <div className="w-full max-w-2xl mt-10" dir="rtl">
-          <h2 className="text-xl font-semibold mb-4 flex items-center">
+          <h2 className="text-xl font-semibold mb-4 flex items-center text-foreground">
             <img
               src="/src/assets/Img/staircase.jpg"
               alt="Staircase"
@@ -294,7 +292,7 @@ const ChallengeInfo: React.FC = () => {
           <div
             className="
               relative flex items-center justify-between rounded-2xl
-              border-2 shadow-shadow-strong border-black px-10 py-8
+              border-2 shadow-shadow-strong border-foreground px-10 py-8
               active:shadow-none active:translate-y-[3px] active:translate-x-[3px]
               transition-all duration-25
             "

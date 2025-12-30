@@ -14,17 +14,17 @@ const LikeAndSaveButtons: React.FC<LikeSaveButtonsProps> = ({
   return (
     <div className="flex space-x-4 mt-5 max-w-xl w-full justify-end">
       <div className="flex items-center space-x-2">
-        <span className="text-black text-xl mt-6">{likeCount}</span>
+        <span className="text-foreground text-xl mt-6">{likeCount}</span>
 
         <CustomButton
-          className="w-min sm:w-min md:w-min bg-white border-primary shadow-primary hover:bg-white rounded-primary-radius p-3 flex items-center space-x-2"
+          className="w-min sm:w-min md:w-min bg-card border-2 border-primary shadow-[0_4px_0_var(--primary)] hover:bg-card rounded-primary-radius p-3 flex items-center space-x-2 dark:border-primary dark:shadow-[0_4px_0_var(--primary)]"
           onClick={onLike}
         >
           <ThumbsUp className="text-primary w-5 h-5" />
         </CustomButton>
 
         <CustomButton
-          className="w-min sm:w-min md:w-min bg-white border-primary shadow-primary hover:bg-white rounded-primary-radius p-3 flex items-center space-x-2"
+          className="w-min sm:w-min md:w-min bg-card border-2 border-primary shadow-[0_4px_0_var(--primary)] hover:bg-card rounded-primary-radius p-3 flex items-center space-x-2 dark:border-primary dark:shadow-[0_4px_0_var(--primary)]"
           onClick={onSave}
         >
           <Bookmark className="text-primary w-5 h-5" />

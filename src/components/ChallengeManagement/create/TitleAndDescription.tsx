@@ -22,7 +22,7 @@ const ChallengeTitleAndDescriptionInput: React.FC<
         {({ values, handleChange }) => (
           <Form>
             {/* عنوان چالش */}
-            <h1 className="text-2xl font-semibold text-black mb-12">
+            <h1 className="text-2xl font-semibold mb-12">
               <Field name="challengeTitle">
                 {({ field }: any) => (
                   <CustomInput

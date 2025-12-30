@@ -15,6 +15,7 @@ import PostPage from "@/pages/PostPage";
 import EditPost from "@/pages/EditPost";
 import MainPage from "@/pages/MainPage";
 import SectionChallengesScreen from "@/pages/SectionChallengesScreen";
+import DarkModePage from "@/pages/DarkLightMode";
 
 // import { LogIn } from "lucide-react";
 import Challenge from "@/pages/ChallengeInfo";
@@ -79,6 +80,10 @@ export const router = createBrowserRouter([
         path: "/challenge/:challengeId/invitelist",
         element: <InviteList />,
       },
+      {
+        path: "darkmode",
+        element: <DarkModePage />,
+      }
     ],
   },
   {

@@ -37,7 +37,7 @@ const Step1BasicInfo: React.FC<StepOneProps> = ({
       {/* آپلود تصویر */}
       <div className="mt-6">
         <div
-          className="flex justify-center items-center bg-primary-picture-background p-10 cursor-pointer rounded-primary-radius border-2 border-black border-dotted transition-all"
+          className="flex justify-center items-center bg-background p-10 cursor-pointer rounded-primary-radius border-2 border-primary border-dotted transition-all"
           onClick={() => document.getElementById("imgUpload")?.click()}
         >
           <input id="imgUpload" type="file" accept="image/*" onChange={handleFile} className="hidden" />

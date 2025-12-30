@@ -17,7 +17,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ searchTerm, onSearchTermChange })
               render={({ field }: any) => (
                 <CustomInput
                   {...field}
-                  icon={<Search className="w-5 h-5 text-gray-500" />}
+                  icon={<Search className="w-5 h-5 text-gray-text" />}
                   value={values.searchTerm}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     handleChange(e);

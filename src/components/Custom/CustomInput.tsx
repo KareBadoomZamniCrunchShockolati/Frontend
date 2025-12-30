@@ -71,7 +71,7 @@ export default function CustomInput({
                   onBlur={handleBlur}
                   dir={isRTL ? "rtl" : "ltr"}
                   rows={rows}
-                  className={`border !border-[var(--borderDefault)] shadow-[0px_1px_0px_var(--borderDefault)] focus:!border-[var(--borderFoucus)] focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)] focus:!ring-0 focus-visible:!ring-0 p-2 rounded-primary-radius w-full resize-none
+                  className={`border !border-foreground shadow-[0px_1px_0px_var(--foreground)] focus:!border-[var(--borderFoucus)] focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)] focus:!ring-0 focus-visible:!ring-0 p-2 rounded-primary-radius w-full resize-none
                     ${isRTL ? "text-right pr-4" : "text-left pl-4"}
                     ${icon ? "pl-12" : ""}
                     transition-all duration-200 ease-in-out
@@ -90,7 +90,7 @@ export default function CustomInput({
                   onFocus={handleFocus}
                   onBlur={handleBlur}
                   dir={isRTL ? "rtl" : "ltr"}
-                  className={`border !border-[var(--borderDefault)] shadow-[0px_1px_0px_var(--borderDefault)] focus:!border-[var(--borderFoucus)] focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)] focus:!ring-0 focus-visible:!ring-0 p-0 rounded-primary-radius h-10 w-full
+                  className={`border !border-[var(--foreground)] shadow-[0px_1px_0px_var(--foreground)] focus:!border-[var(--borderFoucus)] focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)] focus:!ring-0 focus-visible:!ring-0 p-0 rounded-primary-radius h-10 w-full
                     ${isRTL ? "text-right pr-4" : "text-left pl-4"}
                     ${icon ? "pl-12" : ""}
                     transition-all duration-200 ease-in-out
@@ -119,7 +119,7 @@ export default function CustomInput({
                   ${"right-4"}
                   ${
                     isFloating
-                      ? "top-[-10px] text-xs bg-white px-1 text-black"
+                      ? "top-[-10px] text-xs bg-floating-label-background px-1 text-floating-label-text"
                       : as === "textarea"
                         ? "top-2 text-sm text-gray-500"
                         : "top-1/2 -translate-y-1/2 text-sm text-gray-500"

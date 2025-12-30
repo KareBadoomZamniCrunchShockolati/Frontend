@@ -98,7 +98,7 @@ export default function ChallengeCard({
 
   return (
     <Card
-      className="w-full max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-shadow-strong hover:shadow-xl transition-shadow duration-300 border-2 border-black bg-white"
+      className="w-full max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-shadow-strong hover:shadow-xl transition-shadow duration-300 border-2 border-foreground bg-foregeround"
       dir="rtl"
     >
       <div className="flex flex-col md:flex-row">
@@ -132,13 +132,13 @@ export default function ChallengeCard({
                       src={profile.avatar || profile.image}
                       alt={profile.name}
                     />
-                    <AvatarFallback className="bg-white text-neutral-gray-bold text-xs">
+                    <AvatarFallback className="bg-white text-gray-text text-xs">
                       {profile.name?.charAt(0) || "?"}
                     </AvatarFallback>
                   </Avatar>
                 ))}
                 {remainingProfiles > 0 && (
-                  <div className="relative h-8 w-8 border-2 border-white bg-neutral-gray text-neutral-gray-bold text-xs flex items-center justify-center rounded-full shadow-md font-semibold">
+                  <div className="relative h-8 w-8 border-2 border-foreground bg-neutral-gray text-gray-text text-xs flex items-center justify-center rounded-full shadow-md font-semibold">
                     +{remainingProfiles}
                   </div>
                 )}
@@ -177,10 +177,10 @@ export default function ChallengeCard({
                 </Avatar>
 
                 <div className="flex flex-col min-w-0">
-                  <span className="font-semibold text-black text-sm truncate">
+                  <span className="font-semibold text-gray-text text-sm truncate">
                     {creator?.name || "کاربر ناشناس"}
                   </span>
-                  <span className="text-xs text-neutral-gray">ایجاد‌کننده</span>
+                  <span className="text-xs text-gray-text">ایجاد‌کننده</span>
                 </div>
               </div>
 
@@ -215,10 +215,10 @@ export default function ChallengeCard({
 
             {/* عنوان و توضیحات */}
             <div className="mb-4">
-              <h2 className="text-lg font-bold text-black mb-2 line-clamp-2">
+              <h2 className="text-lg font-bold text-gray-text mb-2 line-clamp-2">
                 {title}
               </h2>
-              <p className="text-neutral-gray-bold text-sm leading-relaxed line-clamp-3">
+              <p className="text-gray-text text-sm leading-relaxed line-clamp-3">
                 {description || "بدون توضیحات"}
               </p>
             </div>
@@ -226,24 +226,24 @@ export default function ChallengeCard({
             {/* اطلاعات */}
             <div className="flex flex-wrap gap-6 text-sm mb-4 pb-4 border-b border-neutral-gray">
               <div>
-                <span className="text-neutral-gray-bold text-xs font-medium block mb-1">
+                <span className="text-gray-text text-xs font-medium block mb-1">
                   تاریخ شروع
                 </span>
                 <span className="text-black font-bold">{startDate}</span>
               </div>
 
               <div>
-                <span className="text-neutral-gray-bold text-xs font-medium block mb-1">
+                <span className="text-gray-text text-xs font-medium block mb-1">
                   تاریخ پایان
                 </span>
                 <span className="text-black font-bold">{endDate}</span>
               </div>
 
               <div>
-                <span className="text-neutral-gray-bold text-xs font-medium block mb-1">
+                <span className="text-gray-text text-xs font-medium block mb-1">
                   نظرات
                 </span>
-                <div className="flex items-center gap-1.5 text-black font-bold">
+                <div className="flex items-center gap-1.5 text-gray-text font-bold">
                   <MessageCircle className="h-4 w-4" />
                   <span>{comments}</span>
                 </div>

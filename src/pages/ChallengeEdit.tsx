@@ -26,7 +26,6 @@ import type { ChallengeData } from "@/types/challengeCreateTypes";
 
 import { DEFAULT_IMG } from "@/data/mockImages";
 
-// Use the correct fixed map component
 import LocationMapPicker from "@/components/Custom/LocationMap";
 
 const ChallengeEdit: React.FC = () => {
@@ -174,7 +173,7 @@ const ChallengeEdit: React.FC = () => {
       title: challengeTitle.trim(),
       description: challengeDescription.trim() || null,
       image_url: image !== DEFAULT_IMG ? image : null,
-      address: challengeLocation.trim() || null, // ← Use address field
+      address: challengeLocation.trim() || null,
       latitude: latitude ?? null,
       longitude: longitude ?? null,
       start_time: `${startDate}T${startTime}:00Z`,
@@ -212,7 +211,7 @@ const ChallengeEdit: React.FC = () => {
   if (!challenge || !isCreator) return null;
 
   return (
-    <div className="min-h-screen flex flex-col p-4">
+    <div className="min-h-screen flex flex-col p-4 bg-background text-foreground transition-colors duration-300">
       <div className="flex-1 flex flex-col justify-start items-center w-full">
         <div className="flex justify-between w-full items-center max-w-xl mb-6">
           <BackButton onClick={() => navigate(-1)} />
@@ -278,7 +277,7 @@ const ChallengeEdit: React.FC = () => {
                 />
               </>
             ) : (
-              <p className="text-center text-primary py-8 bg-white rounded-primary-radius">
+              <p className="text-center text-primary py-8 bg-card rounded-primary-radius">
                 هنوز کسی عضو چالش نشده است
               </p>
             )}

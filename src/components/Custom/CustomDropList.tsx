@@ -84,23 +84,23 @@ export default function CustomSelect({
               <div
                 onClick={toggleOpen}
                 className={`
-                  border !border-[var(--borderDefault)]
-                  shadow-[0px_1px_0px_var(--borderDefault)]
+                  border !border-[var(--foreground)]
+                  shadow-[0px_1px_0px_var(--foreground)]
                   focus:!border-[var(--borderFoucus)]
                   focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)]
                   focus:!ring-0 focus-visible:!ring-0
                   p-2 rounded-primary-radius w-full h-10
-                  bg-white cursor-pointer
+                  bg-background cursor-pointer
                   transition-all duration-200 ease-in-out
                   relative flex items-center
                   ${
                     hasError
-                      ? "!border-[var(--borderInvalid)] !shadow-[0px_1px_0px_var(--borderInvalidShadow)]"
+                      ? "!border-[var(--borderInvalid)] !shadow-[0px_1px_0px_var(--borderInvalidShadow)] shadow-foreground"
                       : ""
                   }
                   ${
                     isOpen || isFocused
-                      ? "!border-[var(--borderFoucus)] !shadow-[0px_1px_0px_var(--borderFoucusShadow)]"
+                      ? "!border-[var(--borderFoucus)] !shadow-[0px_1px_0px_var(--borderFoucusShadow)] shadow-foreground"
                       : ""
                   }
                 `}
@@ -110,7 +110,7 @@ export default function CustomSelect({
                     block truncate
                     absolute right-4 left-12 top-1/2 -translate-y-1/2
                     text-right
-                    ${!hasValue ? "text-gray-text" : "text-black"}
+                    ${!hasValue ? "text-gray-text" : "text-gray-text"}
                   `}
                   style={{ direction: isRTL ? "rtl" : "ltr" }}
                 >
@@ -138,7 +138,7 @@ export default function CustomSelect({
                   right-4
                   ${
                     isFloating
-                      ? "top-[-10px] text-xs bg-white px-1 text-black"
+                      ? "top-[-10px] text-xs bg-floating-label-background px-1 text-floating-label-text"
                       : "top-1/2 -translate-y-1/2 text-sm text-gray-text"
                   }
                 `}
@@ -150,8 +150,8 @@ export default function CustomSelect({
                 <div
                   className={`
                     absolute top-full mt-1 w-full
-                    border !border-[var(--borderDefault)]
-                    bg-white rounded-primary-radius
+                    border !border-[var(--foreground)]
+                    bg-background rounded-primary-radius
                     overflow-hidden z-50
                     shadow-lg
                     animate-in fade-in slide-in-from-top-1 duration-200
