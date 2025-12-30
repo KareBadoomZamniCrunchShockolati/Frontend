@@ -83,6 +83,8 @@ export interface ChallengeDataDetails {
   dateRange: string;
   location: string;
   Img: string | null;
+  image_url?: string;
+  cover_image?: string;
   commentsEnabled: boolean;
   categories: string[];
   type: string;

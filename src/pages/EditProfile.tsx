@@ -13,6 +13,7 @@ import ProfileSchema, {
 import {
   getUserProfileService,
   putUserProfileService,
+  uploadProfilePictureService,
   initiateEmailChangeService,
   verifyEmailChangeService,
 } from "@/services/userService";
@@ -24,6 +25,8 @@ import CustomToast from "@/components/Custom/CustomToast";
 
 export default function ProfileInfo() {
   const [image, setImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [initialValues, setInitialValues] =
     useState<ProfileValues>(ProfileInitialValues);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -39,9 +42,29 @@ export default function ProfileInfo() {
   const navigate = useNavigate();
   const { userId } = useUserStore();
 
+  const normalizeEmail = (email: string) => email.trim().toLowerCase();
+  const extractBackendMessage = (error: any) => {
+    const data = error?.response?.data;
+    if (!data) return null;
+    if (typeof data === "string") return data;
+    if (typeof data?.message === "string") return data.message;
+    if (typeof data?.error === "string") return data.error;
+    if (typeof data?.detail === "string") return data.detail;
+    if (Array.isArray(data?.errors) && data.errors.length > 0) {
+      const firstError = data.errors.find((item: unknown) => typeof item === "string");
+      if (firstError) return firstError;
+      if (typeof data.errors[0]?.message === "string") return data.errors[0].message;
+    }
+    return null;
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setImage(URL.createObjectURL(file));
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    setImagePreview(previewUrl);
+    setImageFile(file);
   };
 
   const clearMessages = () => {
@@ -49,19 +72,45 @@ export default function ProfileInfo() {
     setErrorMessage(null);
   };
 
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
+
   const handleSubmit = async (values: ProfileValues) => {
+    const trimmedEmail = values.email.trim();
+    const nextEmail = normalizeEmail(trimmedEmail);
+    const currentEmail = normalizeEmail(initialValues.email || "");
+
     setIsLoading(true);
     clearMessages();
 
     try {
       // اگر ایمیل تغییر کرده باشد، ابتدا initiate
-      if (values.email && values.email !== initialValues.email) {
-        await initiateEmailChangeService({ new_email: values.email });
-        setTempNewEmail(values.email);
+      if (trimmedEmail && nextEmail !== currentEmail) {
+        await initiateEmailChangeService({ new_email: trimmedEmail });
+        setTempNewEmail(trimmedEmail);
         setShowVerify(true);
         setSuccessMessage("کد تأیید به ایمیل جدید ارسال شد");
         setIsLoading(false);
         return;
+      }
+
+      if (imageFile) {
+        const uploadRes = await uploadProfilePictureService(imageFile);
+        const uploadedUrl =
+          uploadRes?.profile_picture ||
+          uploadRes?.data?.profile_picture ||
+          uploadRes?.url ||
+          uploadRes?.data?.url;
+
+        if (uploadedUrl) {
+          setImage(uploadedUrl);
+          setImagePreview(null);
+        }
+
+        setImageFile(null);
       }
 
       // آپدیت اطلاعات دیگر
@@ -70,7 +119,6 @@ export default function ProfileInfo() {
         data: {
           username: values.username,
           bio: values.bio,
-          profile_picture: image || undefined,
         },
       });
 
@@ -79,15 +127,9 @@ export default function ProfileInfo() {
     } catch (error) {
       CustomToast(getBackendErrorMessage(error), "error");
       // مدیریت خطاهای مختلف
-      // if (error.response?.status === 404) {
-      //   setErrorMessage("کاربر یافت نشد. لطفاً دوباره وارد شوید.");
-      // } else if (error.response?.status === 400) {
-      //   setErrorMessage("ایمیل قبلاً استفاده شده است");
-      // } else if (error.response?.status === 500) {
-      //   setErrorMessage("خطای سرور. لطفاً بعداً تلاش کنید.");
-      // } else {
-      //   setErrorMessage("خطا در ثبت تغییرات");
-      // }
+      const backendMessage = extractBackendMessage(error);
+      const status = error.response?.status;
+
     } finally {
       setIsLoading(false);
     }
@@ -187,8 +229,8 @@ export default function ProfileInfo() {
       {/* Avatar */}
       <div className="flex justify-center relative mb-8">
         <Avatar className="w-28 h-28 border border-neutral-gray">
-          {image ? (
-            <AvatarImage src={image} alt="Profile" />
+          {imagePreview || image ? (
+            <AvatarImage src={imagePreview || image || ""} alt="Profile" />
           ) : (
             <AvatarFallback>?</AvatarFallback>
           )}

@@ -7,6 +7,7 @@ export interface StepOneProps {
   onTitleChange: (v: string) => void;
   onDescriptionChange: (v: string) => void;
   onImageChange: (v: string | null) => void;
+  onImageFileChange?: (file: File | null) => void;
   errors?: {
     title?: string;
     description?: string;
@@ -67,6 +68,7 @@ export interface ChallengeData {
   title: string;
   description: string;
   image_url?: string | null;
+  cover_image?: string | null;
   start_time: string;
   end_time: string;
   location?: string;
@@ -93,9 +95,19 @@ export interface createFormValues {
   startTime: string;
   endDate: string;
   endTime: string;
-  challengeLocation: string;
+  challengeLocation: string; 
+  latitude?: number | null;   
+  longitude?: number | null;  
   challengeType: "عمومی" | "شخصی";
   isCommentsEnabled: boolean;
   memberCount: string;
   selectedUsers: UserProfile[];
+}
+
+export interface LocationMapPickerProps {
+  onLocationSelect: (lat: number, lng: number) => void;
+  defaultCenter?: [number, number];
+  initialPosition?: [number, number] | null;
+  height?: string;
+  readOnly?: boolean;
 }

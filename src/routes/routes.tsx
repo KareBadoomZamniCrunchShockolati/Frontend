@@ -26,6 +26,9 @@ import AcceptList from "@/components/Custom/AcceptList";
 import InviteList from "@/components/Custom/InviteList";
 import Comments from "@/pages/Comments";
 import FollowingPosts from "@/pages/FollowingPosts";
+import BadgePage from "@/pages/BadgePage";
+import ChallengeInfo from "@/pages/ChallengeInfo";
+import NotificationPage from "@/pages/notificationPage";
 
 export const router = createBrowserRouter([
   {
@@ -128,6 +131,14 @@ export const router = createBrowserRouter([
       {
         path: "/challenge/:id/comments",
         element: <Comments entityType="challenge" />,
+      },
+      {
+        path: "/badgepage",
+        element: <BadgePage />,
+      },
+      {
+        path: "/notifications",
+        element: <NotificationPage />,
       },
     ],
   },

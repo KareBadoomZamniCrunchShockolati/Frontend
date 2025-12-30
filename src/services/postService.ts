@@ -1,4 +1,11 @@
-import type { CreatePostPayload, LikeRequest, UpdatePostPayload } from "@/types/postTypes";
+import type {
+  CreatePostPayload,
+  LikeRequest,
+  PresignPostImagesRequest,
+  PresignPostImagesResponse,
+  PresignPostImageUpload,
+  UpdatePostPayload,
+} from "@/types/postTypes";
 import { deleteData, getData, postData, PROTECTED_BASE, putData } from "./services";
 
 export const createPostService = async ({
@@ -12,6 +19,68 @@ export const createPostService = async ({
     data: { description, challenge_id, pictures },
   });
   return data;
+};
+
+export const presignPostImagesService = async (
+  payload: PresignPostImagesRequest
+): Promise<PresignPostImagesResponse> => {
+  const data = await postData({
+    endPoint: `${PROTECTED_BASE}/posts/images/presign`,
+    data: payload,
+  });
+
+  if (data?.uploads) {
+    return data as PresignPostImagesResponse;
+  }
+
+  if (data?.data?.uploads) {
+    return data.data as PresignPostImagesResponse;
+  }
+
+  return { uploads: [] };
+};
+
+export const uploadPostImageToPresignedUrl = async (
+  upload: PresignPostImageUpload,
+  file: File
+): Promise<void> => {
+  if (!upload?.upload_url) {
+    throw new Error("Missing upload URL for post image");
+  }
+
+  const headers: Record<string, string> = { ...(upload.headers || {}) };
+  const hasHeader = (name: string) =>
+    Object.keys(headers).some(
+      (key) => key.toLowerCase() === name.toLowerCase()
+    );
+
+  if (!hasHeader("Content-Type")) {
+    headers["Content-Type"] = file?.type || "image/png";
+  }
+
+  try {
+    const signedHeadersParam =
+      new URL(upload.upload_url).searchParams.get("X-Amz-SignedHeaders") || "";
+    const signedHeaders = signedHeadersParam
+      .split(";")
+      .map((h) => h.trim().toLowerCase());
+
+    if (signedHeaders.includes("x-amz-acl") && !hasHeader("x-amz-acl")) {
+      headers["x-amz-acl"] = "public-read";
+    }
+  } catch (error) {
+    console.warn("Could not parse signed headers from presigned URL", error);
+  }
+
+  const response = await fetch(upload.upload_url, {
+    method: "PUT",
+    headers,
+    body: file,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Upload failed with status ${response.status}`);
+  }
 };
 
 export const updatePostService = async ({

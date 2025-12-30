@@ -9,11 +9,14 @@ import Step1BasicInfo from "@/components/ChallengeManagement/create/CreationStep
 import Step2Details from "@/components/ChallengeManagement/create/CreationStepTwo";
 import Step3Members from "@/components/ChallengeManagement/create/CreationStepThree";
 import CustomToast from "@/components/Custom/CustomToast";
+import LoadingPage from "@/components/Custom/LoadingPage";
 import useUserStore from "@/store/userStore/userStore";
 import type { UserProfile } from "@/types/userTypes";
 import { fetchUsers } from "@/services/followerFollowingService";
 import {
   createChallenge,
+  fetchChallengeById,
+  uploadChallengeCover,
   inviteMultipleUsersToChallenge,
   fetchChallengeCategories,
 } from "@/services/challengeService";
@@ -23,7 +26,6 @@ import {
   step2Schema,
   step3Schema,
 } from "@/schemas/challengeSchema";
-
 import type { createFormValues } from "@/types/challengeCreateTypes";
 import { getBackendErrorMessage } from "@/services/errorService";
 
@@ -36,6 +38,7 @@ const ChallengeCreate: React.FC = () => {
 
   const [categories, setCategories] = useState<ChallengeCategoryType[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const token = useUserStore((s) => s.token);
   const userId = useUserStore((s) => s.userId);
@@ -81,6 +84,8 @@ const ChallengeCreate: React.FC = () => {
     endDate: "",
     endTime: "",
     challengeLocation: "",
+    latitude: null,
+    longitude: null,
     challengeType: "عمومی",
     isCommentsEnabled: true,
     memberCount: "",
@@ -88,7 +93,7 @@ const ChallengeCreate: React.FC = () => {
   };
 
   const handleNext = async (
-    values: createFormValues,
+    values: any,
     setTouched: (touched: any) => void,
     setErrors: (errors: any) => void
   ) => {
@@ -120,73 +125,135 @@ const ChallengeCreate: React.FC = () => {
   };
 
   const handleSubmit = async (
-    values: createFormValues,
-    { setSubmitting }: FormikHelpers<createFormValues>
+    values: createFormValues & {
+      latitude?: number | null;
+      longitude?: number | null;
+    },
+    { setSubmitting }: FormikHelpers<any>
   ) => {
+    const extractBackendMessage = (error: any) => {
+      const data = error?.response?.data;
+      if (!data) return null;
+      if (typeof data === "string") return data;
+      if (typeof data?.message === "string") return data.message;
+      if (typeof data?.error === "string") return data.error;
+      if (typeof data?.error_code === "string") return data.error_code;
+      if (typeof data?.detail === "string") return data.detail;
+      if (typeof data?.details?.details === "string") return data.details.details;
+      if (typeof data?.data?.message === "string") return data.data.message;
+      return null;
+    };
+
     if (!token) {
       CustomToast("لطفاً وارد حساب کاربری شوید", "error");
       return;
     }
 
+    if (!values.selectedCategory) {
+      CustomToast("لطفاً یک دسته‌بندی انتخاب کنید", "error");
+      setSubmitting(false);
+      return;
+    }
+
     setSubmitting(true);
+
     try {
       const start_time = `${values.startDate}T${values.startTime}:00Z`;
       const end_time = `${values.endDate}T${values.endTime}:59Z`;
 
-      let category_id = 1;
-      if (values.selectedCategory) {
-        const found = categories.find(
-          (c) => c.name === values.selectedCategory
-        );
-        category_id = found?.id || 1;
+      const selectedCat = categories.find(
+        (c) => c.name === values.selectedCategory
+      );
+      if (!selectedCat) {
+        throw new Error("دسته‌بندی معتبر یافت نشد");
       }
 
       const payload = {
         title: values.title.trim(),
-        description: values.description.trim(),
-        category_id,
+        description: values.description.trim() || null,
+        category_id: selectedCat.id,
         max_participants: values.memberCount
-          ? parseInt(values.memberCount)
+          ? parseInt(values.memberCount, 10)
           : null,
-        visibility: values.challengeType === "شخصی" ? "private" : "public",
-        rule: "none",
+        visibility: values.challengeType === "خصوصی" ? "private" : "public",
+        rule: "Participate actively",
         comments_enabled: values.isCommentsEnabled,
         start_time,
         end_time,
         timezone: "UTC",
-        image_url: values.image,
+        latitude: values.latitude ?? null,
+        longitude: values.longitude ?? null,
+        address: values.challengeLocation.trim() || null,
       };
 
-      const { data: challenge } = await createChallenge(payload);
-      const challengeId = challenge?.ID;
+      const response = await createChallenge(payload);
+      const challengeId =
+        response?.data?.ID ||
+        response?.data?.id ||
+        response?.ID ||
+        response?.id;
 
-      if (!challengeId) throw new Error("چالش ساخته نشد");
+      if (!challengeId) {
+        throw new Error("چالش ساخته نشد — پاسخ نامعتبر");
+      }
 
       setTimeout(() => {
         CustomToast("چالش با موفقیت ساخته شد!", "success");
       }, 1000);
 
-      if (values.selectedUsers.length > 0) {
-        const results = await inviteMultipleUsersToChallenge(
-          challengeId,
-          values.selectedUsers.map((u) => u.id)
-        );
-        const failed = results.filter((r) => !r.success).length;
-        CustomToast(
-          failed === 0
-            ? "دعوت‌ها با موفقیت ارسال شد"
-            : `${failed} دعوت ناموفق بود`,
-          failed === 0 ? "success" : "warning"
-        );
+      let refreshedChallenge: any = null;
+      if (imageFile) {
+        try {
+          await uploadChallengeCover(challengeId, imageFile);
+          try {
+            refreshedChallenge = await fetchChallengeById(challengeId);
+          } catch (refreshError) {
+            console.error(
+              "Failed to refresh challenge after cover upload:",
+              refreshError
+            );
+          }
+        } catch (uploadError: any) {
+          CustomToast(getBackendErrorMessage(uploadError), "error");
+        }
       }
 
-      navigate(`/challenge/${challengeId}`, { replace: true });
-    } catch (err) {
-      CustomToast(getBackendErrorMessage(err), "error");
+      if (values.selectedUsers.length > 0) {
+        const userIds = values.selectedUsers.map((u) => u.id);
+        try {
+          const results = await inviteMultipleUsersToChallenge(
+            challengeId,
+            userIds
+          );
+          const failed = results.filter((r: any) => !r.success).length;
+          CustomToast(
+            failed === 0
+              ? "همه دعوت‌ها با موفقیت ارسال شد"
+              : `${failed} دعوت ناموفق بود`,
+            failed === 0 ? "success" : "warning"
+          );
+        } catch (inviteErr) {
+          CustomToast(getBackendErrorMessage(inviteErr), "error");
+        }
+      }
+
+      navigate(`/challenge/${challengeId}`, {
+        replace: true,
+        state: refreshedChallenge
+          ? { challenge: refreshedChallenge }
+          : undefined,
+      });
+    } catch (err: any) {
+      console.error("Challenge creation failed:", err);
+      CustomToast(err, "error");
     } finally {
       setSubmitting(false);
     }
   };
+
+  if (loadingCategories) {
+    return <LoadingPage />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col p-4 items-center bg-white">
@@ -243,6 +310,7 @@ const ChallengeCreate: React.FC = () => {
                   onTitleChange={(v) => setFieldValue("title", v)}
                   onDescriptionChange={(v) => setFieldValue("description", v)}
                   onImageChange={(img) => setFieldValue("image", img)}
+                  onImageFileChange={(file) => setImageFile(file)}
                   errors={{
                     title: touched.title && errors.title,
                     description: touched.description && errors.description,
@@ -253,7 +321,7 @@ const ChallengeCreate: React.FC = () => {
               {currentStep === 2 && (
                 <Step2Details
                   categories={categories}
-                  loadingCategories={loadingCategories}
+                  loadingCategories={loadingCategories} // now always false here
                   values={values}
                   setFieldValue={setFieldValue}
                   setFieldTouched={setFieldTouched}
@@ -307,12 +375,12 @@ const ChallengeCreate: React.FC = () => {
                       ? () => handleNext(values, setTouched, setErrors)
                       : undefined
                   }
-                  disabled={isSubmitting || loadingCategories}
+                  disabled={isSubmitting}
                   className={`w-full max-w-xl rounded-primary-radius p-5 text-lg transition-all text-white flex items-center justify-center gap-3
-    ${currentStep === 3 ? "bg-primary" : "bg-secondary"}
-    ${isSubmitting || loadingCategories ? "opacity-70 cursor-not-allowed" : ""}`}
+                    ${currentStep === 3 ? "bg-primary" : "bg-secondary"}
+                    ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
                 >
-                  {(isSubmitting || loadingCategories) && (
+                  {isSubmitting && (
                     <div
                       className="inline-block h-5 w-5 animate-spin rounded-full border-3 border-solid border-white border-r-transparent"
                       role="status"
@@ -325,11 +393,9 @@ const ChallengeCreate: React.FC = () => {
 
                   {isSubmitting
                     ? "در حال ثبت..."
-                    : loadingCategories
-                      ? "در حال بارگذاری..."
-                      : currentStep === 3
-                        ? "ثبت چالش"
-                        : "بعدی"}
+                    : currentStep === 3
+                      ? "ثبت چالش"
+                      : "بعدی"}
                 </CustomButton>
               </div>
             </Form>

@@ -10,21 +10,28 @@ import TitleAndDescriptionInput from "@/components/ChallengeManagement/edit/Titl
 import DateAndLocationInput from "@/components/ChallengeManagement/edit/DateAndLocationInput";
 import CategorySelectEdit from "@/components/ChallengeManagement/edit/categorySelectEdit";
 import CustomToast from "@/components/Custom/CustomToast";
+import LoadingPage from "@/components/Custom/LoadingPage";
 import useUserStore from "@/store/userStore/userStore";
 import type { UserProfile } from "@/types/userTypes";
+import { baseURL } from "@/services/services";
 
 import {
   fetchChallengeById,
   updateChallenge,
+  uploadChallengeCover,
   removeParticipantFromChallenge,
   fetchChallengeCategories,
 } from "@/services/challengeService";
+import type { UpdateChallengePayload } from "@/services/challengeService";
 
 import type { ChallengeCategoryType } from "@/types/challengeCreateTypes";
 import type { ChallengeData } from "@/types/challengeCreateTypes";
 
 import { DEFAULT_IMG } from "@/data/mockImages";
 import { getBackendErrorMessage } from "@/services/errorService";
+
+// Use the correct fixed map component
+import LocationMapPicker from "@/components/Custom/LocationMap";
 
 const ChallengeEdit: React.FC = () => {
   const { challengeId } = useParams<{ challengeId: string }>();
@@ -35,8 +42,8 @@ const ChallengeEdit: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isCreator, setIsCreator] = useState(false);
 
-  // فرم فیلدها
   const [image, setImage] = useState<string>(DEFAULT_IMG);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [challengeTitle, setChallengeTitle] = useState("");
   const [challengeDescription, setChallengeDescription] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -44,18 +51,24 @@ const ChallengeEdit: React.FC = () => {
   const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
   const [challengeLocation, setChallengeLocation] = useState("");
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
 
-  // دسته‌بندی
   const [categories, setCategories] = useState<ChallengeCategoryType[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
 
-  // شرکت‌کنندگان
   const [participants, setParticipants] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
-  // بارگذاری چالش
+  const normalizeUrl = (value?: string | null) => {
+    if (!value) return "";
+    if (/^https?:\/\//i.test(value)) return value;
+    if (value.startsWith("/")) return `${baseURL}${value}`;
+    return `${baseURL}/${value}`;
+  };
+
   useEffect(() => {
     const loadChallenge = async () => {
       if (!challengeId || !token || !userId) {
@@ -76,18 +89,20 @@ const ChallengeEdit: React.FC = () => {
         setIsCreator(true);
         setChallenge(data);
 
-        // پر كردن فرم
         setChallengeTitle(data.title);
         setChallengeDescription(data.description || "");
-        setImage(data.image_url || DEFAULT_IMG);
-        setChallengeLocation(data.location || "");
+        const coverImage = normalizeUrl(data.cover_image);
+        const legacyImage = normalizeUrl(data.image_url);
+        setImage(coverImage || legacyImage || DEFAULT_IMG);
+        setChallengeLocation(data.address || ""); 
+        setLatitude(data.latitude ?? null);
+        setLongitude(data.longitude ?? null);
 
         setStartDate(data.start_time.split("T")[0]);
         setStartDateTime(data.start_time.split("T")[1]?.slice(0, 5) || "09:00");
         setEndDate(data.end_time.split("T")[0]);
         setEndTime(data.end_time.split("T")[1]?.slice(0, 5) || "18:00");
 
-        // دسته‌بندی فعلی
         if (data.category_name) {
           setSelectedCategoryName(data.category_name);
         }
@@ -107,7 +122,6 @@ const ChallengeEdit: React.FC = () => {
     loadChallenge();
   }, [challengeId, token, userId, navigate]);
 
-  // بارگذاری دسته‌بندی‌ها
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -126,6 +140,7 @@ const ChallengeEdit: React.FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setImage(reader.result as string);
       reader.readAsDataURL(file);
@@ -146,39 +161,106 @@ const ChallengeEdit: React.FC = () => {
     }
   };
 
-  const handleSave = async () => {
-    if (typeof window.forceValidateDateLocation === "function") {
-      window.forceValidateDateLocation();
-    }
+  const handleLocationSelect = (lat: number, lng: number) => {
+    setLatitude(lat);
+    setLongitude(lng);
+  };
 
-    if (!challengeTitle.trim()) return;
-    if (!startDate || !startTime || !endDate || !endTime) return;
+  const handleSave = async () => {
+    if (!challengeTitle.trim()) {
+      CustomToast("عنوان چالش نمی‌تواند خالی باشد", "error");
+      return;
+    }
+    if (!startDate || !startTime || !endDate || !endTime) {
+      CustomToast("تاریخ و ساعت شروع و پایان الزامی است", "error");
+      return;
+    }
     if (!selectedCategoryName) {
       CustomToast("لطفاً دسته‌بندی چالش را انتخاب کنید", "error");
       return;
     }
 
-    setIsSaving(true);
-
     const selectedCat = categories.find((c) => c.name === selectedCategoryName);
     const category_id = selectedCat?.id || null;
+    const nextStartTime = `${startDate}T${startTime}:00Z`;
+    const nextEndTime = `${endDate}T${endTime}:59Z`;
+    const currentStartTime = challenge?.start_time;
+    const startChanged = currentStartTime
+      ? new Date(currentStartTime).getTime() !==
+        new Date(nextStartTime).getTime()
+      : true;
+    const hasStarted = currentStartTime
+      ? new Date(currentStartTime).getTime() <= Date.now()
+      : false;
 
-    const payload = {
+    if (hasStarted && startChanged) {
+      CustomToast("زمان شروع چالش بعد از شروع قابل تغییر نیست", "error");
+      return;
+    }
+
+    setIsSaving(true);
+
+    const payload: UpdateChallengePayload = {
       title: challengeTitle.trim(),
       description: challengeDescription.trim() || null,
-      image_url: image !== DEFAULT_IMG ? image : null,
-      location: challengeLocation.trim() || null,
-      start_time: `${startDate}T${startTime}:00Z`,
-      end_time: `${endDate}T${endTime}:59Z`,
+      address: challengeLocation.trim() || null, // ← Use address field
+      latitude: latitude ?? null,
+      longitude: longitude ?? null,
+      end_time: nextEndTime,
       timezone: "UTC",
       category_id,
     };
 
+    if (!hasStarted || startChanged) {
+      payload.start_time = nextStartTime;
+    }
+
     try {
       await updateChallenge(challengeId!, payload);
+      if (imageFile) {
+        try {
+          const uploadRes = await uploadChallengeCover(challengeId!, imageFile);
+          let uploadedUrl = normalizeUrl(
+            uploadRes?.cover_image ||
+              uploadRes?.data?.cover_image ||
+              uploadRes?.url ||
+              uploadRes?.data?.url ||
+              uploadRes?.image_url ||
+              uploadRes?.data?.image_url ||
+              ""
+          );
+
+          if (!uploadedUrl) {
+            try {
+              const refreshed = await fetchChallengeById(challengeId!);
+              setChallenge(refreshed);
+              uploadedUrl =
+                normalizeUrl(refreshed?.cover_image) ||
+                normalizeUrl(refreshed?.image_url);
+            } catch (refreshError) {
+              console.error("Failed to refresh challenge after upload:", refreshError);
+            }
+          }
+
+          if (uploadedUrl) {
+            setImage(uploadedUrl);
+          } else {
+            CustomToast("کاور چالش ذخیره نشد", "error");
+          }
+
+          setImageFile(null);
+        } catch (uploadError: any) {
+          const message =
+            uploadError?.response?.data?.message ||
+            uploadError?.response?.data?.details?.details ||
+            uploadError?.message ||
+            "خطا در آپلود کاور چالش";
+          CustomToast(message, "error");
+        }
+      }
       CustomToast("چالش با موفقیت بروزرسانی شد!", "success");
       navigate(`/challenge/${challengeId}`, { replace: true });
-    } catch (err) {
+    } catch (err: any) {
       CustomToast(getBackendErrorMessage(err), "error");
     } finally {
       setIsSaving(false);
@@ -192,16 +274,7 @@ const ChallengeEdit: React.FC = () => {
   );
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-lg font-medium text-neutral-gray-bold">
-            در حال بارگذاری چالش...
-          </p>
-        </div>
-      </div>
-    );
+    return <LoadingPage />;
   }
 
   if (!challenge || !isCreator) return null;
@@ -240,7 +313,15 @@ const ChallengeEdit: React.FC = () => {
             onLocationChange={setChallengeLocation}
           />
 
-          {/* دسته‌بندی چالش — دقیقاً مثل صفحه ساخت */}
+          <div className="space-y-3">
+            <LocationMapPicker
+              onLocationSelect={handleLocationSelect}
+              initialPosition={
+                latitude && longitude ? [latitude, longitude] : null
+              }
+            />
+          </div>
+
           <CategorySelectEdit
             categories={categories}
             loading={loadingCategories}
@@ -248,7 +329,6 @@ const ChallengeEdit: React.FC = () => {
             onCategoryChange={setSelectedCategoryName}
           />
 
-          {/* شرکت‌کنندگان */}
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-4 text-right">
               شرکت‌کنندگان ({participants.length} نفر)

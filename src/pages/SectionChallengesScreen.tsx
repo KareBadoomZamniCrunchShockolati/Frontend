@@ -1,43 +1,27 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import ChallengeCard from "@/components/Custom/ChallangeCard";
-import { convertToJalali } from "@/components/Custom/ConvertToJalali";
+import { VirtualChallengeList } from "@/components/Profile/VirtualChallengeList";
 import {
-  getChallengesByTypeService,
   getChallengesByCategoryService,
   getPopularChallengesService,
   getPublicChallengesService,
 } from "@/services/userService";
 import { getBackendErrorMessage } from "@/services/errorService";
 import CustomToast from "@/components/Custom/CustomToast";
+import type { Challenge } from "@/types/challengeTypes";
+import type {
+  CategoryMetaMap,
+  SectionMetaMap,
+  SectionRouteParams,
+  SectionType,
+} from "@/types/sectionChallengesTypes";
 
-type SectionType =
-  | "popular"
-  | "near"
-  | "followers"
-  | "moreCreators"
-  | "category";
-
-type Challenge = {
-  id: number | string;
-  title: string;
-  description?: string;
-  coverImage?: string;
-  creator?: { name: string };
-  startDate?: string;
-  endDate?: string;
-  start_time?: string;
-  end_time?: string;
-  profiles?: any[];
-  initialLikes?: number;
-  initialComments?: number;
-  isJoined?: boolean;
-  isPrivate?: boolean;
-};
+const PAGE_SIZE = 5;
+const DEFAULT_SECTION: SectionType = "popular";
 
 // نگاشت دسته‌بندی‌ها
-const CATEGORY_META: Record<string, { title: string }> = {
+const CATEGORY_META: CategoryMetaMap = {
   health: { title: "سلامت" },
   fitness: { title: "تناسب اندام" },
   study: { title: "مطالعه" },
@@ -48,7 +32,7 @@ const CATEGORY_META: Record<string, { title: string }> = {
   social: { title: "اجتماعی" },
 };
 
-const SECTION_META: Record<SectionType, { title: string }> = {
+const SECTION_META: SectionMetaMap = {
   popular: { title: "محبوب‌ترین چالش‌ها" },
   near: { title: "چالش‌های نزدیک" },
   followers: { title: "چالش‌های دنبال‌شوندگان" },
@@ -56,87 +40,132 @@ const SECTION_META: Record<SectionType, { title: string }> = {
   moreCreators: { title: "برترین سازندگان" },
 };
 
+const SAMPLE_TITLES: Record<string, string> = {
+  popular: "محبوب",
+  near: "نزدیک",
+  followers: "دنبال‌شونده",
+  health: "سلامت",
+  fitness: "تناسب اندام",
+  study: "مطالعه",
+  finance: "مالی",
+  mindfulness: "ذهن آگاهی",
+  lifestyle: "سبک زندگی",
+  hobby: "سرگرمی",
+  social: "اجتماعی",
+  default: "چالش",
+};
+
+const getColumnCount = () => {
+  if (typeof window === "undefined") return 1;
+  if (window.innerWidth >= 1280) return 4;
+  if (window.innerWidth >= 1024) return 3;
+  if (window.innerWidth >= 640) return 2;
+  return 1;
+};
+
+const resolveSectionType = (
+  rawType: string | undefined,
+  isCategory: boolean
+): SectionType => {
+  if (isCategory) return "category";
+  if (rawType && rawType in SECTION_META) return rawType as SectionType;
+  return DEFAULT_SECTION;
+};
+
+const getFetchType = (
+  isCategory: boolean,
+  categoryId: string | undefined,
+  rawType: string | undefined
+) =>
+  isCategory ? (categoryId ?? DEFAULT_SECTION) : (rawType ?? DEFAULT_SECTION);
+
 // تابع برای دریافت چالش‌ها بر اساس نوع
-async function fetchChallenges(type: string): Promise<Challenge[]> {
+async function fetchChallenges(
+  type: string,
+  page: number,
+  pageSize: number
+): Promise<Challenge[]> {
   try {
     switch (type) {
       case "popular":
-        return await getPopularChallengesService();
+        return await getPopularChallengesService(page, pageSize);
 
       case "near":
-        // اگر سرویس مخصوص نزدیک دارید، از getChallengesByTypeService استفاده کنید
-        // در غیر این صورت از public استفاده کنید
-        return await getPublicChallengesService();
+        // از نظر زمانی نزدیک
+        return await getPublicChallengesService(page, pageSize);
 
       case "followers":
         // اگر سرویس مخصوص دنبال‌شوندگان دارید
-        return await getPublicChallengesService(); // جایگزین با سرویس واقعی
+        return await getPublicChallengesService(page, pageSize); // جایگزین با سرویس واقعی
 
       case "moreCreators":
         // برای سازندگان - فعلاً چالش‌های عمومی نمایش داده می‌شود
-        return await getPublicChallengesService();
+        return await getPublicChallengesService(page, pageSize);
 
       default:
         // اگر type نام دسته‌بندی باشد (مثل health, fitness)
         if (CATEGORY_META[type]) {
-          return await getChallengesByCategoryService(type);
+          return await getChallengesByCategoryService(type, page, pageSize);
         }
 
         // به صورت پیش‌فرض چالش‌های عمومی
-        return await getPublicChallengesService();
+        return await getPublicChallengesService(page, pageSize);
     }
   } catch (error) {
     CustomToast(getBackendErrorMessage(error), "error");
 
     // در صورت خطا، داده‌های نمونه برگردانید
-    return getSampleData(type);
+    return getSampleData(type, page, pageSize);
   }
 }
 
 // تابع برای ایجاد داده‌های نمونه (در صورت خطا)
-function getSampleData(type: string): Challenge[] {
-  const typeTitles: Record<string, string> = {
-    popular: "محبوب",
-    near: "نزدیک",
-    followers: "دنبال‌شونده",
-    health: "سلامت",
-    fitness: "تناسب اندام",
-    study: "مطالعه",
-    finance: "مالی",
-    mindfulness: "ذهن آگاهی",
-    lifestyle: "سبک زندگی",
-    hobby: "سرگرمی",
-    social: "اجتماعی",
-    default: "چالش",
-  };
+function getSampleData(
+  type: string,
+  page: number,
+  pageSize: number
+): Challenge[] {
+  const titlePrefix = SAMPLE_TITLES[type] || SAMPLE_TITLES.default;
+  const offset = (page - 1) * pageSize;
 
-  const titlePrefix = typeTitles[type] || typeTitles.default;
-
-  return Array.from({ length: 8 }).map((_, i) => ({
-    id: `${type}_${i + 1}`,
-    title: `${titlePrefix} چالش ${i + 1}`,
+  return Array.from({ length: pageSize }).map((_, i) => ({
+    id: offset + i + 1,
+    title: `${titlePrefix} چالش ${offset + i + 1}`,
     description: `این یک چالش ${titlePrefix} نمونه است.`,
-    coverImage: `/images/sample-cover.jpg`,
-    creator: { name: "کاربر نمونه" },
+    recurrence_rule: "daily",
+    category_name: type,
+    creator_username: "کاربر نمونه",
+    creator_id: 0,
+    visibility: i % 4 === 0 ? "private" : "public",
+    image_url: "/images/sample-cover.jpg",
+    max_participants: 100,
+    current_participants: Math.floor(Math.random() * 80) + 1,
+    like_count: Math.floor(Math.random() * 100) + 10,
+    comment_count: Math.floor(Math.random() * 20) + 1,
     start_time: "2024-01-15T08:00:00Z",
     end_time: "2024-02-15T23:59:59Z",
-    profiles: [],
-    initialLikes: Math.floor(Math.random() * 100) + 10,
-    initialComments: Math.floor(Math.random() * 20) + 1,
-    isJoined: i % 3 === 0,
-    isPrivate: i % 4 === 0,
+    timezone: "Asia/Tehran",
+    created_at: "2024-01-01T00:00:00Z",
+    is_user_participating: i % 3 === 0,
+    is_user_liked: false,
+    mutualFollowers: [],
+    mutual_participants: [],
   }));
 }
 
 export default function SectionChallengesScreen() {
   const navigate = useNavigate();
-  const { type, categoryId } = useParams<{
-    type?: string;
-    categoryId?: string;
-  }>();
+  const { type, categoryId } = useParams<SectionRouteParams>();
 
   const isCategory = !!categoryId;
-  const sectionType = isCategory ? "category" : (type as SectionType);
+  const sectionType = useMemo(
+    () => resolveSectionType(type, isCategory),
+    [type, isCategory]
+  );
+  const fetchType = useMemo(
+    () => getFetchType(isCategory, categoryId, type),
+    [isCategory, categoryId, type]
+  );
   const title = useMemo(() => {
     if (isCategory && categoryId) {
       return CATEGORY_META[categoryId]?.title || "دسته‌بندی";
@@ -146,18 +175,35 @@ export default function SectionChallengesScreen() {
 
   const [items, setItems] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [columnCount, setColumnCount] = useState(1);
+  const lastFetchedPage = useRef<number | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchPage = useCallback(
+    async (pageNum: number, isLoadMore: boolean = false) => {
       try {
-        setLoading(true);
+        if (!isLoadMore) setLoading(true);
+        else setLoadingMore(true);
+
         setError(null);
 
-        const fetchType = isCategory ? categoryId! : type || "popular";
-        const data = await fetchChallenges(fetchType);
+        if (isLoadMore && lastFetchedPage.current === pageNum) return;
+        lastFetchedPage.current = pageNum;
 
-        setItems(data || []);
+        const data = await fetchChallenges(fetchType, pageNum, PAGE_SIZE);
+        const nextItems = data || [];
+
+        setItems((prev) => (isLoadMore ? [...prev, ...nextItems] : nextItems));
+
+        if (nextItems.length < PAGE_SIZE) {
+          setHasMore(false);
+        } else {
+          setHasMore(true);
+          setPage(pageNum + 1);
+        }
       } catch (e) {
         console.error("Error fetching challenges:", e);
         setError("خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.");
@@ -165,19 +211,34 @@ export default function SectionChallengesScreen() {
         // نمایش داده‌های نمونه در صورت خطا
         const fetchType = isCategory ? categoryId! : type || "popular";
         setItems(getSampleData(fetchType));
+
+        if (!isLoadMore) {
+          setError("خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.");
+          setItems(getSampleData(fetchType, 1, PAGE_SIZE));
+          setHasMore(false);
+        }
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
-    };
+    },
+    [fetchType]
+  );
 
-    fetchData();
-  }, [sectionType, categoryId, type, isCategory]);
+  useEffect(() => {
+    setItems([]);
+    setPage(1);
+    setHasMore(true);
+    lastFetchedPage.current = null;
+    fetchPage(1, false);
+  }, [fetchType, fetchPage]);
 
-  const handleChallengeClick = (challenge: Challenge) => {
-    ب;
-    // ناوبری به صفحه جزئیات چالش
-    navigate(`/challenge/${challenge.id}`);
-  };
+  useEffect(() => {
+    setColumnCount(getColumnCount());
+    const handleResize = () => setColumnCount(getColumnCount());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <div dir="rtl" className="min-h-screen bg-white">
@@ -209,7 +270,7 @@ export default function SectionChallengesScreen() {
           </div>
         ) : error ? (
           <div className="py-10 text-center">
-            <p className="text-red-600 mb-4">{error}</p>
+            <p className="text-error mb-4">{error}</p>
             <p className="text-slate-500 text-sm">
               چالش‌های نمونه نمایش داده می‌شوند
             </p>
@@ -221,22 +282,13 @@ export default function SectionChallengesScreen() {
                 {items.length} چالش یافت شد
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-3">
-              {items.map((item) => (
-                <div
-                  key={item.id}
-                  className="cursor-pointer"
-                  onClick={() => handleChallengeClick(item)}
-                >
-                  <ChallengeCard
-                    {...item}
-                    startDate={convertToJalali(item.start_time)}
-                    endDate={convertToJalali(item.end_time)}
-                    onClick={() => navigate(`/challenge/${item.id}`)}
-                  />
-                </div>
-              ))}
-            </div>
+            <VirtualChallengeList
+              challenges={items}
+              loadingMore={loadingMore}
+              columnCount={columnCount}
+              onLoadMore={() => fetchPage(page, true)}
+              hasMore={hasMore}
+            />
           </>
         ) : (
           <div className="py-10 text-center">

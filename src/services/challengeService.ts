@@ -1,6 +1,7 @@
 // src/services/challengeService.ts
 import type { Payload } from "@/types/payloadChallengeService";
-import { getData, postData, putData, deleteData } from "./services";
+import type { ChallengeCoverUploadResponse } from "@/types/challengeTypes";
+import { getData, postData, putData, deleteData, postImageData } from "./services";
 import { getUserById } from "./userService";
 
 // export const createChallenge = async (payload: Payload) => {
@@ -76,17 +77,22 @@ export const fetchChallengeById = async (challengeId: string | number) => {
 // Update Challenge
 // ================================
 
+export type UpdateChallengePayload = {
+  title: string;
+  description?: string | null;
+  image_url?: string | null;
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  start_time?: string;
+  end_time?: string;
+  timezone?: string;
+  category_id?: number | null;
+};
+
 export const updateChallenge = async (
   challengeId: string | number,
-  payload: {
-    title: string;
-    description: string;
-    image_url?: string | null;
-    location?: string | null;
-    start_time: string;
-    end_time: string;
-    timezone?: string;
-  }
+  payload: UpdateChallengePayload
 ) => {
   // try {
     const response = await putData({
@@ -98,6 +104,27 @@ export const updateChallenge = async (
   //   console.error("Failed to update challenge:", error);
   //   throw error;
   // }
+};
+
+export const uploadChallengeCover = async (
+  challengeId: string | number,
+  file: File
+): Promise<ChallengeCoverUploadResponse> => {
+  if (!file) throw new Error("Cover image file is required");
+
+  const formData = new FormData();
+  formData.append("file", file, file.name || "cover.png");
+
+  try {
+    const response = await postImageData({
+      endPoint: `/api/v1/challenges/${challengeId}/cover`,
+      data: formData,
+    });
+    return response as ChallengeCoverUploadResponse;
+  } catch (error) {
+    console.error("Failed to upload challenge cover:", error);
+    throw error;
+  }
 };
 
 // ================================

@@ -20,20 +20,20 @@ const OwnerButton = () => {
   };
 
   return (
-    <div className="flex justify-center gap-xa-8 sm:gap-x-15 md:gap-x-26 mt-5">
-      <div>
+    <div className="flex w-full justify-around sm:gap-x-15 md:gap-x-26 mt-5">
+      <div className="w-2/5">
         <CustomButton
-          className="bg-secondary hover:bg-secondary"
+          className="bg-secondary hover:bg-secondary w-full"
           onClick={handleEditProfile}
         >
           ویرایش پروفایل
         </CustomButton>
       </div>
 
-      <div>
+      <div className="w-2/5">
         <CustomButton
           onClick={() => setOpen(true)}
-          className="bg-primary hover:bg-primary"
+          className="bg-primary hover:bg-primary w-full"
         >
           بساز+
         </CustomButton>

@@ -4,22 +4,19 @@ import { Formik, Form } from "formik";
 
 import CustomBtn from "./CustomButton";
 import CustomCheckbox from "./CustomCheckbox";
-import { getChallengesByCategoryService } from "@/services/userService";
-import type { Challenge } from "@/types/challengeTypes";
+import { getChallengesByCategoryService, getPublicChallengesService } from "@/services/userService";
 import { getBackendErrorMessage } from "@/services/errorService";
 import CustomToast from "./CustomToast";
+import { applyChallengeFilters } from "@/utils/searchFilters";
+import type { Challenge } from "@/types/challengeTypes";
+import type { ActiveFilters, SortKey } from "@/types/searchTypes";
 
 interface FilterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onApply?: (filters: {
-    selectedCategory: string | null;
-    sortBy: string;
-  }) => void;
+  onApply?: (filters: ActiveFilters) => void;
   onFilteredChallenges?: (challenges: Challenge[]) => void; // اضافه شده
 }
-
-type SortKey = "newest" | "popular" | "trending" | "oldest";
 
 type FilterFormValues = {
   selectedCategory: string | null;
@@ -131,18 +128,19 @@ export function FilterModal({
 
   // تابع اعمال فیلتر و دریافت داده‌ها از API
   const applyFiltersAndFetch = async (
-    selectedCategory: string,
-    sortBy: string
+    selectedCategory: string | null,
+    sortBy: SortKey
   ) => {
     setIsLoading(true);
     try {
-      // دریافت چالش‌ها با فیلتر دسته‌بندی
-      const challenges = await getChallengesByCategoryService(selectedCategory);
-      console.log(challenges);
-
-      // اعمال مرتب‌سازی روی داده‌های دریافتی
-      const sortedChallenges = sortChallenges(challenges, sortBy);
-
+      const challenges = selectedCategory
+        ? await getChallengesByCategoryService(selectedCategory)
+        : await getPublicChallengesService();
+      const sortedChallenges = applyChallengeFilters(challenges, {
+        selectedCategory,
+        sortBy,
+      });
+      
       // ارسال داده‌های فیلتر شده به کامپوننت والد
       if (onFilteredChallenges) {
         onFilteredChallenges(sortedChallenges);
@@ -158,33 +156,6 @@ export function FilterModal({
       CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  // تابع مرتب‌سازی محلی (اگر API مرتب‌سازی ندارد)
-  const sortChallenges = (
-    challenges: Challenge[],
-    sortBy: string
-  ): Challenge[] => {
-    const sorted = [...challenges];
-
-    switch (sortBy) {
-      case "newest":
-        return sorted.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-      case "oldest":
-        return sorted.sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
-      case "popular":
-        return sorted.sort((a, b) => (b.likes || 0) - (a.likes || 0));
-      case "trending":
-        return sorted.sort((a, b) => (b.views || 0) - (a.views || 0));
-      default:
-        return sorted;
     }
   };
 
@@ -212,7 +183,7 @@ export function FilterModal({
       >
         {/* Header */}
         <div
-          className="sticky top-0 bg-white flex items-center justify-between px-4 pt-6 pb-4 border-b border-slate-100 rounded-t-[32px] z-10"
+          className="sticky top-0 bg-white flex items-center justify-between px-4 pt-6 pb-4 border-b border-white rounded-t-[32px] z-10"
           dir="rtl"
         >
           <h2 className="text-xl font-bold text-slate-900">فیلتر</h2>
@@ -260,7 +231,7 @@ export function FilterModal({
                         : "translateY(10px)",
                     }}
                   >
-                    <h3 className="text-base font-bold text-slate-900 mb-4">
+                    <h3 className="text-base font-bold text-black mb-4">
                       دسته‌بندی
                     </h3>
 
@@ -268,10 +239,10 @@ export function FilterModal({
                     <button
                       type="button"
                       onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                      className="w-full mb-10 px-4 py-4 rounded-2xl border-2 border-slate-200 bg-white text-slate-700 font-medium text-sm flex items-center justify-between hover:border-primary transition-all duration-200 active:scale-[0.98]"
+                      className="w-full mb-10 px-4 py-4 rounded-2xl border-2 border-white bg-white text-black font-medium text-sm flex items-center justify-between hover:border-primary transition-all duration-200 active:scale-[0.98]"
                       disabled={isLoading}
                     >
-                      <span className="text-slate-800">
+                      <span className="text-black">
                         {selectedCategoryTitle ?? "همه دسته‌بندی‌ها"}
                       </span>
                       <ChevronDown
@@ -289,7 +260,7 @@ export function FilterModal({
                           : "mt-0 max-h-0 opacity-0"
                       }`}
                     >
-                      <div className="rounded-2xl border-2 border-slate-200 overflow-hidden">
+                      <div className="rounded-2xl border-2 border-white overflow-hidden">
                         <div className="max-h-48 overflow-y-auto">
                           <button
                             type="button"
@@ -297,10 +268,10 @@ export function FilterModal({
                               setFieldValue("selectedCategory", null);
                               setIsCategoryOpen(false);
                             }}
-                            className={`w-full px-4 py-3.5 text-right text-sm font-medium border-b border-slate-100 transition-colors duration-200 ${
+                            className={`w-full px-4 py-3.5 text-right text-sm font-medium border-b border-white transition-colors duration-200 ${
                               !values.selectedCategory
                                 ? "bg-primary/20 text-primary"
-                                : "bg-white text-slate-700 hover:bg-slate-50"
+                                : "bg-white text-black hover:bg-slate-50"
                             }`}
                             disabled={isLoading}
                           >
@@ -315,10 +286,10 @@ export function FilterModal({
                                 setFieldValue("selectedCategory", cat.id);
                                 setIsCategoryOpen(false);
                               }}
-                              className={`w-full px-4 py-3.5 text-right text-sm font-medium border-b border-slate-100 last:border-b-0 transition-colors duration-200 ${
+                              className={`w-full px-4 py-3.5 text-right text-sm font-medium border-b border-white last:border-b-0 transition-colors duration-200 ${
                                 values.selectedCategory === cat.id
                                   ? "bg-primary/20 text-primary"
-                                  : "bg-white text-slate-700 hover:bg-slate-50"
+                                  : "bg-white text-black hover:bg-slate-50"
                               }`}
                               style={{
                                 transitionDelay: isCategoryOpen
@@ -348,7 +319,7 @@ export function FilterModal({
 
                 {/* Buttons */}
                 <div
-                  className="sticky bottom-0 bg-white px-4 py-4 border-t border-slate-100 flex justify-between transition-all duration-300 delay-300
+                  className="sticky bottom-0 bg-white px-4 py-4 border-t border-white flex justify-between transition-all duration-300 delay-300
                   mb-20"
                 >
                   <CustomBtn
