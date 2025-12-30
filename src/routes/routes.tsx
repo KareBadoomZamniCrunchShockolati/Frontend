@@ -28,7 +28,7 @@ import Comments from "@/pages/Comments";
 import FollowingPosts from "@/pages/FollowingPosts";
 import BadgePage from "@/pages/BadgePage";
 import ChallengeInfo from "@/pages/ChallengeInfo";
-import NotificationPage from "@/pages/notificationPage";
+import NotificationPage from "@/pages/NotificationPage";
 
 export const router = createBrowserRouter([
   {
