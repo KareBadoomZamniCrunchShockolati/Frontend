@@ -21,11 +21,14 @@ import Challenge from "@/pages/ChallengeInfo";
 import ChallengeEdit from "@/pages/ChallengeEdit";
 import ChallengeCreate from "@/pages/ChallengeCreate";
 import ProgressCalendar from "@/components/ProgressCalendar";
-import PostComments from "@/pages/PostComments";
 import ChallengePosts from "@/pages/ChallengePosts";
 import AcceptList from "@/components/Custom/AcceptList";
 import InviteList from "@/components/Custom/InviteList";
-import NotificationPage from "@/pages/notificationPage";
+import Comments from "@/pages/Comments";
+import FollowingPosts from "@/pages/FollowingPosts";
+import BadgePage from "@/pages/BadgePage";
+import ChallengeInfo from "@/pages/ChallengeInfo";
+import NotificationPage from "@/pages/NotificationPage";
 
 export const router = createBrowserRouter([
   {
@@ -102,8 +105,12 @@ export const router = createBrowserRouter([
         element: <PostPage />,
       },
       {
+        path: "/following/posts",
+        element: <FollowingPosts />,
+      },
+      {
         path: "/post/:id/comments",
-        element: <PostComments />,
+        element: <Comments entityType="post" />,
       },
       {
         path: "/editChallenge/:challengeId",
@@ -120,6 +127,14 @@ export const router = createBrowserRouter([
       {
         path: "/challenge/:id/posts",
         element: <ChallengePosts />,
+      },
+      {
+        path: "/challenge/:id/comments",
+        element: <Comments entityType="challenge" />,
+      },
+      {
+        path: "/badgepage",
+        element: <BadgePage />,
       },
       {
         path: "/notifications",

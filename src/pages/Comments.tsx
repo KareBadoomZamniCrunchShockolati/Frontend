@@ -1,4 +1,3 @@
-import { CommentService, GetCommentsService } from "@/services/commentService";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { mockComments } from "@/data/mockComments";
@@ -13,10 +12,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ThumbsUp } from "lucide-react";
 import TertiaryCustomButton from "@/components/Custom/TertiaryCustomButton";
 import CommentCard from "@/components/Custom/CommentCard";
+import {
+  CommentChallengeService,
+  CommentPostService,
+  GetCommentsChallengeService,
+  GetCommentsPostService,
+} from "@/services/commentService";
+import { getBackendErrorMessage } from "@/services/errorService";
 
-const PostComments = () => {
+interface props {
+  entityType: "challenge" | "post";
+}
+const Comments = ({ entityType }: props) => {
   const { id } = useParams();
-  const postId = Number(id);
+  const entityId = Number(id);
   const [comments, setComments] = useState<CommentResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -29,15 +38,16 @@ const PostComments = () => {
 
   const fetchComments = async () => {
     try {
-      const data = await GetCommentsService({
-        entity_type: "post",
-        entity_id: postId,
-      });
-
-      setComments(data);
+      if (entityType === "challenge") {
+        const res = await GetCommentsChallengeService(entityId);
+        setComments(Array.isArray(res) ? res : []);
+      } else {
+        const res = await GetCommentsPostService(entityId);
+        setComments(Array.isArray(res) ? res : []);
+      }
+      // console.log(comments);
     } catch (err) {
-      console.error(err);
-      setError("Failed to load comments");
+      CustomToast(getBackendErrorMessage(err), "error");
     } finally {
       setLoading(false);
     }
@@ -45,7 +55,7 @@ const PostComments = () => {
   useEffect(() => {
     fetchComments();
     console.log("comments:", comments);
-  }, [postId]);
+  }, [entityId]);
 
   if (loading) return <div>Loading comments...</div>; //need to make skeleton for this instead ------------------------------------
   if (error) return <div>{error}</div>;
@@ -54,16 +64,29 @@ const PostComments = () => {
     values: { commentText: string },
     { resetForm }: FormikHelpers<{ commentText: string }>
   ) => {
-    console.log("Submitting comment with values:", values);
-    const response: CommentResponse = await CommentService({
-      entity_type: "post",
-      entity_id: postId,
-      content: values.commentText,
-    });
-    CustomToast("نظر با موفقیت ایجاد شد!", "success");
-    console.log("Comment submitted:", response);
-    fetchComments();
-    resetForm();
+    try {
+      console.log("Submitting comment with values:", values);
+      if (entityType === "challenge") {
+        const response: CommentResponse = await CommentChallengeService({
+          entity_type: entityType,
+          entity_id: entityId,
+          content: values.commentText,
+        });
+        console.log("Comment submitted:", response);
+      } else {
+        const response: CommentResponse = await CommentPostService({
+          entity_type: entityType,
+          entity_id: entityId,
+          content: values.commentText,
+        });
+        console.log("Comment submitted:", response);
+      }
+      CustomToast("نظر با موفقیت ایجاد شد!", "success");
+      fetchComments();
+      resetForm();
+    } catch (error) {
+      CustomToast(getBackendErrorMessage(error), "error");
+    }
   };
   return (
     <>
@@ -71,13 +94,13 @@ const PostComments = () => {
         <div className="flex items-center justify-between">
           <button
             className="p-2 border-2 border-primary rounded-xl hover:bg-primary-hover transition-colors"
-            onClick={() => navigate(`/post/${postId}`)}
+            onClick={() => navigate(`/${entityType}/${entityId}`)}
           >
             <ArrowLeft className="w-8 h-8 text-primary" />
           </button>
 
           <p className="text-center font-bold text-title text-primary">
-            نظرات پست
+            نظرات {entityType === "challenge" ? "چالش" : "پست"}
           </p>
         </div>
 
@@ -114,6 +137,7 @@ const PostComments = () => {
             key={comment.id}
             comment={comment}
             refreshComments={fetchComments}
+            entityType={entityType}
           />
         ))}
         {/* <CommentCard isFirstLevel={true} id={1} />
@@ -123,4 +147,4 @@ const PostComments = () => {
   );
 };
 
-export default PostComments;
+export default Comments;

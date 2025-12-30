@@ -16,9 +16,10 @@ import {
 } from "@/components/ui/carousel";
 import { updatePostService, getPostService } from "@/services/postService";
 import AutocompleteSingleSelect from "@/components/Custom/AutocompleteSingleSelect";
-import type { ChallengePreview } from "@/types/postTypes";
+import type { ChallengePreview, PostResponse } from "@/types/postTypes";
 import type { SimpleChallenge } from "@/types/createPostFormTypes";
 import { getParticipatingChallengesService } from "@/services/postService";
+import { getBackendErrorMessage } from "@/services/errorService";
 
 const EditPost = () => {
   const { token, userId } = useUserStore.getState();
@@ -30,7 +31,8 @@ const EditPost = () => {
   const [initialData, setInitialData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [challenges, setChallenges] = useState<SimpleChallenge[]>([]);
-
+  const [ownerId, setOwnerId] = useState<number | null>(null);
+  const isOwnerViewing = ownerId === userId;
   useEffect(() => {
     const fetchPostData = async () => {
       if (!postId) {
@@ -40,16 +42,16 @@ const EditPost = () => {
 
       try {
         console.log("Fetching post data for postId:", postId);
-        const response = await getPostService(Number(postId));
+        const response: PostResponse = await getPostService(Number(postId));
         console.log("Post data received:", response);
         setInitialData(response);
+        setOwnerId(response.user_id);
 
-        if (response.data.pictures && response.data.pictures.length > 0) {
-          setImageURLs(response.data.pictures);
+        if (response.pictures && response.pictures.length > 0) {
+          setImageURLs(response.pictures);
         }
       } catch (err) {
-        console.error("خطا در دریافت اطلاعات پست:", err);
-        CustomToast("خطا در دریافت اطلاعات پست", "error");
+        CustomToast(getBackendErrorMessage(err), "error");
       } finally {
         setLoading(false);
       }
@@ -72,8 +74,7 @@ const EditPost = () => {
 
         setChallenges(simpleChallenges);
       } catch (err) {
-        console.error("Error fetching challenges:", err);
-        CustomToast("خطا در بارگذاری چالش‌ها", "error");
+        CustomToast(getBackendErrorMessage(err), "error");
       }
     };
 
@@ -131,10 +132,9 @@ const EditPost = () => {
       });
 
       CustomToast("ویرایش پست با موفقیت انجام شد", "success");
-      navigate(`/post/${userId}`);
+      navigate(`/post/${postId}`);
     } catch (err) {
-      console.error(err);
-      CustomToast("خطا در ویرایش پست", "error");
+      CustomToast(getBackendErrorMessage(err), "error");
     }
   };
 
@@ -157,17 +157,19 @@ const EditPost = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mt-5 mr-5 ml-5">
-        <button
-          className="p-2 border-2 border-primary rounded-xl hover:bg-primary-hover transition-colors"
-          onClick={() => navigate(`/dashboard/${userId}`)}
-        >
-          <ArrowLeft className="w-8 h-8 text-primary" />
-        </button>
-        <p className="text-center font-bold text-title text-primary">
-          ویرایش پست
-        </p>
-      </div>
+      {isOwnerViewing && (
+        <div className="flex items-center justify-between mt-5 mr-5 ml-5">
+          <button
+            className="p-2 border-2 border-primary rounded-xl hover:bg-primary-hover transition-colors"
+            onClick={() => navigate(`/dashboard/${userId}`)}
+          >
+            <ArrowLeft className="w-8 h-8 text-primary" />
+          </button>
+          <p className="text-center font-bold text-title text-primary">
+            ویرایش پست
+          </p>
+        </div>
+      )}
 
       <Formik
         initialValues={{
@@ -233,11 +235,15 @@ const EditPost = () => {
                   disabled={imageURLs.length >= 5}
                 />
                 <p className="text-center text-base">
-                  {imageURLs.length >= 5 ? "حداکثر تصویر رسیده" : "افزودن تصویر"}
+                  {imageURLs.length >= 5
+                    ? "حداکثر تصویر رسیده"
+                    : "افزودن تصویر"}
                 </p>
                 <Upload className="absolute right-5 !w-6 !h-6" />
               </CustomButton>
-              <p className="text-xs text-neutral-gray">{imageURLs.length}/5 تصویر</p>
+              <p className="text-xs text-neutral-gray">
+                {imageURLs.length}/5 تصویر
+              </p>
             </div>
 
             {/* Description */}
@@ -259,7 +265,8 @@ const EditPost = () => {
               <AutocompleteSingleSelect
                 items={challenges}
                 value={
-                  challenges.find((c) => c.id === values.challengeID)?.name || ""
+                  challenges.find((c) => c.id === values.challengeID)?.name ||
+                  ""
                 }
                 onChange={(selected: SimpleChallenge | null) =>
                   setFieldValue("challengeID", selected ? selected.id : null)

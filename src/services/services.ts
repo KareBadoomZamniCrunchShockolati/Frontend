@@ -13,6 +13,8 @@ import type {
 	PutParams,
 } from "../types/apiTypes";
 import useUserStore from "@/store/userStore/userStore";
+import { getBackendErrorMessage } from "./errorService";
+import CustomToast from "@/components/Custom/CustomToast";
 
 export const baseURL = "http://localhost:8080"; // backend URL
 export const AUTH_BASE = "/api/v1";
@@ -23,6 +25,7 @@ const apiClient: AxiosInstance = axios.create({
 	timeout: 20000,
 	headers: {
 		"Content-Type": "application/json",
+		"Accept-Language": "fa",
 	},
 });
 
@@ -59,7 +62,7 @@ export const getData = async ({ endPoint, headers, params }: GetParams) => {
 		return response.data;
 	} catch (error) {
 		console.error("error in getData", error);
-		throw error;
+		CustomToast(getBackendErrorMessage(error), "error");
 	}
 };
 
@@ -72,22 +75,27 @@ export const postData = async ({ endPoint, data, headers }: PostParams) => {
 		return response.data;
 	} catch (error) {
 		console.error("error in postData", error);
-		throw error;
+		CustomToast(getBackendErrorMessage(error), "error");
 	}
 };
 
 // ✅ POST image/form-data
-export const postImageData = async ({ endPoint, data }: PostParams) => {
-	try {
-		const response: AxiosResponse = await apiClient.post(endPoint, data, {
-			headers: { "Content-Type": "multipart/form-data" },
-		});
-		return response.data;
-	} catch (error) {
-		console.error("error in postImageData", error);
-		throw error;
-	}
+export const postImageData = async ({ endPoint, data, headers }: PostParams) => {
+  const isFormData = data instanceof FormData;
+  const requestHeaders: Record<string, string> = { ...(headers || {}) };
+
+  if (isFormData) {
+    delete requestHeaders["Content-Type"];
+  }
+
+  const response = await apiClient.post(endPoint, data, {
+    headers: requestHeaders,
+    transformRequest: [(payload) => payload],
+  });
+
+  return response.data;
 };
+
 
 // ✅ PATCH
 export const patchData = async ({ endPoint, data, headers }: PatchParams) => {
@@ -98,7 +106,7 @@ export const patchData = async ({ endPoint, data, headers }: PatchParams) => {
 		return response.data;
 	} catch (error) {
 		console.error("error in patchData", error);
-		throw error;
+		CustomToast(getBackendErrorMessage(error), "error");
 	}
 };
 
@@ -109,7 +117,7 @@ export const putData = async ({ endPoint, data }: PutParams) => {
 		return response.data;
 	} catch (error) {
 		console.error("error in putData", error);
-		throw error;
+		CustomToast(getBackendErrorMessage(error), "error");
 	}
 };
 
@@ -123,6 +131,6 @@ export const deleteData = async ({ endPoint, data, headers }: DeleteParams) => {
 		return response.data;
 	} catch (error) {
 		console.error("error in deleteData", error);
-		throw error;
+		CustomToast(getBackendErrorMessage(error), "error");
 	}
 };

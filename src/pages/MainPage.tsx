@@ -14,6 +14,7 @@ import {
   getPopularChallengesService,
   getTopCreatorsListService, // اضافه کردن سرویس جدید
 } from "@/services/userService";
+import type { ActiveFilters } from "@/types/searchTypes";
 import { useNavigate } from "react-router-dom";
 import { convertToJalali } from "@/components/Custom/ConvertToJalali";
 import { HorizontalScroller } from "@/components/Custom/HorizontalScroller";
@@ -30,6 +31,9 @@ import SocialIcon from "@/assets/Icon/Social.svg";
 
 import { CreatorCard } from "@/components/Custom/CreatorCard";
 import BottomNav from "@/components/Custom/BottomNav";
+import { OverlappingCards } from "@/components/Custom/OverlappingCards";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "@/components/Custom/CustomToast";
 
 function CategoryGrid({
   categories,
@@ -71,7 +75,6 @@ function CategoryGrid({
   );
 }
 
-// ... کدهای قبلی بدون تغییر
 
 export default function HomeScreen() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -93,10 +96,7 @@ export default function HomeScreen() {
     topCreators: true, // اضافه کردن loading state جدید
   });
 
-  const [activeFilters, setActiveFilters] = useState<{
-    selectedCategory: string | null;
-    sortBy: string;
-  } | null>(null);
+  const [activeFilters, setActiveFilters] = useState<ActiveFilters | null>(null);
 
   const navigate = useNavigate();
 
@@ -136,7 +136,7 @@ export default function HomeScreen() {
 
       setTopCreators(formattedCreators);
     } catch (error) {
-      console.error("Error fetching top creators:", error);
+      CustomToast(getBackendErrorMessage(error), "error");
       // داده‌های نمونه در صورت خطا
       setTopCreators([
         { id: 1, username: "mahditd", avatar: "/images/mahditd.jpg", rank: 1 },
@@ -157,6 +157,7 @@ export default function HomeScreen() {
     } catch (error) {
       console.error("Error fetching popular challenges:", error);
       setPopularChallenges(getSampleData("popular"));
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setLoadingStates((prev) => ({ ...prev, popular: false }));
     }
@@ -171,6 +172,7 @@ export default function HomeScreen() {
     } catch (error) {
       console.error("Error fetching nearby challenges:", error);
       setNearbyChallenges(getSampleData("near"));
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setLoadingStates((prev) => ({ ...prev, nearby: false }));
     }
@@ -185,6 +187,7 @@ export default function HomeScreen() {
     } catch (error) {
       console.error("Error fetching following challenges:", error);
       setFollowingChallenges(getSampleData("following"));
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setLoadingStates((prev) => ({ ...prev, following: false }));
     }
@@ -203,6 +206,7 @@ export default function HomeScreen() {
       const sampleData = getSampleData("all");
       setAllChallenges(sampleData);
       setVisibleChallenges(sampleData);
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setLoadingStates((prev) => ({ ...prev, all: false }));
     }
@@ -250,10 +254,7 @@ export default function HomeScreen() {
     setIsFilterModalOpen(true);
   };
 
-  const handleFilterApply = (filters: {
-    selectedCategory: string | null;
-    sortBy: string;
-  }) => {
+  const handleFilterApply = (filters: ActiveFilters) => {
     setActiveFilters(filters);
 
     if (!filters?.selectedCategory) {
@@ -438,6 +439,49 @@ export default function HomeScreen() {
             }}
           </Formik>
           <BottomNav />
+                <div
+        className="w-full mt-[var(--top-page)] p-4"
+        onClick={() => {
+          setTimeout(() => {
+            navigate(`/following/posts`);
+          }, 200);
+        }}
+      >
+        <div
+        dir="ltr"
+          className="
+                relative
+                flex
+                items-center
+                justify-between
+                rounded-2xl
+                border-2
+                shadow-shadow-strong
+                border-black
+                px-10
+                py-8
+                active:shadow-none
+                active:translate-y-[3px]
+                active:translate-x-[3px]
+                transition-all duration-25
+              "
+          style={{
+            background: "linear-gradient(135deg, var(--secondary), var(--secondary-hover) 80%)",
+          }}
+        >
+          <div className="text-white text-right">
+            <h2 className="text-2xl font-bold mb-2">پست‌های افراد دنبال‌شده</h2>
+
+            <p className="text-sm opacity-90">
+دیدن پست‌های افرادی که دنبال می‌کنید
+            </p>
+          </div>
+
+          <div className="relative">
+            <OverlappingCards hasProfiles={true}/>
+          </div>
+        </div>
+      </div>
         </div>
       </div>
 
