@@ -82,6 +82,21 @@ const ChallengeInfo: React.FC = () => {
 
   // const handleDelete = (id: string, username: string) => {
   //   console.log(`${username} (id:${id}) removed`);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [likeCount, setLikeCount] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isParticipated, setIsParticipated] = useState<boolean>(false);
+
+  const filteredUsers = useMemo(() => {
+    if (participants) {
+      return participants.filter((u) =>
+        u.username.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    } else return null;
+  }, [participants, searchTerm]);
+
+  const handleDelete = (id: string, username: string) => {
+    console.log(`${username} (id:${id}) removed`);
 
   // Fallback from navigation state (kept for backward compatibility)
   const payload: ChallengeDataDetails =
