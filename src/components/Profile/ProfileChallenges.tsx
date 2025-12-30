@@ -20,6 +20,7 @@ import { getBackendErrorMessage } from "@/services/errorService";
 import CustomToast from "../Custom/CustomToast";
 import { VirtualChallengeList } from "./VirtualChallengeList";
 import SkeletonChallengeCard from "./SkeletonChallengeCard";
+import ChallengeCard from "../Custom/ChallangeCard";
 
 const PAGE_SIZE = 5;
 

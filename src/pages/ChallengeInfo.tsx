@@ -52,18 +52,16 @@ const ChallengeInfo: React.FC = () => {
   const { challengeId } = useParams<{ challengeId: string }>();
   const challenge_Id = Number(challengeId);
   const [isLiked, setIsLiked] = useState(false);
-  const payload: ChallengeDataDetails =
-    (location.state?.challenge as ChallengeDataDetails) ?? defaultChallenge;
 
-  const {
-    Img,
-    title,
-    description,
-    dateRange,
-    location: challengeLocation,
-  } = payload;
+  // const {
+  //   Img,
+  //   title,
+  //   description,
+  //   dateRange,
+  //   location: challengeLocation,
+  // } = payload;
 
-  const safeImageUrl = Img && Img.trim() !== "" ? Img : DEFAULT_CHALLENGE_IMG;
+  // const safeImageUrl = Img && Img.trim() !== "" ? Img : DEFAULT_CHALLENGE_IMG;
 
   const [challenge, setChallenge] = useState<ChallengeDataDetails>(
     payload as ChallengeDataDetails
@@ -72,6 +70,18 @@ const ChallengeInfo: React.FC = () => {
   // const [challengeId, setChallengeId] = useState<string | undefined>(
   //   useParams().challengeId
   // );
+  const [likeCount, setLikeCount] = useState(0);
+
+  // const filteredUsers = useMemo(() => {
+  //   if (participants) {
+  //     return participants.filter((u) =>
+  //       u.username.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
+  //   } else return null;
+  // }, [participants, searchTerm]);
+
+  // const handleDelete = (id: string, username: string) => {
+  //   console.log(`${username} (id:${id}) removed`);
   const [searchTerm, setSearchTerm] = useState("");
   const [likeCount, setLikeCount] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -107,8 +117,6 @@ const ChallengeInfo: React.FC = () => {
         ? normalizeUrl(payload.image_url)
         : DEFAULT_CHALLENGE_IMG;
 
-  const [challenge, setChallenge] = useState<ChallengeDataDetails | any>(payload);
-  const [participants, setParticipants] = useState<UserProfile[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isParticipated, setIsParticipated] = useState<boolean>(false);
@@ -175,9 +183,8 @@ const ChallengeInfo: React.FC = () => {
       try {
         const fetched = await fetchChallengeById(String(challenge_Id));
         setChallenge(fetched);
-        setChallenge(fetchedChallenge);
-        setLikeCount(fetchedChallenge.like_count);
-        setIsLiked(fetchedChallenge.is_user_liked);
+        setLikeCount(fetched.like_count);
+        setIsLiked(fetched.is_user_liked);
       } catch (err) {
         console.error("Failed to fetch challenge:", err);
         CustomToast("خطا در بارگذاری چالش", "error");
@@ -235,16 +242,13 @@ const ChallengeInfo: React.FC = () => {
         try {
           const data = await joinPrivateChallenge(Number(challenge_Id));
           console.log(data);
+          setIsParticipated(true);
         } catch (e) {
-          // CustomToast(getBackendErrorMessage(e), "error");
+          CustomToast(getBackendErrorMessage(e), "error");
         }
       }
-      setIsParticipated(true);
-      CustomToast("با موفقیت به چالش پیوستید!", "success");
-    } catch (e) {
-      CustomToast("خطا در پیوستن به چالش", "error");
-    }
-  };
+  }
+};
 
   const leaveChallengeHandler = async () => {
     if (challenge_Id) {
