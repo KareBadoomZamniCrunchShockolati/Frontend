@@ -10,6 +10,23 @@ export interface UpdatePostPayload {
 	pictures?: string[];
 }
 
+export interface PresignPostImagesRequest {
+  count: number;
+  content_type: string;
+}
+
+export interface PresignPostImageUpload {
+  key: string;
+  upload_url: string;
+  headers?: Record<string, string>;
+  temp_public_url?: string;
+  expires_at?: string;
+}
+
+export interface PresignPostImagesResponse {
+  uploads: PresignPostImageUpload[];
+}
+
 export interface PostResponse {
   id: number;
   user_id: number;

@@ -7,6 +7,7 @@ export interface StepOneProps {
   onTitleChange: (v: string) => void;
   onDescriptionChange: (v: string) => void;
   onImageChange: (v: string | null) => void;
+  onImageFileChange?: (file: File | null) => void;
   errors?: {
     title?: string;
     description?: string;
@@ -67,6 +68,7 @@ export interface ChallengeData {
   title: string;
   description: string;
   image_url?: string | null;
+  cover_image?: string | null;
   start_time: string;
   end_time: string;
   location?: string;

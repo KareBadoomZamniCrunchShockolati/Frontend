@@ -5,9 +5,13 @@ import { Search } from "lucide-react";
 import CustomInput from "../Custom/CustomInput";
 import CustomDropdown from "../Custom/CustomDropdown";
 import { useNavigate } from "react-router-dom";
+import { baseURL } from "@/services/services";
+import useUserStore from "@/store/userStore/userStore";
+
 import {
   getParticipatingChallengesService,
   getMutualFollowersService,
+  getUserProfileService,
   searchChallengesService,
 } from "@/services/userService";
 import type { Challenge } from "@/types/challengeTypes";
@@ -16,15 +20,25 @@ import SkeletonChallengeCard from "./SkeletonChallengeCard";
 
 const PAGE_SIZE = 5;
 
+const normalizeUrl = (value?: string) => {
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith("/")) return `${baseURL}${value}`;
+  return `${baseURL}/${value}`;
+};
+
 const ProfileChallenges = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [currentUserAvatar, setCurrentUserAvatar] = useState("");
+  const [checkedCategories, setCheckedCategories] = useState<{
+    [key: number]: boolean;
+  }>({});
   const [searchQuery, setSearchQuery] = useState("");
 
+  const { userId } = useUserStore();
   const navigate = useNavigate();
 
   const categories = [
@@ -123,27 +137,48 @@ const ProfileChallenges = () => {
   );
 
   useEffect(() => {
-    setChallenges([]);
-    setPage(1);
-    setHasMore(true);
-    fetchChallenges(1, false);
-  }, [searchQuery, fetchChallenges]);
-
-  // تشخیص تعداد ستون بر اساس عرض صفحه
-  const getColumnCount = () => {
-    if (typeof window === "undefined") return 1;
-    if (window.innerWidth >= 1024) return 3;
-    if (window.innerWidth >= 640) return 2;
-    return 1;
-  };
-
-  const [columnCount, setColumnCount] = useState(getColumnCount());
+    const q = searchQuery.trim();
+    if (q) fetchSearchedChallenges(q);
+    else fetchParticipatingChallenges();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
   useEffect(() => {
-    const handleResize = () => setColumnCount(getColumnCount());
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    const fetchProfilePicture = async () => {
+      try {
+        const profileRes = await getUserProfileService(userId);
+        const profile = profileRes?.data ?? profileRes;
+        setCurrentUserAvatar(normalizeUrl(profile?.profile_picture || ""));
+      } catch (profileError) {
+        console.error("Error fetching profile picture:", profileError);
+      }
+    };
+
+    fetchProfilePicture();
+  }, [userId]);
+
+  // ----- منطق چک‌باکس دسته‌بندی‌ها (مثل کد خودت) -----
+  const handleCategoryChange = (newChecked: { [key: number]: boolean }) => {
+    if (newChecked[0] && !checkedCategories[0]) {
+      setCheckedCategories({ 0: true });
+    } else if (
+      !newChecked[0] &&
+      Object.keys(newChecked).some(
+        (k) => Number(k) !== 0 && newChecked[Number(k)]
+      )
+    ) {
+      const updated = { ...newChecked };
+      delete updated[0];
+      setCheckedCategories(updated);
+    } else setCheckedCategories(newChecked);
+  };
+
+  // ----- فیلتر چالش‌ها بر اساس دسته‌بندی‌های انتخاب شده -----
+  const filteredChallenges = challenges;
+  const resolveAvatarUrl = (user: any) =>
+    normalizeUrl(
+      user?.profile_picture || user?.avatar_url || user?.avatar || user?.image || ""
+    );
 
   if (error) {
     return (
@@ -199,17 +234,49 @@ const ProfileChallenges = () => {
         </div>
       </div>
 
-      {/* لیست چالش‌ها */}
-      {loading && challenges.length === 0 ? (
-        <SkeletonChallengeCard />
-      ) : (
-        <VirtualChallengeList
-          challenges={challenges}
-          loadingMore={loadingMore && !searchQuery.trim()}
-          columnCount={columnCount}
-          hasMore={hasMore}
-          onLoadMore={() => fetchChallenges(page, true)}
-        />
+      {/* نمایش چالش‌ها */}
+      {!loading && filteredChallenges.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 m-2.5">
+          {filteredChallenges.map((challenge) => (
+            <ChallengeCard
+              key={challenge.id}
+              id={challenge.id}
+              onClick={() => navigate(`/challenge/${challenge.id}`)}
+              title={challenge.title}
+              description={challenge.description}
+              startDate={convertToJalali(challenge.start_time)}
+              endDate={convertToJalali(challenge.end_time)}
+              profiles={
+                challenge.mutualFollowers?.map((user: any) => ({
+                  id: user.id,
+                  name: user.username || user.name || "",
+                  avatar: resolveAvatarUrl(user),
+                  image: resolveAvatarUrl(user),
+                })) || []
+              }
+              initialLikes={challenge.like_count}
+              initialComments={challenge.comment_count}
+              coverImage={
+                normalizeUrl(challenge.cover_image || "") ||
+                normalizeUrl(challenge.image_url) ||
+                "https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=800&q=80"
+              }
+              isPrivate={challenge.visibility === "private"}
+              isJoined={challenge?.is_user_participating || true}
+              creator={{
+                name: challenge.creator_username,
+                avatar:
+                  challenge.creator_id === userId
+                    ? currentUserAvatar
+                    : normalizeUrl(
+                        challenge.creator_profile_picture ||
+                          challenge.creator_avatar_url ||
+                          ""
+                      ),
+              }}
+            />
+          ))}
+        </div>
       )}
 
       {/* حالت خالی */}
