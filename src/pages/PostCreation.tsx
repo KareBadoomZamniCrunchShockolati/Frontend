@@ -28,6 +28,7 @@ import {
   presignPostImagesService,
   uploadPostImageToPresignedUrl,
 } from "@/services/postService";
+import { getBackendErrorMessage } from "@/services/errorService";
 import type {
   ChallengePreview,
   PostResponse,
@@ -79,7 +80,7 @@ const PostCreation = () => {
 
         setChallenges(simpleChallenges);
       } catch (err) {
-        console.error(err);
+        CustomToast(getBackendErrorMessage(err), "error");
       }
     };
 

@@ -28,6 +28,7 @@ import type { ChallengeCategoryType } from "@/types/challengeCreateTypes";
 import type { ChallengeData } from "@/types/challengeCreateTypes";
 
 import { DEFAULT_IMG } from "@/data/mockImages";
+import { getBackendErrorMessage } from "@/services/errorService";
 
 // Use the correct fixed map component
 import LocationMapPicker from "@/components/Custom/LocationMap";
@@ -111,7 +112,7 @@ const ChallengeEdit: React.FC = () => {
         );
         setParticipants(others);
       } catch (err) {
-        CustomToast("خطا در بارگذاری چالش", "error");
+        CustomToast(getBackendErrorMessage(err), "error");
         navigate(-1);
       } finally {
         setLoading(false);
@@ -127,7 +128,7 @@ const ChallengeEdit: React.FC = () => {
         const cats = await fetchChallengeCategories();
         setCategories(cats);
       } catch (err) {
-        CustomToast("خطا در بارگذاری دسته‌بندی‌ها", "error");
+        CustomToast(getBackendErrorMessage(err), "error");
       } finally {
         setLoadingCategories(false);
       }
@@ -155,8 +156,8 @@ const ChallengeEdit: React.FC = () => {
         prev.filter((u) => u.user_id !== Number(participantId))
       );
       CustomToast("کاربر با موفقیت حذف شد", "success");
-    } catch (err: any) {
-      CustomToast(err.message || "حذف ناموفق بود", "error");
+    } catch (err) {
+      CustomToast(getBackendErrorMessage(err), "error");
     }
   };
 
@@ -260,12 +261,7 @@ const ChallengeEdit: React.FC = () => {
       CustomToast("چالش با موفقیت بروزرسانی شد!", "success");
       navigate(`/challenge/${challengeId}`, { replace: true });
     } catch (err: any) {
-      const message =
-        err?.response?.data?.message ||
-        err?.response?.data?.details?.details ||
-        err.message ||
-        "ذخیره تغییرات ناموفق بود";
-      CustomToast(message, "error");
+      CustomToast(getBackendErrorMessage(err), "error");
     } finally {
       setIsSaving(false);
     }

@@ -72,7 +72,7 @@ const ProfileChallenges = () => {
       const response = await getMutualFollowersService(challengeId);
       return response.data || response || [];
     } catch (error) {
-      console.error("Error fetching mutual followers:", error);
+      CustomToast(getBackendErrorMessage(error), "error");
       return [];
     }
   };
@@ -113,11 +113,11 @@ const ProfileChallenges = () => {
           rawList = await getParticipatingChallengesService(pageNum, PAGE_SIZE);
         }
 
-        const hydrated = await hydrateChallenges(rawList);
+  //       const hydrated = await hydrateChallenges(rawList);
 
-        setChallenges((prev) =>
-          isLoadMore ? [...prev, ...hydrated] : hydrated
-        );
+  //       setChallenges((prev) =>
+  //         isLoadMore ? [...prev, ...hydrated] : hydrated
+  //       );
 
         if (isSearching) {
           setHasMore(false);
