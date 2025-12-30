@@ -3,7 +3,7 @@ import { ArrowLeft, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { topProfile } from "@/types/topProfile";
 
-const TopBackText = ({ text }: { text: string }) => {
+const TopBackText = ({ text, icon }: { text: string; icon?: string }) => {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -18,7 +18,14 @@ const TopBackText = ({ text }: { text: string }) => {
       >
         <ArrowLeft className="w-full h-full text-primary" />
       </button>
-      <span className="text-primary text-2xl font-bold">{text}</span>
+      {icon ? (
+        <div className="flex items-center gap-2">
+          <img src={icon} alt="" />
+          <span className="text-primary text-2xl font-bold">{text}</span>{" "}
+        </div>
+      ) : (
+        <span className="text-primary text-2xl font-bold">{text}</span>
+      )}
     </div>
   );
 };

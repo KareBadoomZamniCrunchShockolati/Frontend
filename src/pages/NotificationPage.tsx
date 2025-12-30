@@ -4,6 +4,7 @@ import profileImg from "@/assets/Img/Icon/User.svg";
 import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import happy from "@/assets/Img/Icon/emoji-happy.svg";
 import { Navigate, useNavigate } from "react-router-dom";
+import bell from "@/assets/Img/Icon/bell.svg";
 
 const newData = [
   {
@@ -46,7 +47,7 @@ const oldData = [
 const NotificationPage = () => {
   return (
     <div className="p-4">
-      <TopBackText text="اعلانات" />
+      <TopBackText text="اعلانات" icon={bell} />
       <div className="flex flex-col p-4  gap-4 bg-primary border-3 border-black rounded-2xl">
         <p className="text-right font-extrabold text-2xl text-white">جدید</p>
         {newData.map((x) => {
