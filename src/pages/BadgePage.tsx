@@ -6,6 +6,7 @@ import bdg3 from "@/assets/Img/Icon/bdg3.svg";
 import { useEffect, useState } from "react";
 import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import TopBackText from "@/components/Custom/TopBackText";
+import { cn } from "@/lib/utils";
 
 type bdg = {
   ImgSrc: string;
@@ -89,7 +90,7 @@ const BadgePage = () => {
   return (
     <div className="p-2">
       <TopBackText text="نشان ها" />
-      <div className=" rounded-[8px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-secondary flex flex-col items-center text-xl font-extrabold text-white">
+      <div className=" rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] shadow-foreground bg-secondary flex flex-col items-center text-xl font-extrabold text-white">
         <div className="flex gap-5 justify-center items-center relative w-full max-w-xl mb-4  pb-20 pt-15">
           <div className="w-1/4 translate-y-[-30px]" onClick={() => setAdd(1)}>
             <img
@@ -120,23 +121,29 @@ const BadgePage = () => {
       <div className="flex justify-between flex-wrap gap-2 mt-10">
         {data.map((data, index) => (
           <div
-            className="w-[31%]  px-4 py-2 border-3 border-primary rounded-[8px] shadow-[2px_2px_0px_0px_rgba(255,119,0,1)]"
+            className="w-[31%] relative  px-4 py-2 border-3 border-primary rounded-[8px] shadow-[2px_2px_0px_0px_rgba(255,119,0,1)]"
             key={index}
             onClick={() => {
               if (add !== null) {
-                if (add == 1) {
+                let used = false;
+                for (let i of images) {
+                  if (index == i) used = true;
+                }
+
+                if (add == 1 && !used) {
                   let imagesCopy = [...images];
+
                   imagesCopy[0] = index;
                   setImages(imagesCopy);
                   setAdd(null);
                 }
-                if (add == 2) {
+                if (add == 2 && !used) {
                   let imagesCopy = [...images];
                   imagesCopy[1] = index;
                   setImages(imagesCopy);
                   setAdd(null);
                 }
-                if (add == 3) {
+                if (add == 3 && !used) {
                   let imagesCopy = [...images];
                   imagesCopy[2] = index;
                   setImages(imagesCopy);
@@ -148,6 +155,14 @@ const BadgePage = () => {
               }
             }}
           >
+            {add && (
+              <div
+                className={cn(
+                  "w-4 h-4 border-2 border-black absolute right-2 rounded-[4px]",
+                  images.includes(index) && "bg-black"
+                )}
+              ></div>
+            )}
             <img className="w-full" src={data.ImgSrc} alt="" />
             <p className="text-center mt-4">{data.title}</p>
           </div>
