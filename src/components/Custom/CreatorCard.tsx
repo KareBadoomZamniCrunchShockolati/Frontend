@@ -22,9 +22,9 @@ function Medal({ rank }) {
 
 export function CreatorCard({ creator }) {
   return (
-    <div className="relative w-[150px] shrink-0 rounded-2xl border-2 border-black bg-white overflow-hidden shadow-shadow-light">
+    <div className="relative w-[150px] shrink-0 rounded-2xl border-2 border-foreground bg-background overflow-hidden shadow-shadow-light">
       <div className="relative flex justify-center pt-4 pb-8">
-        <div className="relative h-20 w-20 rounded-full border-2 border-black overflow-hidden bg-slate-200">
+        <div className="relative h-20 w-20 rounded-full border-2 border-foreground overflow-hidden bg-slate-200">
           <img
             src={creator.avatar}
             alt={creator.username}
@@ -39,7 +39,7 @@ export function CreatorCard({ creator }) {
       </div>
 
       <div
-        className={`h-10 flex items-center justify-center font-bold text-sm border-t-2 border-black mt-4 pt-2
+        className={`h-10 flex items-center justify-center font-bold text-sm border-t-2 border-foreground mt-4 pt-2
           ${creator.rank === 1 && "bg-yellow-400"}
           ${creator.rank === 2 && "bg-gray-200"}
           ${creator.rank === 3 && "bg-orange-300"}

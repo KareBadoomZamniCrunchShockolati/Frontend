@@ -39,9 +39,7 @@ const EditPost = () => {
       }
 
       try {
-        console.log("Fetching post data for postId:", postId);
         const response = await getPostService(Number(postId));
-        console.log("Post data received:", response);
         setInitialData(response);
 
         if (response.data.pictures && response.data.pictures.length > 0) {
@@ -140,7 +138,11 @@ const EditPost = () => {
 
   if (!token) {
     CustomToast("ابتدا باید وارد حساب کاربری شوید!", "error");
-    return <div className="text-center mt-10">ابتدا باید وارد حساب کاربری شوید!</div>;
+    return (
+      <div className="min-h-screen bg-background text-center text-foreground mt-10 text-lg font-medium">
+        ابتدا باید وارد حساب کاربری شوید!
+      </div>
+    );
   }
 
   if (loading) {
@@ -149,17 +151,17 @@ const EditPost = () => {
 
   if (!initialData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-xl text-gray-text">پست یافت نشد</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-xl text-muted-foreground">پست یافت نشد</p>
       </div>
     );
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 flex flex-col">
       <div className="flex items-center justify-between mt-5 mr-5 ml-5">
         <button
-          className="p-2 border-2 border-primary rounded-xl hover:bg-primary-hover transition-colors"
+          className="p-2 border-2 border-foreground rounded-xl hover:bg-muted transition-colors"
           onClick={() => navigate(`/dashboard/${userId}`)}
         >
           <ArrowLeft className="w-8 h-8 text-primary" />
@@ -178,10 +180,9 @@ const EditPost = () => {
         enableReinitialize
       >
         {({ values, setFieldValue }) => (
-          <Form>
-            {/* Image Preview */}
+          <Form className="flex-1 flex flex-col">
             <div className="flex flex-col items-center gap-2 mr-5 ml-5 mt-4">
-              <label className="w-full h-64 border-2 border-gray-400 rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden">
+              <label className="w-full h-64 border-2 border-foreground rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden bg-card">
                 {imageURLs.length > 0 ? (
                   <Carousel className="w-full h-full relative">
                     <CarouselContent className="h-full">
@@ -191,7 +192,7 @@ const EditPost = () => {
                           className="w-full h-full flex items-center justify-center relative"
                         >
                           <FileX
-                            className="absolute top-2 right-2 w-6 h-6 text-destructive cursor-pointer z-20 bg-white rounded-full p-1"
+                            className="absolute top-2 right-2 w-6 h-6 text-destructive cursor-pointer z-20 bg-card rounded-full p-1"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -208,13 +209,13 @@ const EditPost = () => {
                     </CarouselContent>
                     {imageURLs.length > 1 && (
                       <>
-                        <CarouselPrevious className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
-                        <CarouselNext className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20" />
+                        <CarouselPrevious className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-card rounded-full p-1 shadow-md z-20" />
+                        <CarouselNext className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-card rounded-full p-1 shadow-md z-20" />
                       </>
                     )}
                   </Carousel>
                 ) : (
-                  <span className="text-neutral-gray font-bold text-center">
+                  <span className="text-muted-foreground font-bold text-center">
                     پیش‌نمایش
                   </span>
                 )}
@@ -237,11 +238,10 @@ const EditPost = () => {
                 </p>
                 <Upload className="absolute right-5 !w-6 !h-6" />
               </CustomButton>
-              <p className="text-xs text-neutral-gray">{imageURLs.length}/5 تصویر</p>
+              <p className="text-xs text-muted-foreground">{imageURLs.length}/5 تصویر</p>
             </div>
 
-            {/* Description */}
-            <div className="mr-5 ml-5 mt-4">
+            <div className="mr-5 ml-5 mt-4 flex-1">
               <CustomInput
                 name="description"
                 label="توضیحات"
@@ -251,7 +251,6 @@ const EditPost = () => {
               />
             </div>
 
-            {/* Challenge Selection */}
             <div className="mr-5 ml-5 mt-2">
               <p className="text-right text-xl font-bold mb-2">
                 چالش مربوطه (اختیاری)
@@ -268,8 +267,7 @@ const EditPost = () => {
               />
             </div>
 
-            {/* Save Button */}
-            <div className="mt-10 mr-5 ml-5">
+            <div className="mt-10 mr-5 ml-5 pb-6">
               <CustomButton
                 type="submit"
                 className="bg-secondary w-full mb-2"
@@ -282,7 +280,7 @@ const EditPost = () => {
           </Form>
         )}
       </Formik>
-    </>
+    </div>
   );
 };
 

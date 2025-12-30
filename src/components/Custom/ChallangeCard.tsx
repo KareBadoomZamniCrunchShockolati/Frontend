@@ -229,14 +229,14 @@ export default function ChallengeCard({
                 <span className="text-gray-text text-xs font-medium block mb-1">
                   تاریخ شروع
                 </span>
-                <span className="text-black font-bold">{startDate}</span>
+                <span className="text-foreground font-bold">{startDate}</span>
               </div>
 
               <div>
                 <span className="text-gray-text text-xs font-medium block mb-1">
                   تاریخ پایان
                 </span>
-                <span className="text-black font-bold">{endDate}</span>
+                <span className="text-foreground font-bold">{endDate}</span>
               </div>
 
               <div>

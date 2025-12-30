@@ -14,8 +14,8 @@ export default function BottomNav() {
   const isDashboard = location.pathname.startsWith("/dashboard");
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[100] border-2 border-black  border-b-0 bg-black shadow-lg rounded-tr-xl rounded-tl-xl ">
-      <div className="flex h-16  bg-white rounded-tr-xl rounded-tl-xl overflow-hidden">
+    <div className="fixed inset-x-0 bottom-0 z-[100] border-2 border-foreground  border-b-0 bg-foreground shadow-lg rounded-tr-xl rounded-tl-xl ">
+      <div className="flex h-16  bg-background rounded-tr-xl rounded-tl-xl overflow-hidden">
         {/* Home Button */}
         <button
           type="button"
@@ -23,7 +23,7 @@ export default function BottomNav() {
           className={`
             w-full
             flex-1 flex flex-col items-center justify-center font-bold
-            ${isHome ? "bg-primary text-white" : "text-black"}
+            ${isHome ? "bg-primary text-background" : "text-foreground"}
             rounded-tr-xl
             transition-all duration-300 ease-in-out
           `}
@@ -32,7 +32,7 @@ export default function BottomNav() {
           <span className="text-xs">خانه</span>
         </button>
 
-        <div className="w-1 bg-black shrink-0" />
+        <div className="w-1 bg-foreground shrink-0" />
 
         {/* Dashboard/Profile Button */}
         <button
@@ -41,7 +41,7 @@ export default function BottomNav() {
           onClick={() => userId && navigate(`/dashboard/${userId}`)}
           className={`
             flex-1 flex flex-col items-center justify-center font-bold
-            ${isDashboard ? "bg-primary text-white " : "text-black"}
+            ${isDashboard ? "bg-primary text-background" : "text-foreground"}
             ${!userId ? "opacity-50 cursor-not-allowed" : ""}
             rounded-tl-xl
             transition-all duration-300 ease-in-out

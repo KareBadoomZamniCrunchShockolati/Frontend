@@ -326,7 +326,7 @@ export default function ProfileInfo() {
 
               <div>
                 <CustomInput name="email" label="ایمیل جدید" />
-                <p className="text-xs text-gray-500 mt-1" dir="rtl">
+                <p className="text-xs text-gray-text mt-1" dir="rtl">
                   {values.email !== initialValues.email
                     ? "برای تغییر ایمیل، کد تأیید ارسال خواهد شد"
                     : "ایمیل فعلی شما"}

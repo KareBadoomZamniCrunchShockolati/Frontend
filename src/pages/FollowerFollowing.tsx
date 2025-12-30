@@ -163,7 +163,7 @@ const FollowerFollowingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start p-4 w-full">
+    <div className="min-h-screen flex flex-col items-center justify-start p-4 w-full bg-background">
       <BackButtonWithUsername
         username={fullName}
         onBackClick={() => navigate(`/dashboard/${selectedUser}`)}

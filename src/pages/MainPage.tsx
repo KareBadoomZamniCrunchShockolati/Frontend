@@ -12,13 +12,12 @@ import {
   getPublicChallengesService,
   getParticipatingChallengesService,
   getPopularChallengesService,
-  getTopCreatorsListService, // اضافه کردن سرویس جدید
+  getTopCreatorsListService,
 } from "@/services/userService";
 import { useNavigate } from "react-router-dom";
 import { convertToJalali } from "@/components/Custom/ConvertToJalali";
 import { HorizontalScroller } from "@/components/Custom/HorizontalScroller";
 
-/* === Category Icons === */
 import HealthIcon from "@/assets/Icon/Health.svg";
 import StudyIcon from "@/assets/Icon/Study.svg";
 import FinanceIcon from "@/assets/Icon/Finance.svg";
@@ -40,7 +39,7 @@ function CategoryGrid({
 
   return (
     <div className="px-4 pt-4">
-      <div className="mb-3 mt-5 text-base font-bold text-slate-900">
+      <div className="mb-3 mt-5 text-base font-bold text-foreground">
         دسته‌بندی‌ها
       </div>
 
@@ -50,7 +49,7 @@ function CategoryGrid({
             key={c.id}
             type="button"
             onClick={() => navigate(`/category/${c.id}`)}
-            className="flex flex-col cursor-pointer items-center gap-2 rounded-2xl border-2 border-black bg-white py-3 shadow-shadow-light active:scale-[0.98]"
+            className="flex flex-col cursor-pointer items-center gap-2 rounded-2xl border-2 border-foreground bg-card py-3 shadow-shadow-light active:scale-[0.98]"
           >
             <div>
               <img
@@ -61,7 +60,7 @@ function CategoryGrid({
               />
             </div>
 
-            <span className="text-xs font-medium text-slate-700">
+            <span className="text-xs font-medium text-foreground">
               {c.title}
             </span>
           </button>
@@ -71,8 +70,6 @@ function CategoryGrid({
   );
 }
 
-// ... کدهای قبلی بدون تغییر
-
 export default function HomeScreen() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -80,7 +77,7 @@ export default function HomeScreen() {
   const [popularChallenges, setPopularChallenges] = useState<any[]>([]);
   const [nearbyChallenges, setNearbyChallenges] = useState<any[]>([]);
   const [followingChallenges, setFollowingChallenges] = useState<any[]>([]);
-  const [topCreators, setTopCreators] = useState<any[]>([]); // حالت جدید برای سازندگان برتر
+  const [topCreators, setTopCreators] = useState<any[]>([]);
 
   const [allChallenges, setAllChallenges] = useState<any[]>([]);
   const [visibleChallenges, setVisibleChallenges] = useState<any[]>([]);
@@ -90,7 +87,7 @@ export default function HomeScreen() {
     nearby: true,
     following: true,
     all: true,
-    topCreators: true, // اضافه کردن loading state جدید
+    topCreators: true,
   });
 
   const [activeFilters, setActiveFilters] = useState<{
@@ -114,20 +111,17 @@ export default function HomeScreen() {
     []
   );
 
-  // فچ کردن سازندگان برتر
   const fetchTopCreators = async () => {
     try {
       setLoadingStates((prev) => ({ ...prev, topCreators: true }));
       const response = await getTopCreatorsListService();
-      // ساختار سازندگان برای نمایش در کارت
       const formattedCreators =
         response.map((creator: any, index: number) => ({
           id: creator.id,
           username: creator.username,
-          avatar: "", // اگر API آواتار دارد، از creator.avatar استفاده کنید
-          rank: index + 1, // یا از داده‌های دیگری برای رتبه استفاده کنید
+          avatar: "",
+          rank: index + 1,
           stats: {
-            // اضافه کردن آمار برای نمایش احتمالی
             challengeCount: creator.challenge_count,
             totalLikes: creator.total_likes,
             totalParticipants: creator.total_participants,
@@ -137,7 +131,6 @@ export default function HomeScreen() {
       setTopCreators(formattedCreators);
     } catch (error) {
       console.error("Error fetching top creators:", error);
-      // داده‌های نمونه در صورت خطا
       setTopCreators([
         { id: 1, username: "mahditd", avatar: "/images/mahditd.jpg", rank: 1 },
         { id: 2, username: "emadme", avatar: "/images/emadme.jpg", rank: 2 },
@@ -148,7 +141,6 @@ export default function HomeScreen() {
     }
   };
 
-  // فچ کردن چالش‌های محبوب
   const fetchPopularChallenges = async () => {
     try {
       setLoadingStates((prev) => ({ ...prev, popular: true }));
@@ -162,7 +154,6 @@ export default function HomeScreen() {
     }
   };
 
-  // فچ کردن چالش‌های نزدیک
   const fetchNearbyChallenges = async () => {
     try {
       setLoadingStates((prev) => ({ ...prev, nearby: true }));
@@ -176,7 +167,6 @@ export default function HomeScreen() {
     }
   };
 
-  // فچ کردن چالش‌های دنبال‌شوندگان
   const fetchFollowingChallenges = async () => {
     try {
       setLoadingStates((prev) => ({ ...prev, following: true }));
@@ -190,7 +180,6 @@ export default function HomeScreen() {
     }
   };
 
-  // فچ کردن همه چالش‌ها (برای جستجو)
   const fetchAllChallenges = async () => {
     try {
       setLoadingStates((prev) => ({ ...prev, all: true }));
@@ -208,7 +197,6 @@ export default function HomeScreen() {
     }
   };
 
-  // تابع کمکی برای ایجاد داده‌های نمونه
   const getSampleData = (type: string) => {
     const typeTitles = {
       popular: "محبوب",
@@ -230,21 +218,17 @@ export default function HomeScreen() {
       isJoined: i % 2 === 0,
       isPrivate: i % 3 === 0,
       creator: { name: "کاربر ناشناس" },
-      type: type, // اضافه کردن نوع برای شناسایی
+      type: type,
     }));
   };
 
   useEffect(() => {
-    // دریافت داده‌ها برای هر بخش به صورت جداگانه
     fetchPopularChallenges();
     fetchNearbyChallenges();
     fetchFollowingChallenges();
     fetchAllChallenges();
-    fetchTopCreators(); // فراخوانی سرویس جدید
+    fetchTopCreators();
   }, []);
-
-  // حذف آرایه creators ثابت از کد (استفاده از داده‌های API)
-  // const creators = [ ... ];
 
   const handleSearchFilter = () => {
     setIsFilterModalOpen(true);
@@ -294,7 +278,7 @@ export default function HomeScreen() {
 
   return (
     <>
-      <div dir="rtl" className="min-h-screen pb-20">
+      <div dir="rtl" className="min-h-screen pb-20 bg-background text-foreground transition-colors duration-300">
         <div className="mx-auto pb-6">
           <Formik initialValues={{ q: "" }} onSubmit={() => {}}>
             {({ values, setFieldValue }) => {
@@ -327,7 +311,6 @@ export default function HomeScreen() {
                   <Banner />
                   <CategoryGrid categories={categories} />
 
-                  {/* بخش محبوب‌ترین چالش‌ها */}
                   <SectionHeader
                     title="محبوب‌ترین چالش‌ها"
                     onMore={() => navigate("/section/popular")}
@@ -353,7 +336,6 @@ export default function HomeScreen() {
                     </HorizontalScroller>
                   )}
 
-                  {/* بخش چالش‌های نزدیک */}
                   <SectionHeader
                     title="چالش های نزدیک"
                     onMore={() => navigate("/section/near")}
@@ -378,10 +360,9 @@ export default function HomeScreen() {
                     </HorizontalScroller>
                   )}
 
-                  {/* بخش برترین سازندگان */}
                   <SectionHeader
                     title="برترین سازندگان"
-                    onMore={() => navigate("/creators")} // یا مسیر دلخواه
+                    onMore={() => navigate("/creators")}
                   />
                   {loadingStates.topCreators ? (
                     <div className="p-4 text-center">
@@ -390,13 +371,12 @@ export default function HomeScreen() {
                   ) : (
                     <HorizontalScroller>
                       {topCreators
-                        .slice() // کپی برای عدم تغییر آرایه اصلی
+                        .slice()
                         .sort((a, b) => a.rank - b.rank)
                         .map((c) => (
                           <CreatorCard
                             key={c.id}
                             creator={c}
-                            // میتوانید اطلاعات اضافی را هم پاس دهید
                             additionalInfo={
                               c.stats
                                 ? `چالش‌ها: ${c.stats.challengeCount}`
@@ -407,7 +387,6 @@ export default function HomeScreen() {
                     </HorizontalScroller>
                   )}
 
-                  {/* بخش چالش‌های دنبال‌شوندگان */}
                   <div>
                     <SectionHeader
                       title="چالش های دنبال شوندگان"

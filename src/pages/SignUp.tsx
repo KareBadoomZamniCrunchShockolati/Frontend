@@ -162,16 +162,16 @@ function SignUp() {
       onFinalStepCompleted={() => console.log("All steps completed!")}
       backButtonText="Previous"
       nextButtonText="Next"
-      className="min-h-screen flex items-center justify-center bg-gray-50"
+      className="min-h-screen flex items-center justify-center bg-background"
       dir="rtl"
-      stepCircleContainerClassName="bg-white "
+      stepCircleContainerClassName="bg-background"
       stepContainerClassName=""
       backButtonProps={{ className: "hidden" }}
       nextButtonProps={{ id: "stepper-next", className: "hidden" }}
       disableStepIndicators={true}
     >
       <Step>
-        <div className="flex items-center justify-between mb-12 ">
+        <div className="flex items-center justify-between mb-12">
           <img src={telegramLogo} alt="لوگو" className="w-18 h-18 rounded-xl" />
           <button
             className="p-2 border-2 border-primary rounded-xl hover:bg-primary-hover transition-colors"
@@ -250,7 +250,7 @@ function SignUp() {
           <div className="text-4xl font-extrabold text-primary mb-2">
             ! رمز عبورت رو بساز
           </div>
-          <p className="text-neutral-gray-bold text-sm font-extrabold">
+          <p className="text-gray-text text-sm font-extrabold">
             رمز عبورت باید حداقل ۸ کاراکتر و شامل عدد و علامت خاص باشد تا امنیت
             حسابت حفظ شود
           </p>

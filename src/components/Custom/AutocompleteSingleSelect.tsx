@@ -40,7 +40,7 @@ const AutocompleteSingleSelect = ({
         className="
                 w-full 
                 border 
-                !border-[var(--borderDefault)] 
+                !border-[var(--foreground)] 
                 shadow-border-default 
                 focus:!border-[var(--borderFoucus)] 
                 focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)] 
@@ -50,7 +50,7 @@ const AutocompleteSingleSelect = ({
                 p-2 
                 text-right
                 transition-all duration-200 ease-in-out
-                placeholder:text-neutral-gray
+                placeholder:text-gray-text
                 placeholder:text-sm
                 placeholder:font-bold
               "
@@ -61,7 +61,7 @@ const AutocompleteSingleSelect = ({
         placeholder={placeHolder}
       />
       {showDropdown && filteredItems.length > 0 && (
-        <div className="absolute z-10 w-full bg-white border-2 border-border rounded-xl mt-1 max-h-40 overflow-y-auto">
+        <div className="absolute z-10 w-full bg-background border-2 border-border rounded-xl mt-1 max-h-40 overflow-y-auto">
           {filteredItems.map((item) => (
             <div
               dir="rtl"

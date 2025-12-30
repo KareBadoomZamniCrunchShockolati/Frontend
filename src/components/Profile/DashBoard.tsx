@@ -16,37 +16,25 @@ const DashBoard: React.FC = () => {
     if (!userId) {
       navigate("/");
     }
-
-    return () => {
-      document.removeEventListener("dblclick", preventZoom);
-    };
   }, [userId, navigate]);
 
-  const preventZoom = (e: MouseEvent) => {
-    e.preventDefault();
-  };
-
   if (!userId) return <p dir="rtl">در حال بارگذاری...</p>;
-
-  console.log(viewedUserId);
-  console.log(userId);
 
   const profileId = viewedUserId || userId;
   const isOwner = profileId === userId;
 
   return (
     <div
-      className="min-h-screen"
+      className="min-h-screen bg-background text-foreground transition-colors duration-300"
       style={{
-        touchAction: "pan-y", // جلوگیری از زوم پینچ در موبایل
+        touchAction: "pan-y",
         maxWidth: "100vw",
         overflowX: "hidden",
       }}
     >
       <ProfileHeader userId={profileId} isOwner={isOwner} />
       <ProfileBody />
-      <div className="mt-20 h-fit"
-       dir="rtl">
+      <div className="mt-20 h-fit" dir="rtl">
         <BottomNav />
       </div>
     </div>
