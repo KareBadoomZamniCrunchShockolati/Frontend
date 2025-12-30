@@ -12,6 +12,8 @@ import {
 import type { User } from "@/types/acceptUser";
 import styles from "./AcceptList.module.css";
 import { useNavigate, useParams } from "react-router-dom";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "./CustomToast";
 
 const AcceptList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,7 +37,7 @@ const AcceptList = () => {
         console.log("challenge id must be a number");
       }
     } catch (err) {
-      console.error(err);
+      CustomToast(getBackendErrorMessage(err), "error");
     }
   };
 
@@ -45,7 +47,7 @@ const AcceptList = () => {
       console.log(data);
       navigate(0);
     } catch (e) {
-      console.log(e);
+      CustomToast(getBackendErrorMessage(e), "error");
     }
   };
 
@@ -55,7 +57,7 @@ const AcceptList = () => {
       console.log(data);
       navigate(0);
     } catch (e) {
-      console.log(e);
+      CustomToast(getBackendErrorMessage(e), "error");
     }
   };
 

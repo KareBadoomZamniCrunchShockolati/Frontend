@@ -7,17 +7,18 @@ import { useMobile } from "@/hooks/ResponsiveHooks";
 import loginFormSchemaConfig from "@/schemas/loginFormSchema";
 import { Eye, EyeClosed } from "lucide-react";
 import CustomCheckbox from "@/components/Custom/CustomCheckbox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Label } from "@radix-ui/react-label";
 import { Checkbox } from "@radix-ui/react-checkbox";
 import type { LoginPayload } from "@/types/authTypes";
 import { loginService } from "@/services/authService";
 import CustomToast from "@/components/Custom/CustomToast";
-import { Link, useNavigate } from "react-router-dom"; // ← اضافه شد
+import { Link, useLocation, useNavigate } from "react-router-dom"; // ← اضافه شد
 import useUserStore from "@/store/userStore/userStore";
+import { getBackendErrorMessage } from "@/services/errorService";
 
 export default function Login() {
-  const { setUsername, setToken, setUserId } = useUserStore();
+  const {setUsername, setToken, setUserId } = useUserStore();
   const navigate = useNavigate(); // ← اضافه شد
   const [showPassword, setShowPassword] = useState(true);
   const [loginStatus, setLoginStatus] = useState<string | null>(null); // وضعیت لاگین
@@ -31,7 +32,7 @@ export default function Login() {
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const response = await loginService(values);
-      const user = response.user_response;
+      const user = response.data;
 
       if (user?.token) {
         setToken(user.token);
@@ -42,14 +43,18 @@ export default function Login() {
 
         setLoginStatus("ورود با موفقیت انجام شد!");
         setTimeout(() => {
-          navigate(`/dashboard/${response.user_response.id}`);
+          navigate(`/dashboard/${response.data.id}`);
         }, 2000);
+        setTimeout(() => {
+          CustomToast(`خوش اومدی، ${user.username}! `, "info");
+        }, 2500);
       } else {
         setLoginStatus("ورود انجام نشد، دوباره تلاش کنید.");
       }
     } catch (error: any) {
       console.error("Login failed:", error);
       setLoginStatus(error?.response?.data?.message || "ورود انجام نشد!");
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       actions.setSubmitting(false);
     }

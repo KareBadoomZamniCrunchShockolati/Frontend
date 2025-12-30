@@ -16,6 +16,8 @@ import NameBio from "../NameBio";
 import TopProfile from "@/components/topProfile";
 import { cn } from "@/lib/utils";
 import defaultBadges from "@/data/mockBadges";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "@/components/Custom/CustomToast";
 
 export function getUserInitials(fullName: string): string {
   if (!fullName) return "";
@@ -52,7 +54,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           setBio(userRes.bio || "null");
         }
       } catch (err) {
-        console.error("Error fetching user profile:", err);
+        CustomToast(getBackendErrorMessage(err), "error");
       }
 
       try {
@@ -60,7 +62,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         if (followersRes?.count !== undefined)
           setFollowersCount(followersRes.count);
       } catch (err) {
-        console.error("Error fetching followers:", err);
+        CustomToast(getBackendErrorMessage(err), "error");
       }
 
       // تعداد فالووینگ‌ها
@@ -69,7 +71,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         if (followingRes?.count !== undefined)
           setFollowingCount(followingRes.count);
       } catch (err) {
-        console.error("Error fetching following:", err);
+        CustomToast(getBackendErrorMessage(err), "error");
       }
     }
 

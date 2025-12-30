@@ -27,6 +27,7 @@ import {
   step3Schema,
 } from "@/schemas/challengeSchema";
 import type { createFormValues } from "@/types/challengeCreateTypes";
+import { getBackendErrorMessage } from "@/services/errorService";
 
 const ChallengeCreate: React.FC = () => {
   const navigate = useNavigate();
@@ -49,8 +50,8 @@ const ChallengeCreate: React.FC = () => {
       try {
         const users = await fetchUsers(userId.toString(), "followers");
         setFetchedUsers(users || []);
-      } catch {
-        CustomToast("خطا در بارگذاری فالوئرها", "error");
+      } catch(err) {
+        CustomToast(getBackendErrorMessage(err), "error");
       } finally {
         setLoadingUsers(false);
       }
@@ -65,7 +66,7 @@ const ChallengeCreate: React.FC = () => {
         const cats = await fetchChallengeCategories();
         setCategories(cats);
       } catch (err) {
-        CustomToast("خطا در بارگذاری دسته‌بندی‌ها", "error");
+        CustomToast(getBackendErrorMessage(err), "error");
       } finally {
         setLoadingCategories(false);
       }
@@ -196,7 +197,9 @@ const ChallengeCreate: React.FC = () => {
         throw new Error("چالش ساخته نشد — پاسخ نامعتبر");
       }
 
-      CustomToast("چالش با موفقیت ساخته شد!", "success");
+      setTimeout(() => {
+        CustomToast("چالش با موفقیت ساخته شد!", "success");
+      }, 1000);
 
       let refreshedChallenge: any = null;
       if (imageFile) {
@@ -211,11 +214,7 @@ const ChallengeCreate: React.FC = () => {
             );
           }
         } catch (uploadError: any) {
-          const message =
-            extractBackendMessage(uploadError) ||
-            uploadError?.message ||
-            "خطا در آپلود کاور چالش";
-          CustomToast(message, "error");
+          CustomToast(getBackendErrorMessage(uploadError), "error");
         }
       }
 
@@ -234,7 +233,7 @@ const ChallengeCreate: React.FC = () => {
             failed === 0 ? "success" : "warning"
           );
         } catch (inviteErr) {
-          CustomToast("خطا در ارسال برخی دعوت‌ها", "warning");
+          CustomToast(getBackendErrorMessage(inviteErr), "error");
         }
       }
 
@@ -246,11 +245,7 @@ const ChallengeCreate: React.FC = () => {
       });
     } catch (err: any) {
       console.error("Challenge creation failed:", err);
-      const message =
-        extractBackendMessage(err) ||
-        err.message ||
-        "خطا در ساخت چالش — لطفاً ورودی‌ها را بررسی کنید";
-      CustomToast(message, "error");
+      CustomToast(err, "error");
     } finally {
       setSubmitting(false);
     }

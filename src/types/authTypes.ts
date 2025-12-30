@@ -24,7 +24,7 @@ export interface LoginResponse {
 
 export interface AuthResponse {
   message: string;
-  user_response: {
+  data: {
     id: number;
     username: string;
     email: string;

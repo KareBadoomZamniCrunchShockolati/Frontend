@@ -15,6 +15,9 @@ import {
   searchChallengesService,
 } from "@/services/userService";
 import type { Challenge } from "@/types/challengeTypes";
+import { convertToJalali } from "../Custom/ConvertToJalali";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "../Custom/CustomToast";
 import { VirtualChallengeList } from "./VirtualChallengeList";
 import SkeletonChallengeCard from "./SkeletonChallengeCard";
 
@@ -75,7 +78,7 @@ const ProfileChallenges = () => {
       const response = await getMutualFollowersService(challengeId);
       return response.data || response || [];
     } catch (error) {
-      console.error("Error fetching mutual followers:", error);
+      CustomToast(getBackendErrorMessage(error), "error");
       return [];
     }
   };
@@ -242,6 +245,7 @@ const ProfileChallenges = () => {
       {!loading && filteredChallenges.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 m-2.5">
           {filteredChallenges.map((challenge) => (
+
             <ChallengeCard
               key={challenge.id}
               id={challenge.id}
@@ -279,7 +283,7 @@ const ProfileChallenges = () => {
                       ),
               }}
             />
-          ))}
+))}
         </div>
       )}
 
