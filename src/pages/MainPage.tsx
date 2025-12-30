@@ -14,6 +14,7 @@ import {
   getPopularChallengesService,
   getTopCreatorsListService, // اضافه کردن سرویس جدید
 } from "@/services/userService";
+import type { ActiveFilters } from "@/types/searchTypes";
 import { useNavigate } from "react-router-dom";
 import { convertToJalali } from "@/components/Custom/ConvertToJalali";
 import { HorizontalScroller } from "@/components/Custom/HorizontalScroller";
@@ -71,7 +72,6 @@ function CategoryGrid({
   );
 }
 
-// ... کدهای قبلی بدون تغییر
 
 export default function HomeScreen() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -93,10 +93,7 @@ export default function HomeScreen() {
     topCreators: true, // اضافه کردن loading state جدید
   });
 
-  const [activeFilters, setActiveFilters] = useState<{
-    selectedCategory: string | null;
-    sortBy: string;
-  } | null>(null);
+  const [activeFilters, setActiveFilters] = useState<ActiveFilters | null>(null);
 
   const navigate = useNavigate();
 
@@ -250,10 +247,7 @@ export default function HomeScreen() {
     setIsFilterModalOpen(true);
   };
 
-  const handleFilterApply = (filters: {
-    selectedCategory: string | null;
-    sortBy: string;
-  }) => {
+  const handleFilterApply = (filters: ActiveFilters) => {
     setActiveFilters(filters);
 
     if (!filters?.selectedCategory) {

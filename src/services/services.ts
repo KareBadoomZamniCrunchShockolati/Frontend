@@ -21,9 +21,6 @@ export const PROTECTED_BASE = "/api/v1";
 const apiClient: AxiosInstance = axios.create({
 	baseURL,
 	timeout: 20000,
-	headers: {
-		"Content-Type": "application/json",
-	},
 });
 
 // const token = useUserStore.getState().token; // ✅ این درسته و باید جایگزین بشه
@@ -77,17 +74,22 @@ export const postData = async ({ endPoint, data, headers }: PostParams) => {
 };
 
 // ✅ POST image/form-data
-export const postImageData = async ({ endPoint, data }: PostParams) => {
-	try {
-		const response: AxiosResponse = await apiClient.post(endPoint, data, {
-			headers: { "Content-Type": "multipart/form-data" },
-		});
-		return response.data;
-	} catch (error) {
-		console.error("error in postImageData", error);
-		throw error;
-	}
+export const postImageData = async ({ endPoint, data, headers }: PostParams) => {
+  const isFormData = data instanceof FormData;
+  const requestHeaders: Record<string, string> = { ...(headers || {}) };
+
+  if (isFormData) {
+    delete requestHeaders["Content-Type"];
+  }
+
+  const response = await apiClient.post(endPoint, data, {
+    headers: requestHeaders,
+    transformRequest: [(payload) => payload],
+  });
+
+  return response.data;
 };
+
 
 // ✅ PATCH
 export const patchData = async ({ endPoint, data, headers }: PatchParams) => {
