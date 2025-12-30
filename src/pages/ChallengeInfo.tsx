@@ -18,6 +18,7 @@ import { mockChallenges } from "@/data/mockChallenges";
 
 import { OverlappingCards } from "@/components/Custom/OverlappingCards";
 import { cn } from "@/lib/utils";
+import { baseURL } from "@/services/services";
 
 // Use the correct fixed map component
 import LocationMapPicker from "@/components/Custom/LocationMap";
@@ -51,9 +52,20 @@ const ChallengeInfo: React.FC = () => {
   const payload: ChallengeDataDetails =
     (location.state?.challenge as ChallengeDataDetails) ?? defaultChallenge;
 
+  const normalizeUrl = (value?: string | null) => {
+    if (!value) return "";
+    if (/^https?:\/\//i.test(value)) return value;
+    if (value.startsWith("/")) return `${baseURL}${value}`;
+    return `${baseURL}/${value}`;
+  };
+
   const safeImageUrl = payload.Img?.trim()
     ? payload.Img
-    : DEFAULT_CHALLENGE_IMG;
+    : payload.cover_image?.trim()
+      ? normalizeUrl(payload.cover_image)
+      : payload.image_url?.trim()
+        ? normalizeUrl(payload.image_url)
+        : DEFAULT_CHALLENGE_IMG;
 
   const [challenge, setChallenge] = useState<ChallengeDataDetails | any>(payload);
   const [participants, setParticipants] = useState<UserProfile[]>([]);
@@ -192,7 +204,14 @@ const ChallengeInfo: React.FC = () => {
       <div className="flex-1 flex flex-col items-center">
         <BackButtonAndMenu onMenuClick={handleMenu} />
 
-        <ImageAndBadgeContainer imageUrl={challenge.Img ?? challenge.image_url ?? undefined} />
+        <ImageAndBadgeContainer
+          imageUrl={
+            normalizeUrl(challenge.cover_image) ||
+            challenge.Img ||
+            normalizeUrl(challenge.image_url) ||
+            undefined
+          }
+        />
 
         <LikeAndSaveButtons
           onLike={handleLike}
