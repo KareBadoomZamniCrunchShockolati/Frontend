@@ -130,6 +130,19 @@ const ChallengeCreate: React.FC = () => {
     },
     { setSubmitting }: FormikHelpers<any>
   ) => {
+    const extractBackendMessage = (error: any) => {
+      const data = error?.response?.data;
+      if (!data) return null;
+      if (typeof data === "string") return data;
+      if (typeof data?.message === "string") return data.message;
+      if (typeof data?.error === "string") return data.error;
+      if (typeof data?.error_code === "string") return data.error_code;
+      if (typeof data?.detail === "string") return data.detail;
+      if (typeof data?.details?.details === "string") return data.details.details;
+      if (typeof data?.data?.message === "string") return data.data.message;
+      return null;
+    };
+
     if (!token) {
       CustomToast("لطفاً وارد حساب کاربری شوید", "error");
       return;
@@ -172,8 +185,6 @@ const ChallengeCreate: React.FC = () => {
         address: values.challengeLocation.trim() || null,
       };
 
-      console.log("Sending payload:", payload);
-
       const response = await createChallenge(payload);
       const challengeId =
         response?.data?.ID ||
@@ -194,12 +205,14 @@ const ChallengeCreate: React.FC = () => {
           try {
             refreshedChallenge = await fetchChallengeById(challengeId);
           } catch (refreshError) {
-            console.error("Failed to refresh challenge after cover upload:", refreshError);
+            console.error(
+              "Failed to refresh challenge after cover upload:",
+              refreshError
+            );
           }
         } catch (uploadError: any) {
           const message =
-            uploadError?.response?.data?.message ||
-            uploadError?.response?.data?.details?.details ||
+            extractBackendMessage(uploadError) ||
             uploadError?.message ||
             "خطا در آپلود کاور چالش";
           CustomToast(message, "error");
@@ -227,13 +240,14 @@ const ChallengeCreate: React.FC = () => {
 
       navigate(`/challenge/${challengeId}`, {
         replace: true,
-        state: refreshedChallenge ? { challenge: refreshedChallenge } : undefined,
+        state: refreshedChallenge
+          ? { challenge: refreshedChallenge }
+          : undefined,
       });
     } catch (err: any) {
       console.error("Challenge creation failed:", err);
       const message =
-        err?.response?.data?.message ||
-        err?.response?.data?.details?.details ||
+        extractBackendMessage(err) ||
         err.message ||
         "خطا در ساخت چالش — لطفاً ورودی‌ها را بررسی کنید";
       CustomToast(message, "error");

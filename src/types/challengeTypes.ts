@@ -28,3 +28,11 @@ export interface LikeRequest {
   entity_type: string;
   entity_id: number;
 }
+
+export interface ChallengeCoverUploadResponse {
+  data: {
+    cover_image: string;
+  };
+  message: string;
+  status: number;
+}

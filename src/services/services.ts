@@ -75,16 +75,21 @@ export const postData = async ({ endPoint, data, headers }: PostParams) => {
 
 // ✅ POST image/form-data
 export const postImageData = async ({ endPoint, data, headers }: PostParams) => {
-	try {
-		const response: AxiosResponse = await apiClient.post(endPoint, data, {
-			headers,
-		});
-		return response.data;
-	} catch (error) {
-		console.error("error in postImageData", error);
-		throw error;
-	}
+  const isFormData = data instanceof FormData;
+  const requestHeaders: Record<string, string> = { ...(headers || {}) };
+
+  if (isFormData) {
+    delete requestHeaders["Content-Type"];
+  }
+
+  const response = await apiClient.post(endPoint, data, {
+    headers: requestHeaders,
+    transformRequest: [(payload) => payload],
+  });
+
+  return response.data;
 };
+
 
 // ✅ PATCH
 export const patchData = async ({ endPoint, data, headers }: PatchParams) => {

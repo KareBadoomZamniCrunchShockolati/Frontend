@@ -1,5 +1,6 @@
 // src/services/challengeService.ts
 import type { Payload } from "@/types/payloadChallengeService";
+import type { ChallengeCoverUploadResponse } from "@/types/challengeTypes";
 import { getData, postData, putData, deleteData, postImageData } from "./services";
 import { getUserById } from "./userService";
 
@@ -107,18 +108,18 @@ export const updateChallenge = async (
 export const uploadChallengeCover = async (
   challengeId: string | number,
   file: File
-) => {
+): Promise<ChallengeCoverUploadResponse> => {
   if (!file) throw new Error("Cover image file is required");
 
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append("file", file, file.name || "cover.png");
 
   try {
     const response = await postImageData({
       endPoint: `/api/v1/challenges/${challengeId}/cover`,
       data: formData,
     });
-    return response;
+    return response as ChallengeCoverUploadResponse;
   } catch (error) {
     console.error("Failed to upload challenge cover:", error);
     throw error;
