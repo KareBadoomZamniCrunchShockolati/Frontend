@@ -26,6 +26,7 @@ import {
   getParticipatingChallengesService,
 } from "@/services/postService";
 import type { ChallengePreview, PostResponse } from "@/types/postTypes";
+import { getBackendErrorMessage } from "@/services/errorService";
 const PostCreation = () => {
   const { token, userId } = useUserStore.getState();
   const [imageURLs, setImageURLs] = useState<string[]>([]);
@@ -72,7 +73,7 @@ const PostCreation = () => {
 
         setChallenges(simpleChallenges);
       } catch (err) {
-        console.error(err);
+        CustomToast(getBackendErrorMessage(err), "error");
       }
     };
 

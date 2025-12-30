@@ -14,6 +14,8 @@ import {
 
 import type { Challenge } from "@/types/challengeTypes";
 import { convertToJalali } from "../Custom/ConvertToJalali";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "../Custom/CustomToast";
 
 const ProfileChallenges = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -40,7 +42,7 @@ const ProfileChallenges = () => {
       const response = await getMutualFollowersService(challengeId);
       return response.data || response;
     } catch (error) {
-      console.error("Error fetching mutual followers:", error);
+      CustomToast(getBackendErrorMessage(error), "error");
       return [];
     }
   };
@@ -66,7 +68,7 @@ const ProfileChallenges = () => {
       setChallenges(data);
     } catch (err) {
       setError("خطا در دریافت چالش‌ها");
-      console.error("Error fetching challenges:", err);
+      CustomToast(getBackendErrorMessage(err), "error");
     } finally {
       setLoading(false);
     }
@@ -84,7 +86,7 @@ const ProfileChallenges = () => {
 
       setChallenges(data);
     } catch (error) {
-      console.error("Error searching challenges:", error);
+      CustomToast(getBackendErrorMessage(error), "error");
       setChallenges([]);
     } finally {
       setLoading(false);

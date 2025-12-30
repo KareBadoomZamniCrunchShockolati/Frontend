@@ -1,6 +1,8 @@
+import CustomToast from "@/components/Custom/CustomToast";
 import { Card, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { mockposts, postSkeleton } from "@/data/mockPosts";
+import { getBackendErrorMessage } from "@/services/errorService";
 import {
   getChallengePostsService,
   getChallengesWithIdService,
@@ -29,7 +31,7 @@ const FollowingPosts = () => {
         const mappedPosts = mapBackendPostsToUI(backendPosts);
         setPosts(mappedPosts);
       } catch (err) {
-        console.error(err);
+        CustomToast(getBackendErrorMessage(err), "error");
       } finally {
         setLoading(false);
       }

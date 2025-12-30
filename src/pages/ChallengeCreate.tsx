@@ -25,6 +25,7 @@ import {
 } from "@/schemas/challengeSchema";
 
 import type { createFormValues } from "@/types/challengeCreateTypes";
+import { getBackendErrorMessage } from "@/services/errorService";
 
 const ChallengeCreate: React.FC = () => {
   const navigate = useNavigate();
@@ -46,8 +47,8 @@ const ChallengeCreate: React.FC = () => {
       try {
         const users = await fetchUsers(userId.toString(), "followers");
         setFetchedUsers(users || []);
-      } catch {
-        CustomToast("خطا در بارگذاری فالوئرها", "error");
+      } catch(err) {
+        CustomToast(getBackendErrorMessage(err), "error");
       } finally {
         setLoadingUsers(false);
       }
@@ -62,7 +63,7 @@ const ChallengeCreate: React.FC = () => {
         const cats = await fetchChallengeCategories();
         setCategories(cats);
       } catch (err) {
-        CustomToast("خطا در بارگذاری دسته‌بندی‌ها", "error");
+        CustomToast(getBackendErrorMessage(err), "error");
       } finally {
         setLoadingCategories(false);
       }
@@ -180,8 +181,8 @@ const ChallengeCreate: React.FC = () => {
       }
 
       navigate(`/challenge/${challengeId}`, { replace: true });
-    } catch (err: any) {
-      CustomToast(err.message || "خطا در ثبت چالش", "error");
+    } catch (err) {
+      CustomToast(getBackendErrorMessage(err), "error");
     } finally {
       setSubmitting(false);
     }

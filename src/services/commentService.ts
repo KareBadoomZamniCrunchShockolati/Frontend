@@ -15,9 +15,10 @@ export const CommentChallengeService = async ({
 };
 
 export const GetCommentsChallengeService = async (id:number) => {
-  return await getData({
+  const res = await getData({
     endPoint: `${PROTECTED_BASE}/challenges/${id}/comments`,
   });
+  return res.data;
 };
 export const CommentPostService = async ({
   entity_type = "post",
@@ -33,9 +34,10 @@ export const CommentPostService = async ({
 };
 
 export const GetCommentsPostService = async (id:number) => {
-  return await getData({
+  const res = await getData({
     endPoint: `${PROTECTED_BASE}/posts/${id}/comments`,
   });
+  return res.data;
 };
 
 // export const CommentService = async ({

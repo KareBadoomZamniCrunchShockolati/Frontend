@@ -9,6 +9,8 @@ import {
   getPopularChallengesService,
   getPublicChallengesService,
 } from "@/services/userService";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "@/components/Custom/CustomToast";
 
 type SectionType =
   | "popular"
@@ -84,7 +86,7 @@ async function fetchChallenges(type: string): Promise<Challenge[]> {
         return await getPublicChallengesService();
     }
   } catch (error) {
-    console.error(`Error fetching challenges for ${type}:`, error);
+    CustomToast(getBackendErrorMessage(error), "error");
 
     // در صورت خطا، داده‌های نمونه برگردانید
     return getSampleData(type);
@@ -159,7 +161,7 @@ export default function SectionChallengesScreen() {
       } catch (e) {
         console.error("Error fetching challenges:", e);
         setError("خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.");
-
+        CustomToast(getBackendErrorMessage(e), "error");
         // نمایش داده‌های نمونه در صورت خطا
         const fetchType = isCategory ? categoryId! : type || "popular";
         setItems(getSampleData(fetchType));

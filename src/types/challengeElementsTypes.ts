@@ -39,10 +39,11 @@ export interface ImageContainerWithShadowProps {
 
 export interface LikeSaveButtonsProps {
   likeCount: number;
-  // commentCount:number;
+  commentCount:number;
   onLike: () => void;
   onSave: () => void;
-  // isLiked:boolean;
+  challengeId:number;
+  isLiked:boolean;
 
 }
 
@@ -89,6 +90,7 @@ export interface ChallengeDataDetails {
   participants: FetchedUserProfile[];
   like_count: number;
   comment_count: number;
+  is_user_liked:boolean;
   start_time: string;
   end_time: string;
   visibility: string;

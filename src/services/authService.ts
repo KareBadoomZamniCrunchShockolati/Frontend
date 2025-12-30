@@ -16,10 +16,11 @@ import { AUTH_BASE, postData } from "./services";
 // };
 // Login function
 export const loginService = async (credentials: LoginPayload): Promise<AuthResponse> => {
-    return postData({
+    const data = postData({
         endPoint: `${AUTH_BASE}/auth/login`,
         data: credentials,
     });
+    return data
 };
 
 // Signup function

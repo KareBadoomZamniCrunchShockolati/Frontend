@@ -4,13 +4,18 @@ import { Formik, Form } from "formik";
 
 import CustomBtn from "./CustomButton";
 import CustomCheckbox from "./CustomCheckbox";
-import { getChallengesByCategoryService} from "@/services/userService";
+import { getChallengesByCategoryService } from "@/services/userService";
 import type { Challenge } from "@/types/challengeTypes";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "./CustomToast";
 
 interface FilterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onApply?: (filters: { selectedCategory: string | null; sortBy: string }) => void;
+  onApply?: (filters: {
+    selectedCategory: string | null;
+    sortBy: string;
+  }) => void;
   onFilteredChallenges?: (challenges: Challenge[]) => void; // اضافه شده
 }
 
@@ -21,11 +26,11 @@ type FilterFormValues = {
   sort: Record<SortKey, boolean>;
 };
 
-export function FilterModal({ 
-  isOpen, 
-  onClose, 
+export function FilterModal({
+  isOpen,
+  onClose,
   onApply,
-  onFilteredChallenges 
+  onFilteredChallenges,
 }: FilterModalProps) {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -109,8 +114,9 @@ export function FilterModal({
   };
 
   const getSortBy = (values: FilterFormValues): SortKey => {
-    const found = (Object.entries(values.sort) as [SortKey, boolean][])
-      .find(([, v]) => v === true)?.[0];
+    const found = (Object.entries(values.sort) as [SortKey, boolean][]).find(
+      ([, v]) => v === true
+    )?.[0];
     return found ?? "newest";
   };
 
@@ -132,39 +138,47 @@ export function FilterModal({
     try {
       // دریافت چالش‌ها با فیلتر دسته‌بندی
       const challenges = await getChallengesByCategoryService(selectedCategory);
-      console.log(challenges)
-      
+      console.log(challenges);
+
       // اعمال مرتب‌سازی روی داده‌های دریافتی
       const sortedChallenges = sortChallenges(challenges, sortBy);
-      
+
       // ارسال داده‌های فیلتر شده به کامپوننت والد
       if (onFilteredChallenges) {
         onFilteredChallenges(sortedChallenges);
       }
-      
+
       // اعمال فیلترها (برای log یا stateهای دیگر)
       if (onApply) {
         onApply({ selectedCategory, sortBy });
       }
-      
+
       return sortedChallenges;
     } catch (error) {
-      console.error("Error fetching filtered challenges:", error);
-      throw error;
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setIsLoading(false);
     }
   };
 
   // تابع مرتب‌سازی محلی (اگر API مرتب‌سازی ندارد)
-  const sortChallenges = (challenges: Challenge[], sortBy: string): Challenge[] => {
+  const sortChallenges = (
+    challenges: Challenge[],
+    sortBy: string
+  ): Challenge[] => {
     const sorted = [...challenges];
-    
+
     switch (sortBy) {
       case "newest":
-        return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        return sorted.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       case "oldest":
-        return sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        return sorted.sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
       case "popular":
         return sorted.sort((a, b) => (b.likes || 0) - (a.likes || 0));
       case "trending":
@@ -216,10 +230,10 @@ export function FilterModal({
           initialValues={initialValues}
           onSubmit={async (values, { resetForm }) => {
             const sortBy = getSortBy(values);
-            
+
             // اعمال فیلتر و دریافت داده‌ها
             await applyFiltersAndFetch(values.selectedCategory, sortBy);
-            
+
             setIsCategoryOpen(false);
             handleClose();
           }}
@@ -232,13 +246,18 @@ export function FilterModal({
             return (
               <Form>
                 {/* Content */}
-                <div className="px-4 py-4 max-h-[55vh] overflow-y-auto" dir="rtl">
+                <div
+                  className="px-4 py-4 max-h-[55vh] overflow-y-auto"
+                  dir="rtl"
+                >
                   {/* دسته‌بندی */}
                   <div
                     className="mb-6 transition-all duration-300 delay-75"
                     style={{
                       opacity: isModalVisible ? 1 : 0,
-                      transform: isModalVisible ? "translateY(0)" : "translateY(10px)",
+                      transform: isModalVisible
+                        ? "translateY(0)"
+                        : "translateY(10px)",
                     }}
                   >
                     <h3 className="text-base font-bold text-slate-900 mb-4">
@@ -302,7 +321,9 @@ export function FilterModal({
                                   : "bg-white text-slate-700 hover:bg-slate-50"
                               }`}
                               style={{
-                                transitionDelay: isCategoryOpen ? `${index * 30}ms` : "0ms",
+                                transitionDelay: isCategoryOpen
+                                  ? `${index * 30}ms`
+                                  : "0ms",
                               }}
                               disabled={isLoading}
                             >
@@ -318,7 +339,9 @@ export function FilterModal({
                   {isLoading && (
                     <div className="text-center py-4">
                       <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                      <p className="text-sm text-slate-600 mt-2">در حال دریافت داده‌ها...</p>
+                      <p className="text-sm text-slate-600 mt-2">
+                        در حال دریافت داده‌ها...
+                      </p>
                     </div>
                   )}
                 </div>
@@ -340,8 +363,8 @@ export function FilterModal({
                     پاک کردن
                   </CustomBtn>
 
-                  <CustomBtn 
-                    type="submit" 
+                  <CustomBtn
+                    type="submit"
                     className="!bg-primary !text-white"
                     disabled={isLoading}
                   >

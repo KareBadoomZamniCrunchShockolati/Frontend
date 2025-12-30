@@ -14,6 +14,8 @@ import {
 } from "@/services/followerFollowingService";
 import useUserStore from "@/store/userStore/userStore";
 import type { FollowerFollowingUser } from "@/types/followerFollowing";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "@/components/Custom/CustomToast";
 
 const FollowerFollowingPage: React.FC = () => {
   const location = useLocation();
@@ -62,9 +64,8 @@ const FollowerFollowingPage: React.FC = () => {
       setFilteredUsers(users || []);
       setLoading(false);
     } catch (error) {
-      console.error("Failed to fetch users:", error);
       setLoading(false);
-      setError("Failed to load users. Please try again later.");
+      CustomToast(getBackendErrorMessage(error), "error");
     }
   };
 
@@ -120,7 +121,7 @@ const FollowerFollowingPage: React.FC = () => {
         }
       } catch (error) {
         console.error("Error deleting user:", error);
-        setError("Error deleting user. Please try again later.");
+        CustomToast(getBackendErrorMessage(error), "error");
       }
     } else {
       setError("Authentication required to perform this action.");

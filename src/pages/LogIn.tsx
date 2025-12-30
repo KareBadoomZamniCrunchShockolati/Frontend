@@ -15,6 +15,7 @@ import { loginService } from "@/services/authService";
 import CustomToast from "@/components/Custom/CustomToast";
 import { Link, useLocation, useNavigate } from "react-router-dom"; // ← اضافه شد
 import useUserStore from "@/store/userStore/userStore";
+import { getBackendErrorMessage } from "@/services/errorService";
 
 export default function Login() {
   const {setUsername, setToken, setUserId } = useUserStore();
@@ -31,7 +32,7 @@ export default function Login() {
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       const response = await loginService(values);
-      const user = response.user_response;
+      const user = response.data;
 
       if (user?.token) {
         setToken(user.token);
@@ -42,7 +43,7 @@ export default function Login() {
 
         setLoginStatus("ورود با موفقیت انجام شد!");
         setTimeout(() => {
-          navigate(`/dashboard/${response.user_response.id}`);
+          navigate(`/dashboard/${response.data.id}`);
         }, 2000);
         setTimeout(() => {
           CustomToast(`خوش اومدی، ${user.username}! `, "info");
@@ -53,6 +54,7 @@ export default function Login() {
     } catch (error: any) {
       console.error("Login failed:", error);
       setLoginStatus(error?.response?.data?.message || "ورود انجام نشد!");
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       actions.setSubmitting(false);
     }

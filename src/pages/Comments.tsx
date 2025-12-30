@@ -18,6 +18,7 @@ import {
   GetCommentsChallengeService,
   GetCommentsPostService,
 } from "@/services/commentService";
+import { getBackendErrorMessage } from "@/services/errorService";
 
 interface props {
   entityType: "challenge" | "post";
@@ -38,16 +39,15 @@ const Comments = ({ entityType }: props) => {
   const fetchComments = async () => {
     try {
       if (entityType === "challenge") {
-        const data = await GetCommentsChallengeService(entityId);
-        setComments(data.data);
+        const res = await GetCommentsChallengeService(entityId);
+        setComments(Array.isArray(res) ? res : []);
       } else {
-        const data = await GetCommentsPostService(entityId);
-        setComments(data);
+        const res = await GetCommentsPostService(entityId);
+        setComments(Array.isArray(res) ? res : []);
       }
       // console.log(comments);
     } catch (err) {
-      console.error(err);
-      setError("Failed to load comments");
+      CustomToast(getBackendErrorMessage(err), "error");
     } finally {
       setLoading(false);
     }
@@ -64,25 +64,29 @@ const Comments = ({ entityType }: props) => {
     values: { commentText: string },
     { resetForm }: FormikHelpers<{ commentText: string }>
   ) => {
-    console.log("Submitting comment with values:", values);
-    if (entityType === "challenge") {
-      const response: CommentResponse = await CommentChallengeService({
-        entity_type: entityType,
-        entity_id: entityId,
-        content: values.commentText,
-      });
-      console.log("Comment submitted:", response);
-    } else {
-      const response: CommentResponse = await CommentPostService({
-        entity_type: entityType,
-        entity_id: entityId,
-        content: values.commentText,
-      });
-      console.log("Comment submitted:", response);
+    try {
+      console.log("Submitting comment with values:", values);
+      if (entityType === "challenge") {
+        const response: CommentResponse = await CommentChallengeService({
+          entity_type: entityType,
+          entity_id: entityId,
+          content: values.commentText,
+        });
+        console.log("Comment submitted:", response);
+      } else {
+        const response: CommentResponse = await CommentPostService({
+          entity_type: entityType,
+          entity_id: entityId,
+          content: values.commentText,
+        });
+        console.log("Comment submitted:", response);
+      }
+      CustomToast("نظر با موفقیت ایجاد شد!", "success");
+      fetchComments();
+      resetForm();
+    } catch (error) {
+      CustomToast(getBackendErrorMessage(error), "error");
     }
-    CustomToast("نظر با موفقیت ایجاد شد!", "success");
-    fetchComments();
-    resetForm();
   };
   return (
     <>

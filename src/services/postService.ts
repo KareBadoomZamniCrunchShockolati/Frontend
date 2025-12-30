@@ -27,9 +27,10 @@ export const updatePostService = async ({
 };
 
 export const getPostService = async (id: number) => {
-  return await getData({
+  const res = await getData({
     endPoint: `${PROTECTED_BASE}/posts/${id}`,
   });
+  return res.data;
 };
 
 export const deletePostService = async (id: number) => {
@@ -75,20 +76,23 @@ export const getChallengesWithIdService = async (id: number) => {
 // };
 
 export const getUserPostsService = async (id: number) => {
-  return await getData({
+  const res = await getData({
     endPoint: `${PROTECTED_BASE}/posts/user/${id}`,
   });
+  return res.data;
 };
 
 export const getChallengePostsService = async (id: number) => {
-  return await getData({
+  const res = await getData({
     endPoint: `${PROTECTED_BASE}/posts/challenge/${id}`,
   });
+  return res.data;
 };
 
 export const getFollowingPostsService = async () => {
-  return await getData({
+  const res = await getData({
     endPoint: `${PROTECTED_BASE}/posts/feed`,
   });
+  return res.data;
 };
 

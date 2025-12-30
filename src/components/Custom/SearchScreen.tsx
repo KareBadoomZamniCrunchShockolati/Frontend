@@ -6,6 +6,8 @@ import CustomInput from "@/components/Custom/CustomInput";
 import { searchChallengesService } from "@/services/userService";
 import { convertToJalali } from "./ConvertToJalali";
 import { useNavigate } from "react-router-dom";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "./CustomToast";
 
 interface ActiveFilters {
   selectedCategory: string | null;
@@ -165,7 +167,7 @@ export function SearchModal({
       const response = await searchChallengesService(query);
       setSearchResults(response.data || []);
     } catch (error) {
-      console.error("Error searching challenges:", error);
+      CustomToast(getBackendErrorMessage(error), "error");
       setSearchResults([]);
     } finally {
       setIsSearching(false);

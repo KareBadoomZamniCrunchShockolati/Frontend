@@ -1,3 +1,5 @@
+import CustomToast from "@/components/Custom/CustomToast";
+import { getBackendErrorMessage } from "./errorService";
 import { getData, deleteData, postData } from "./services";
 
 export const fetchUsers = async (
@@ -13,8 +15,7 @@ export const fetchUsers = async (
     const data = await getData({ endPoint: endpoint });
     return data.users;
   } catch (error) {
-    console.error("Failed to fetch users:", error);
-    throw error;
+    CustomToast(getBackendErrorMessage(error), "error");
   }
 };
 
@@ -60,7 +61,7 @@ export const removeFollower = async (
     if (error instanceof Error) {
       console.error("Error message:", error.message);
     }
-    throw error; // Re-throw the error so the caller can handle it
+    CustomToast(getBackendErrorMessage(error), "error");
   }
 };
 
@@ -93,7 +94,7 @@ export const removeFollowing = async (
     return data; 
   } catch (error) {
     console.error("Failed to remove following:", error);
-    throw error;
+    CustomToast(getBackendErrorMessage(error), "error");
   }
 };
 
@@ -127,7 +128,7 @@ export const followUser = async (
     return data;
   } catch (error) {
     console.error("Failed to follow user:", error);
-    throw error;
+    CustomToast(getBackendErrorMessage(error), "error");
   }
 };
 
@@ -158,7 +159,7 @@ export const checkIfFollowing = async (
     }
   } catch (error) {
     console.error("Failed to check if following:", error);
-    throw error;
-  }
+    CustomToast(getBackendErrorMessage(error), "error");
+    }
 };
 

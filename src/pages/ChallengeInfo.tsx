@@ -34,6 +34,9 @@ import {
 import { getParticipatingChallengesService } from "@/services/postService";
 import { cn } from "@/lib/utils";
 import { set } from "react-hook-form";
+import CustomToast from "@/components/Custom/CustomToast";
+import { getBackendErrorMessage } from "@/services/errorService";
+import { LikeChallengeService, UnlikeChallengeService, UnlikePostService } from "@/services/likeService";
 
 const DEFAULT_CHALLENGE_IMG =
   "https://www.muchbetteradventures.com/magazine/content/images/size/w2000/2024/04/mount-everest-at-sunset.jpg";
@@ -52,6 +55,7 @@ const defaultChallenge: ChallengeDataDetails = {
   Img: DEFAULT_CHALLENGE_IMG,
   participants: [],
   like_count: 0,
+  is_user_liked: false,
   comment_count: 0, //------------------------------this just added and its type
   start_time: "28 اردیبهشت",
   end_time: "8شهریور",
@@ -63,7 +67,7 @@ const ChallengeInfo: React.FC = () => {
   const navigate = useNavigate();
   const { challengeId } = useParams();
   const challenge_Id = Number(challengeId);
-
+  const [isLiked, setIsLiked] = useState(false);
   const payload: ChallengeDataDetails =
     (location.state?.challenge as ChallengeDataDetails) ?? defaultChallenge;
 
@@ -85,7 +89,7 @@ const ChallengeInfo: React.FC = () => {
   //   useParams().challengeId
   // );
   const [searchTerm, setSearchTerm] = useState("");
-  const [likeCount, setLikeCount] = useState(10);
+  const [likeCount, setLikeCount] = useState(0);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isParticipated, setIsParticipated] = useState<boolean>(false);
 
@@ -114,8 +118,24 @@ const ChallengeInfo: React.FC = () => {
     });
   };
 
-  const handleLike = () =>
-    setChallenge((c) => ({ ...c, like_count: c.like_count + 1 }));
+  const handleLike = async () =>{
+        if (!challenge) return;
+        try {
+          if (isLiked) {
+            // Unlike
+            await UnlikeChallengeService(Number(challengeId));
+            setIsLiked(false);
+            setLikeCount((prev) => prev - 1);
+          } else {
+            // Like
+            await LikeChallengeService(Number(challengeId));
+            setIsLiked(true);
+            setLikeCount((prev) => prev + 1);
+          }
+        } catch (err) {
+          CustomToast(getBackendErrorMessage(err), "error");
+        }
+      }
   const handleSave = () => console.log("Challenge saved!");
 
   const nextSlide = () =>
@@ -132,10 +152,13 @@ const ChallengeInfo: React.FC = () => {
     const fetchChallenge = async () => {
       const fetchedChallenge = await fetchChallengeById(String(challenge_Id));
       setChallenge(fetchedChallenge);
+      setLikeCount(fetchedChallenge.like_count);
+      setIsLiked(fetchedChallenge.is_user_liked);
     };
 
     fetchChallenge();
   }, [challenge_Id]);
+  console.log("like count",likeCount)
   useEffect(() => {
     const fetchUsers = async () => {
       let users = [];
@@ -196,7 +219,7 @@ const ChallengeInfo: React.FC = () => {
           const data = await joinPublicChallenge(Number(challenge_Id));
           console.log(data);
         } catch (e) {
-          console.log("error: ", e);
+          // CustomToast(getBackendErrorMessage(e), "error");
         }
       }
     } else if (challenge.visibility == "private") {
@@ -205,7 +228,7 @@ const ChallengeInfo: React.FC = () => {
           const data = await joinPrivateChallenge(Number(challenge_Id));
           console.log(data);
         } catch (e) {
-          console.log("error: ", e);
+          // CustomToast(getBackendErrorMessage(e), "error");
         }
       }
     }
@@ -217,7 +240,7 @@ const ChallengeInfo: React.FC = () => {
         setIsParticipated(false);
         console.log(data);
       } catch (e) {
-        console.log("error: ", e);
+        CustomToast(getBackendErrorMessage(e), "error");
       }
     }
   };
@@ -229,9 +252,12 @@ const ChallengeInfo: React.FC = () => {
         <ImageAndBadgeContainer imageUrl={challenge.Img ?? undefined} />
 
         <LikeAndSaveButtons
+          commentCount={challenge.comment_count}
           onLike={handleLike}
           onSave={handleSave}
-          likeCount={challenge.like_count}
+          likeCount={likeCount}
+          challengeId={Number(challengeId)}
+          isLiked={isLiked}
         />
 
         <TitleAndDescription

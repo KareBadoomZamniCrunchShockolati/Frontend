@@ -27,6 +27,8 @@ import { timeAgo } from "@/utils/timeAgoDiff";
 import { Skeleton } from "@/components/ui/skeleton";
 import CustomBtn from "@/components/Custom/CustomBtn";
 import { LikePostService, UnlikePostService } from "@/services/likeService";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "@/components/Custom/CustomToast";
 
 const PostPage = () => {
   const { id } = useParams();
@@ -63,7 +65,7 @@ const PostPage = () => {
         // console.log("isliked:"+isLiked);//-------
         // console.log("like count"+likeCount);//-------
       } catch (err) {
-        console.error(err);
+        CustomToast(getBackendErrorMessage(err), "error");
       } finally {
         setLoading(false);
       }
@@ -86,7 +88,7 @@ const PostPage = () => {
         setLikeCount((prev) => prev + 1);
       }
     } catch (err) {
-      console.error("Error toggling like:", err);
+      CustomToast(getBackendErrorMessage(err), "error");
     }
   };
 
@@ -101,7 +103,7 @@ const PostPage = () => {
           setChallenge(challenge);
         }
       } catch (err) {
-        console.error(err);
+        CustomToast(getBackendErrorMessage(err), "error");
       }
     };
 
@@ -209,7 +211,7 @@ const PostPage = () => {
                     rounded-full overflow-hidden"
             >
               <AvatarImage
-                alt={username}
+                alt={postData?.username}
                 src="https://samanskh.github.io/assets/images/bio-photo.jpg"
                 className="object-cover w-full h-full"
               />
@@ -221,7 +223,7 @@ const PostPage = () => {
             </Avatar>
             <div dir="rtl" className="flex flex-col gap-2 translate-y-[2px]">
               <p className="text-sm sm:text-base font-semibold text-black" onClick={() => navigate(`/dashboard/${postData?.user_id}`)}>
-                {username}
+                {postData?.username}
               </p>
               <p
                 dir="rtl"
@@ -410,7 +412,7 @@ const PostPage = () => {
                     rounded-full overflow-hidden"
           >
             <AvatarImage
-              alt={username}
+              alt={postData?.username}
               src="https://samanskh.github.io/assets/images/bio-photo.jpg"
               className="object-cover w-full h-full"
             />
@@ -422,7 +424,7 @@ const PostPage = () => {
           </Avatar>
           <div dir="rtl" className="flex flex-col gap-2 translate-y-[2px]">
             <p className="text-sm sm:text-base font-semibold text-black">
-              {username}
+              {postData?.username}
             </p>
             <p
               dir="rtl"

@@ -19,6 +19,8 @@ import {
 
 import useUserStore from "@/store/userStore/userStore";
 import type { ProfileValues } from "@/types/editprofileTypes";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "@/components/Custom/CustomToast";
 
 export default function ProfileInfo() {
   const [image, setImage] = useState<string | null>(null);
@@ -74,19 +76,18 @@ export default function ProfileInfo() {
 
       setSuccessMessage("تغییرات با موفقیت ذخیره شد!");
       setTimeout(() => navigate(`/dashboard/${userId}`), 2000);
-    } catch (error: any) {
-      console.error("Error updating profile:", error);
-
+    } catch (error) {
+      CustomToast(getBackendErrorMessage(error), "error");
       // مدیریت خطاهای مختلف
-      if (error.response?.status === 404) {
-        setErrorMessage("کاربر یافت نشد. لطفاً دوباره وارد شوید.");
-      } else if (error.response?.status === 400) {
-        setErrorMessage("ایمیل قبلاً استفاده شده است");
-      } else if (error.response?.status === 500) {
-        setErrorMessage("خطای سرور. لطفاً بعداً تلاش کنید.");
-      } else {
-        setErrorMessage("خطا در ثبت تغییرات");
-      }
+      // if (error.response?.status === 404) {
+      //   setErrorMessage("کاربر یافت نشد. لطفاً دوباره وارد شوید.");
+      // } else if (error.response?.status === 400) {
+      //   setErrorMessage("ایمیل قبلاً استفاده شده است");
+      // } else if (error.response?.status === 500) {
+      //   setErrorMessage("خطای سرور. لطفاً بعداً تلاش کنید.");
+      // } else {
+      //   setErrorMessage("خطا در ثبت تغییرات");
+      // }
     } finally {
       setIsLoading(false);
     }
@@ -117,18 +118,8 @@ export default function ProfileInfo() {
       setTimeout(() => {
         setShowVerify(false);
       }, 2000);
-    } catch (error: any) {
-      console.error("Error verifying email:", error);
-
-      if (error.response?.status === 400) {
-        setErrorMessage("کد تأیید نامعتبر است");
-      } else if (error.response?.status === 404) {
-        setErrorMessage("درخواست تغییر ایمیل یافت نشد");
-      } else if (error.response?.status === 410) {
-        setErrorMessage("کد منقضی شده است. لطفاً دوباره درخواست کنید");
-      } else {
-        setErrorMessage("خطا در تأیید ایمیل");
-      }
+    } catch (error) {
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setIsLoading(false);
     }
@@ -142,16 +133,8 @@ export default function ProfileInfo() {
       await initiateEmailChangeService({ new_email: tempNewEmail });
       setResendMessage("کد جدید ارسال شد");
       setSuccessMessage("کد تأیید جدید به ایمیل شما ارسال شد");
-    } catch (error: any) {
-      console.error("Error resending code:", error);
-
-      if (error.response?.status === 404) {
-        setResendMessage("کاربر یافت نشد");
-      } else if (error.response?.status === 429) {
-        setResendMessage("تعداد درخواست‌ها زیاد است. لطفاً کمی صبر کنید");
-      } else {
-        setResendMessage("خطا در ارسال دوباره کد");
-      }
+    } catch (error) {
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setIsLoading(false);
     }
@@ -178,13 +161,14 @@ export default function ProfileInfo() {
           });
         }
       } catch (error) {
-        console.error("Error fetching user profile:", error);
-        setErrorMessage("خطا در دریافت اطلاعات پروفایل");
+        CustomToast(getBackendErrorMessage(error), "error");
+        // setErrorMessage("خطا در دریافت اطلاعات پروفایل");
       }
     };
     fetchData();
   }, [userId]);
 
+  successMessage && CustomToast(successMessage,"success");
   return (
     <div className="min-h-screen w-full px-6 py-10 bg-background" dir="ltr">
       {/* Header */}
@@ -226,19 +210,19 @@ export default function ProfileInfo() {
       </div>
 
       {/* پیام‌ها */}
-      {successMessage && (
+      {/* {successMessage && (
         <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-center font-semibold flex items-center justify-center gap-2">
           <Mail className="w-4 h-4" />
           {successMessage}
         </div>
-      )}
+      )} */}
 
-      {errorMessage && (
+      {/* {errorMessage && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-center font-semibold flex items-center justify-center gap-2">
           <AlertCircle className="w-4 h-4" />
           {errorMessage}
         </div>
-      )}
+      )} */}
 
       {/* مرحله تأیید ایمیل */}
       {showVerify ? (

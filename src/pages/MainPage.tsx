@@ -31,6 +31,8 @@ import SocialIcon from "@/assets/Icon/Social.svg";
 import { CreatorCard } from "@/components/Custom/CreatorCard";
 import BottomNav from "@/components/Custom/BottomNav";
 import { OverlappingCards } from "@/components/Custom/OverlappingCards";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "@/components/Custom/CustomToast";
 
 function CategoryGrid({
   categories,
@@ -137,7 +139,7 @@ export default function HomeScreen() {
 
       setTopCreators(formattedCreators);
     } catch (error) {
-      console.error("Error fetching top creators:", error);
+      CustomToast(getBackendErrorMessage(error), "error");
       // داده‌های نمونه در صورت خطا
       setTopCreators([
         { id: 1, username: "mahditd", avatar: "/images/mahditd.jpg", rank: 1 },
@@ -158,6 +160,7 @@ export default function HomeScreen() {
     } catch (error) {
       console.error("Error fetching popular challenges:", error);
       setPopularChallenges(getSampleData("popular"));
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setLoadingStates((prev) => ({ ...prev, popular: false }));
     }
@@ -172,6 +175,7 @@ export default function HomeScreen() {
     } catch (error) {
       console.error("Error fetching nearby challenges:", error);
       setNearbyChallenges(getSampleData("near"));
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setLoadingStates((prev) => ({ ...prev, nearby: false }));
     }
@@ -186,6 +190,7 @@ export default function HomeScreen() {
     } catch (error) {
       console.error("Error fetching following challenges:", error);
       setFollowingChallenges(getSampleData("following"));
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setLoadingStates((prev) => ({ ...prev, following: false }));
     }
@@ -204,6 +209,7 @@ export default function HomeScreen() {
       const sampleData = getSampleData("all");
       setAllChallenges(sampleData);
       setVisibleChallenges(sampleData);
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setLoadingStates((prev) => ({ ...prev, all: false }));
     }

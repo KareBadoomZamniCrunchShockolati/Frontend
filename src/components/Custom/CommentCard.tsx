@@ -13,6 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { SendHorizontal } from "lucide-react";
 import type { CommentCardProps } from "@/types/commentCardProps";
 import { CommentChallengeService, CommentPostService } from "@/services/commentService";
+import { getBackendErrorMessage } from "@/services/errorService";
 
 const CommentCard = ({
   comment,
@@ -54,7 +55,7 @@ const CommentCard = ({
         setLikeCount((prev) => prev + 1);
       }
     } catch (err) {
-      console.error("Error toggling like:", err);
+      CustomToast(getBackendErrorMessage(err), "error");
     }
   };
   const handleSubmitReply = async (values: { commentText: string }) => {
