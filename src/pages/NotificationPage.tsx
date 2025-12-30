@@ -5,6 +5,9 @@ import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import happy from "@/assets/Img/Icon/emoji-happy.svg";
 import { Navigate, useNavigate } from "react-router-dom";
 import bell from "@/assets/Img/Icon/bell.svg";
+import { useEffect, useState } from "react";
+import "@/data/mockSocket"; // ← just importing starts the server
+import { divIcon } from "leaflet";
 
 const newData = [
   {
@@ -45,6 +48,20 @@ const oldData = [
 ];
 
 const NotificationPage = () => {
+  const [data, setData] = useState<string[]>([]);
+  useEffect(() => {
+    const socket = new window.WebSocket("ws://localhost:8080");
+    let new_data;
+    socket.onmessage = (event) => {
+      console.log("RECEIVED:", JSON.parse(event.data));
+      new_data = JSON.parse(event.data);
+      console.log(new_data.message);
+      setData((prev) => [...prev, new_data.message + new_data.c]);
+    };
+
+    return () => socket.close();
+  }, []);
+
   return (
     <div className="p-4">
       <TopBackText text="اعلانات" icon={bell} />
@@ -84,6 +101,7 @@ const NotificationPage = () => {
         })}
         <ProgressCard message=" تونستی 5 روز پشت سر هم به چالش کوه‌نوردی روی دریا پایبند بمونی این خیلی عالیه" />
       </div>
+      {data && data.map((x) => <div>{x}</div>)}
     </div>
   );
 };
