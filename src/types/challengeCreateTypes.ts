@@ -93,9 +93,19 @@ export interface createFormValues {
   startTime: string;
   endDate: string;
   endTime: string;
-  challengeLocation: string;
+  challengeLocation: string; 
+  latitude?: number | null;   
+  longitude?: number | null;  
   challengeType: "عمومی" | "شخصی";
   isCommentsEnabled: boolean;
   memberCount: string;
   selectedUsers: UserProfile[];
+}
+
+export interface LocationMapPickerProps {
+  onLocationSelect: (lat: number, lng: number) => void;
+  defaultCenter?: [number, number];
+  initialPosition?: [number, number] | null;
+  height?: string;
+  readOnly?: boolean;
 }

@@ -1,6 +1,6 @@
 export type Payload = {
   title: string;
-  description: string;
+  description?: string | null;
   category_id: number;
   max_participants?: number | null;
   visibility: "public" | "private";
@@ -10,4 +10,7 @@ export type Payload = {
   end_time: string;
   timezone: string;
   image_url?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  address?: string | null;
 };
