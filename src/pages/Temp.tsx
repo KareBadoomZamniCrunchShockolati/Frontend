@@ -1,5 +1,6 @@
 import CustomToast from "@/components/Custom/CustomToast";
 import { loginService } from "@/services/authService";
+import { getBackendErrorMessage } from "@/services/errorService";
 import useUserStore from "@/store/userStore/userStore";
 import { translateNumber } from "@/utils/translateNumber";
 import { useState } from "react";
@@ -25,7 +26,7 @@ export default function Temp() {
 			})
 			.catch((error) => {
 				console.log(error);
-				CustomToast("Login failed", "error");
+				CustomToast(getBackendErrorMessage(error), "error");
 			})
 			.finally(() => setLoading(false));
 	};

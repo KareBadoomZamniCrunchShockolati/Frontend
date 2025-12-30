@@ -1,4 +1,6 @@
 import { getData } from "@/services/services";
+import { getBackendErrorMessage } from "./errorService";
+import CustomToast from "@/components/Custom/CustomToast";
 
 
 export const searchChallengesService = async (query = '', filters = {}) => {
@@ -16,6 +18,6 @@ export const searchChallengesService = async (query = '', filters = {}) => {
     return response || [];
   } catch (error) {
     console.error('Error in searchChallengesService:', error);
-    throw error;
+    CustomToast(getBackendErrorMessage(error), "error");
   }
 };

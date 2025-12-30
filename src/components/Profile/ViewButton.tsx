@@ -7,6 +7,8 @@ import {
   checkIfFollowing,
 } from "@/services/followerFollowingService";
 import useUserStore from "@/store/userStore/userStore";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "../Custom/CustomToast";
 
 interface Props {
   loggedInUserId: string;
@@ -37,7 +39,7 @@ const ViewButton = ({ loggedInUserId, isFollowing = false, token }: Props) => {
         console.log("Follow status:", followingStatus);
         setIsUserFollowing(followingStatus);
       } catch (error) {
-        console.error("Error fetching follow status:", error);
+        CustomToast(getBackendErrorMessage(error), "error");
       }
     };
 
@@ -59,7 +61,7 @@ const ViewButton = ({ loggedInUserId, isFollowing = false, token }: Props) => {
 
       setIsUserFollowing(true); // Update the button to 'Unfollow' after following
     } catch (error) {
-      console.error("Failed to follow the user:", error);
+      CustomToast(getBackendErrorMessage(error), "error");
     }
   };
 
@@ -72,7 +74,7 @@ const ViewButton = ({ loggedInUserId, isFollowing = false, token }: Props) => {
       await removeFollowing(loggedInUserId, userId, userToken);
       setIsUserFollowing(false); // Update the button to 'Follow' after unfollowing
     } catch (error) {
-      console.error("Failed to unfollow the user:", error);
+      CustomToast(getBackendErrorMessage(error), "error");
     }
   };
 

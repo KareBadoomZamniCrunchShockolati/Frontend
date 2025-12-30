@@ -7,6 +7,8 @@ import {
   getPopularChallengesService,
   getPublicChallengesService,
 } from "@/services/userService";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "@/components/Custom/CustomToast";
 import type { Challenge } from "@/types/challengeTypes";
 import type {
   CategoryMetaMap,
@@ -110,7 +112,7 @@ async function fetchChallenges(
         return await getPublicChallengesService(page, pageSize);
     }
   } catch (error) {
-    console.error(`Error fetching challenges for ${type}:`, error);
+    CustomToast(getBackendErrorMessage(error), "error");
 
     // در صورت خطا، داده‌های نمونه برگردانید
     return getSampleData(type, page, pageSize);
@@ -204,6 +206,11 @@ export default function SectionChallengesScreen() {
         }
       } catch (e) {
         console.error("Error fetching challenges:", e);
+        setError("خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.");
+        CustomToast(getBackendErrorMessage(e), "error");
+        // نمایش داده‌های نمونه در صورت خطا
+        const fetchType = isCategory ? categoryId! : type || "popular";
+        setItems(getSampleData(fetchType));
 
         if (!isLoadMore) {
           setError("خطا در دریافت اطلاعات. لطفاً دوباره تلاش کنید.");

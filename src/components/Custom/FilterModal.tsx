@@ -3,13 +3,13 @@ import { X, ChevronDown } from "lucide-react";
 import { Formik, Form } from "formik";
 
 import CustomBtn from "./CustomButton";
-import {
-  getChallengesByCategoryService,
-  getPublicChallengesService,
-} from "@/services/userService";
+import CustomCheckbox from "./CustomCheckbox";
+import { getChallengesByCategoryService, getPublicChallengesService } from "@/services/userService";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "./CustomToast";
+import { applyChallengeFilters } from "@/utils/searchFilters";
 import type { Challenge } from "@/types/challengeTypes";
 import type { ActiveFilters, SortKey } from "@/types/searchTypes";
-import { applyChallengeFilters } from "@/utils/searchFilters";
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -23,11 +23,11 @@ type FilterFormValues = {
   sort: Record<SortKey, boolean>;
 };
 
-export function FilterModal({ 
-  isOpen, 
-  onClose, 
+export function FilterModal({
+  isOpen,
+  onClose,
   onApply,
-  onFilteredChallenges 
+  onFilteredChallenges,
 }: FilterModalProps) {
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -111,8 +111,9 @@ export function FilterModal({
   };
 
   const getSortBy = (values: FilterFormValues): SortKey => {
-    const found = (Object.entries(values.sort) as [SortKey, boolean][])
-      .find(([, v]) => v === true)?.[0];
+    const found = (Object.entries(values.sort) as [SortKey, boolean][]).find(
+      ([, v]) => v === true
+    )?.[0];
     return found ?? "newest";
   };
 
@@ -144,16 +145,15 @@ export function FilterModal({
       if (onFilteredChallenges) {
         onFilteredChallenges(sortedChallenges);
       }
-      
+
       // اعمال فیلترها (برای log یا stateهای دیگر)
       if (onApply) {
         onApply({ selectedCategory, sortBy });
       }
-      
+
       return sortedChallenges;
     } catch (error) {
-      console.error("Error fetching filtered challenges:", error);
-      throw error;
+      CustomToast(getBackendErrorMessage(error), "error");
     } finally {
       setIsLoading(false);
     }
@@ -201,10 +201,10 @@ export function FilterModal({
           initialValues={initialValues}
           onSubmit={async (values, { resetForm }) => {
             const sortBy = getSortBy(values);
-            
+
             // اعمال فیلتر و دریافت داده‌ها
             await applyFiltersAndFetch(values.selectedCategory, sortBy);
-            
+
             setIsCategoryOpen(false);
             handleClose();
           }}
@@ -217,13 +217,18 @@ export function FilterModal({
             return (
               <Form>
                 {/* Content */}
-                <div className="px-4 py-4 max-h-[55vh] overflow-y-auto" dir="rtl">
+                <div
+                  className="px-4 py-4 max-h-[55vh] overflow-y-auto"
+                  dir="rtl"
+                >
                   {/* دسته‌بندی */}
                   <div
                     className="mb-6 transition-all duration-300 delay-75"
                     style={{
                       opacity: isModalVisible ? 1 : 0,
-                      transform: isModalVisible ? "translateY(0)" : "translateY(10px)",
+                      transform: isModalVisible
+                        ? "translateY(0)"
+                        : "translateY(10px)",
                     }}
                   >
                     <h3 className="text-base font-bold text-black mb-4">
@@ -287,7 +292,9 @@ export function FilterModal({
                                   : "bg-white text-black hover:bg-slate-50"
                               }`}
                               style={{
-                                transitionDelay: isCategoryOpen ? `${index * 30}ms` : "0ms",
+                                transitionDelay: isCategoryOpen
+                                  ? `${index * 30}ms`
+                                  : "0ms",
                               }}
                               disabled={isLoading}
                             >
@@ -303,7 +310,9 @@ export function FilterModal({
                   {isLoading && (
                     <div className="text-center py-4">
                       <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                      <p className="text-sm text-slate-600 mt-2">در حال دریافت داده‌ها...</p>
+                      <p className="text-sm text-slate-600 mt-2">
+                        در حال دریافت داده‌ها...
+                      </p>
                     </div>
                   )}
                 </div>
@@ -325,8 +334,8 @@ export function FilterModal({
                     پاک کردن
                   </CustomBtn>
 
-                  <CustomBtn 
-                    type="submit" 
+                  <CustomBtn
+                    type="submit"
                     className="!bg-primary !text-white"
                     disabled={isLoading}
                   >

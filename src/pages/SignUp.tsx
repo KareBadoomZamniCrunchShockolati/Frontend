@@ -16,11 +16,16 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { resendVerificationCode, signupService, verifyEmailService } from "@/services/authService";
+import {
+  resendVerificationCode,
+  signupService,
+  verifyEmailService,
+} from "@/services/authService";
 import { set, type FieldValues } from "react-hook-form";
 import type { SignupPayload } from "@/types/authTypes";
 import CustomToast from "@/components/Custom/CustomToast";
 import useUserStore from "@/store/userStore/userStore";
+import { getBackendErrorMessage } from "@/services/errorService";
 
 function SignUp() {
   const initialValues: SignupPayload & {
@@ -41,14 +46,14 @@ function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [timeLeft, setTimeLeft] = useState(10);
   const [emailConfirmDisabled, setDisabled] = useState(true);
-  const [shouldClear, setShouldClear] = useState(false) // for reseting the verification code
+  const [shouldClear, setShouldClear] = useState(false); // for reseting the verification code
 
-    useEffect(() => {
+  useEffect(() => {
     if (shouldClear) {
-      setOTPValue("") 
-      setShouldClear(false)
+      setOTPValue("");
+      setShouldClear(false);
     }
-  }, [shouldClear])
+  }, [shouldClear]);
 
   useEffect(() => {
     if (timeLeft <= 0) return;
@@ -60,16 +65,16 @@ function SignUp() {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  const handleClick = async (email:string, password:string) => {
+  const handleClick = async (email: string, password: string) => {
     setShouldClear(true);
     setTimeLeft(10);
     setDisabled(true);
     try {
-      await resendVerificationCode(email,password);
+      await resendVerificationCode(email, password);
       alert("کد جدید به ایمیل شما ارسال شد ✅");
     } catch (err) {
       console.error("Failed to resend code:", err);
-      alert("ارسال مجدد کد با خطا مواجه شد ❌");
+      CustomToast(getBackendErrorMessage(err), "error");
     }
   };
 
@@ -91,12 +96,14 @@ function SignUp() {
     try {
       const data = await signupService(values);
       console.log("Signup success! Token:", data.token);
-    } catch (err: any) {// eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       console.log("Signup failed:", err.response?.data || err.message || err);
+      CustomToast(getBackendErrorMessage(err), "error");
     }
   };
 
-  const { setToken , setUserId , setUsername } = useUserStore();
+  const { setToken, setUserId, setUsername } = useUserStore();
   const handleVerify = async (emailToVerify: string, codeToVerify: string) => {
     try {
       const data = await verifyEmailService({
@@ -109,17 +116,16 @@ function SignUp() {
       setToken(data.token);
       setUserId(data.userId);
       setUsername(data.username);
-      
+
       console.log("Email verified successfully!");
       // alert("ثبت نام شما تکمیل شد ✅");
-      CustomToast("ثبت نام شما تکمیل شد ✅","success");
+      CustomToast("ثبت نام شما تکمیل شد ✅", "success");
       // redirect or move to next step
     } catch (err) {
       console.error("Verification failed:", err);
       // alert("کد تایید اشتباه است یا منقضی شده ❌");
-      CustomToast("کد تایید اشتباه است یا منقضی شده ❌","error");
-    }
-    finally{
+      CustomToast(getBackendErrorMessage(err), "error");
+    } finally {
       console.log("Verification process ended");
       console.log("email:", emailToVerify);
       console.log("code:", codeToVerify);
@@ -133,23 +139,23 @@ function SignUp() {
   }, [isPressedBack, isPressedNext]);
 
   const firstSubmit = (data: FieldValues) => {
-            setusername(data.username);
-            setEmail(data.email);
-            setIsPressedNext((prev) => !prev);
-            console.log("Step1 values:", data);
-          }
+    setusername(data.username);
+    setEmail(data.email);
+    setIsPressedNext((prev) => !prev);
+    console.log("Step1 values:", data);
+  };
   const secondSubmit = (data: FieldValues) => {
-            setPassword(data.password);
-            const payload: SignupPayload = {
-              username: username,
-              email: email,
-              password: password,
-              bio: bio,
-            };
-            console.log("Submitting signup payload:", payload);
-            handleSignup(payload);
-            console.log(bio);
-          }
+    setPassword(data.password);
+    const payload: SignupPayload = {
+      username: username,
+      email: email,
+      password: password,
+      bio: bio,
+    };
+    console.log("Submitting signup payload:", payload);
+    handleSignup(payload);
+    console.log(bio);
+  };
 
   return (
     <Stepper
@@ -198,7 +204,7 @@ function SignUp() {
         >
           {({ isSubmitting, isValid, dirty }) => (
             <Form className="flex flex-col items-stretch gap-4 w-full h-full">
-              <CustomInput name="username" label="نام کاربری"/>
+              <CustomInput name="username" label="نام کاربری" />
 
               <CustomInput name="email" label="پست الکترونیک" />
 
@@ -330,17 +336,17 @@ function SignUp() {
                     <InputOTP
                       value={OTPvalue}
                       maxLength={6}
-                      onChange={(value:string) => {
+                      onChange={(value: string) => {
                         setOTPValue(value);
                         if (value.length === 6) {
-                          handleVerify(email,value);
+                          handleVerify(email, value);
                           console.log("email:", email);
                           console.log("OTP کامل شد:", value);
                           setIsPressedNext((prev) => !prev);
                         }
                       }}
                     >
-                      <InputOTPGroup >
+                      <InputOTPGroup>
                         <InputOTPSlot index={0} />
                         <InputOTPSlot index={1} />
                         <InputOTPSlot index={2} />
@@ -368,7 +374,7 @@ function SignUp() {
                   shadow-[0px_1px_0px_var(--borderDefault)]
                   transition-all duration-300
                 "
-                    onClick={() => handleClick(email,password)}
+                    onClick={() => handleClick(email, password)}
                   />
                 </Form>
               )}
