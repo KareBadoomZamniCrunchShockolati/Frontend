@@ -62,7 +62,8 @@ const ChallengeInfo: React.FC = () => {
   // } = payload;
 
   // const safeImageUrl = Img && Img.trim() !== "" ? Img : DEFAULT_CHALLENGE_IMG;
-
+  const payload: ChallengeDataDetails =
+    (location.state?.challenge as ChallengeDataDetails) ?? defaultChallenge;
   const [challenge, setChallenge] = useState<ChallengeDataDetails>(
     payload as ChallengeDataDetails
   );
@@ -70,7 +71,6 @@ const ChallengeInfo: React.FC = () => {
   // const [challengeId, setChallengeId] = useState<string | undefined>(
   //   useParams().challengeId
   // );
-  const [likeCount, setLikeCount] = useState(0);
 
   // const filteredUsers = useMemo(() => {
   //   if (participants) {
@@ -87,20 +87,19 @@ const ChallengeInfo: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isParticipated, setIsParticipated] = useState<boolean>(false);
 
-  const filteredUsers = useMemo(() => {
-    if (participants) {
-      return participants.filter((u) =>
-        u.username.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    } else return null;
-  }, [participants, searchTerm]);
+  // const filteredUsers = useMemo(() => {
+  //   if (participants) {
+  //     return participants.filter((u) =>
+  //       u.username.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
+  //   } else return null;
+  // }, [participants, searchTerm]);
 
   const handleDelete = (id: string, username: string) => {
-    console.log(`${username} (id:${id}) removed`);
+    console.log(`${username} (id:${id}) removed`);};
 
   // Fallback from navigation state (kept for backward compatibility)
-  const payload: ChallengeDataDetails =
-    (location.state?.challenge as ChallengeDataDetails) ?? defaultChallenge;
+
 
   const normalizeUrl = (value?: string | null) => {
     if (!value) return "";
@@ -117,9 +116,6 @@ const ChallengeInfo: React.FC = () => {
         ? normalizeUrl(payload.image_url)
         : DEFAULT_CHALLENGE_IMG;
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isParticipated, setIsParticipated] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
 
   // Use real backend latitude/longitude for the map

@@ -95,57 +95,57 @@ const ProfileChallenges = () => {
 
   const lastFetchedPage = useRef<number | null>(null);
 
-  const fetchChallenges = useCallback(
-    async (pageNum: number, isLoadMore: boolean = false) => {
-      try {
-        if (!isLoadMore) setLoading(true);
-        else setLoadingMore(true);
+  // const fetchChallenges = useCallback(
+  //   async (pageNum: number, isLoadMore: boolean = false) => {
+  //     try {
+  //       if (!isLoadMore) setLoading(true);
+  //       else setLoadingMore(true);
 
-        setError(null);
+  //       setError(null);
 
-        if (isLoadMore && lastFetchedPage.current === pageNum) return;
-        lastFetchedPage.current = pageNum;
+  //       if (isLoadMore && lastFetchedPage.current === pageNum) return;
+  //       lastFetchedPage.current = pageNum;
 
-        let rawList: Challenge[] = [];
+  //       let rawList: Challenge[] = [];
 
-        if (searchQuery.trim()) {
-          const response = await searchChallengesService(searchQuery);
-          rawList = response?.data ?? response ?? [];
-          setHasMore(false);
-        } else {
-          rawList = await getParticipatingChallengesService(pageNum, PAGE_SIZE);
-        }
+  //       if (searchQuery.trim()) {
+  //         const response = await searchChallengesService(searchQuery);
+  //         rawList = response?.data ?? response ?? [];
+  //         setHasMore(false);
+  //       } else {
+  //         rawList = await getParticipatingChallengesService(pageNum, PAGE_SIZE);
+  //       }
 
-        const hydrated = await hydrateChallenges(rawList);
+  //       const hydrated = await hydrateChallenges(rawList);
 
-        setChallenges((prev) =>
-          isLoadMore ? [...prev, ...hydrated] : hydrated
-        );
+  //       setChallenges((prev) =>
+  //         isLoadMore ? [...prev, ...hydrated] : hydrated
+  //       );
 
-        if (!searchQuery.trim()) {
-          if (rawList.length < PAGE_SIZE) {
-            setHasMore(false); // ✅ این آخرشه
-          } else {
-            setHasMore(true);
-            setPage((prev) => prev + 1);
-          }
-        }
-      } catch (err) {
-        setError("خطا در دریافت چالش‌ها");
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
-      }
-    },
-    [searchQuery]
-  );
+  //       if (!searchQuery.trim()) {
+  //         if (rawList.length < PAGE_SIZE) {
+  //           setHasMore(false); // ✅ این آخرشه
+  //         } else {
+  //           setHasMore(true);
+  //           setPage((prev) => prev + 1);
+  //         }
+  //       }
+  //     } catch (err) {
+  //       setError("خطا در دریافت چالش‌ها");
+  //     } finally {
+  //       setLoading(false);
+  //       setLoadingMore(false);
+  //     }
+  //   },
+  //   [searchQuery]
+  // );
 
-  useEffect(() => {
-    const q = searchQuery.trim();
-    if (q) fetchSearchedChallenges(q);
-    else fetchParticipatingChallenges();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery]);
+  // useEffect(() => {
+  //   const q = searchQuery.trim();
+  //   if (q) fetchSearchedChallenges(q);
+  //   else fetchParticipatingChallenges();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [searchQuery]);
 
   useEffect(() => {
     const fetchProfilePicture = async () => {
