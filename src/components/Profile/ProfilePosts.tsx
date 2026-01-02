@@ -12,6 +12,8 @@ import { mapBackendPostsToUI } from "@/utils/mapBackendPostsToUI";
 import useUserStore from "@/store/userStore/userStore";
 import type { MockPost, simplePost } from "@/types/profilePostsTypes";
 import { postSkeleton } from "@/data/mockPosts";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "../Custom/CustomToast";
 
 
 
@@ -27,7 +29,7 @@ const ProfilePosts = () => {
         const mappedPosts = mapBackendPostsToUI(backendPosts);
         setPosts(mappedPosts);
       } catch (err) {
-        console.error(err);
+        CustomToast(getBackendErrorMessage(err), "error");
       } finally {
         setLoading(false);
       }

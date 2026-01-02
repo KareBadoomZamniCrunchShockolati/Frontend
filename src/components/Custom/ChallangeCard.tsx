@@ -12,6 +12,8 @@ import {
 import CustomBtn from "@/components/Custom/CustomBtn";
 import type { ChallengeCardProps } from "@/types/challengeCardTypes";
 import { LikeService, UnlikeService } from "@/services/userService";
+import { getBackendErrorMessage } from "@/services/errorService";
+import CustomToast from "./CustomToast";
 
 export default function ChallengeCard({
   id,
@@ -47,8 +49,7 @@ export default function ChallengeCard({
 
       return response?.data || response;
     } catch (error) {
-      console.error("Error liking challenge:", error);
-      return null;
+      CustomToast(getBackendErrorMessage(error), "error");
     }
   };
 
@@ -64,8 +65,7 @@ export default function ChallengeCard({
 
       return response?.data || response;
     } catch (error) {
-      console.error("Error unliking challenge:", error);
-      return null;
+      CustomToast(getBackendErrorMessage(error), "error");
     }
   };
 
@@ -85,7 +85,7 @@ export default function ChallengeCard({
           text: description,
           url: `${window.location.origin}/challenge/${id}`,
         })
-        .catch((err) => console.error("خطا در اشتراک‌گذاری:", err));
+        .catch((err) => CustomToast(getBackendErrorMessage(err), "error"));
     }
   }, [title, description]);
 

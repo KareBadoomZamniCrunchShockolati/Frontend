@@ -6,14 +6,14 @@ import type { CommentResponse } from "@/types/commentTypes";
 import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import { timeAgo } from "@/utils/timeAgoDiff";
 import formatFollowBarNumber from "@/utils/formatFollowBarNumber";
-import { LikeService, UnlikeService } from "@/services/postService";
 import { Form, Formik } from "formik";
 import CustomInput from "./CustomInput";
-import { CommentService } from "@/services/commentService";
 import CustomToast from "./CustomToast";
 import { useNavigate, useParams } from "react-router-dom";
 import { SendHorizontal } from "lucide-react";
 import type { CommentCardProps } from "@/types/commentCardProps";
+import { CommentChallengeService, CommentPostService } from "@/services/commentService";
+import { getBackendErrorMessage } from "@/services/errorService";
 
 const CommentCard = ({
   comment,
@@ -22,11 +22,12 @@ const CommentCard = ({
   parentUsername,
   parentUserId,
   isOpenFirstReplies = false,
+  entityType,
   // openFirstReplies,
   // closeFirstReplies,
 }: CommentCardProps) => {
   const { id } = useParams();
-  const postId = Number(id);
+  const entityId = Number(id);
   const [openReplySection, setOpenReplySection] = useState(false);
   const replyColor = openReplySection ? "text-neutral-gray" : "text-primary";
   const pasokhColor = openReplySection ? "text-neutral-gray" : "text-black";
@@ -44,30 +45,40 @@ const CommentCard = ({
     try {
       if (isLiked) {
         // Unlike
-        await UnlikeService({ entity_type: "comment", entity_id: comment.id });
+        // await UnlikeService({ entity_type: "comment", entity_id: comment.id });-----------------------------BRUHHHHHHHHHHH
         setIsLiked(false);
         setLikeCount((prev) => prev - 1);
       } else {
         // Like
-        await LikeService({ entity_type: "comment", entity_id: comment.id });
+        // await LikeService({ entity_type: "comment", entity_id: comment.id });-----------------------------BRUHHHHHHHHHHH
         setIsLiked(true);
         setLikeCount((prev) => prev + 1);
       }
     } catch (err) {
-      console.error("Error toggling like:", err);
+      CustomToast(getBackendErrorMessage(err), "error");
     }
   };
   const handleSubmitReply = async (values: { commentText: string }) => {
     console.log("Submitting comment with values:", values);
-    const response: CommentResponse = await CommentService({
-      entity_type: "post",
-      entity_id: postId,
-      content: values.commentText,
-      parent_id: comment.id,
-    });
+    if (entityType === "challenge") {
+      const response: CommentResponse = await CommentChallengeService({
+        entity_type: entityType,
+        entity_id: entityId,
+        content: values.commentText,
+        parent_id: comment.id,
+      });
+      console.log("Comment submitted:", response);
+    } else {
+      const response: CommentResponse = await CommentPostService({
+        entity_type: entityType,
+        entity_id: entityId,
+        content: values.commentText,
+        parent_id: comment.id,
+      });
+      console.log("Comment submitted:", response);
+    }
     setOpenReplySection(false);
     CustomToast("نظر با موفقیت ایجاد شد!", "success");
-    console.log("Comment submitted:", response);
     refreshComments();
   };
   let border = "shadow-none border-none";
@@ -260,6 +271,7 @@ const CommentCard = ({
                     ? false
                     : isOpenFirstReplies
                 }
+                entityType={entityType}
               />
             ))}
           </div>

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import CustomInput from "@/components/Custom/CustomInput";
 import CustomDropdown from "@/components/Custom/CustomDropdown";
 import { Formik, Form } from "formik";
+import type { FormikHelpers } from "formik";
 import AutocompleteSingleSelect from "@/components/Custom/AutocompleteSingleSelect";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileX } from "lucide-react";
@@ -24,9 +25,15 @@ import type {
 import {
   createPostService,
   getParticipatingChallengesService,
+  presignPostImagesService,
+  uploadPostImageToPresignedUrl,
 } from "@/services/postService";
-import type { ChallengePreview, PostResponse } from "@/types/postTypes";
-
+import { getBackendErrorMessage } from "@/services/errorService";
+import type {
+  ChallengePreview,
+  PostResponse,
+  PresignPostImageUpload,
+} from "@/types/postTypes";
 const PostCreation = () => {
   const { token, userId } = useUserStore.getState();
   const [imageURLs, setImageURLs] = useState<string[]>([]);
@@ -75,22 +82,110 @@ const PostCreation = () => {
 
         setChallenges(simpleChallenges);
       } catch (err) {
-        console.error(err);
+        CustomToast(getBackendErrorMessage(err), "error");
       }
     };
 
     fetchChallenges();
   }, []);
 
-  const handleSubmit = async (values: CreatePostFormValues) => {
-    console.log("Submitting post with values:", values);
-    const response: PostResponse = await createPostService({
-      description: values.description,
-      challenge_id: values.challengeID,
-      pictures: ["images_placeholder"],
+  const extractBackendMessage = (error: any) => {
+    const data = error?.response?.data;
+    if (!data) return null;
+    if (typeof data === "string") return data;
+    if (typeof data?.message === "string") return data.message;
+    if (typeof data?.error === "string") return data.error;
+    if (typeof data?.error_code === "string") return data.error_code;
+    if (typeof data?.detail === "string") return data.detail;
+    if (typeof data?.details?.details === "string") return data.details.details;
+    if (typeof data?.data?.message === "string") return data.data.message;
+    return null;
+  };
+
+  const uploadImagesForPost = async (files: File[]) => {
+    if (files.length === 0) return [];
+
+    const grouped = new Map<string, number[]>();
+    files.forEach((file, index) => {
+      const contentType = file.type || "image/png";
+      const existing = grouped.get(contentType) || [];
+      existing.push(index);
+      grouped.set(contentType, existing);
     });
-    CustomToast("پست با موفقیت ایجاد شد!", "success");
-    console.log("Post submitted:", response);
+
+    const presignResults = await Promise.all(
+      Array.from(grouped.entries()).map(async ([contentType, indices]) => {
+        const presign = await presignPostImagesService({
+          count: indices.length,
+          content_type: contentType,
+        });
+        return { indices, uploads: presign.uploads };
+      })
+    );
+
+    const uploadsByIndex: { index: number; upload: PresignPostImageUpload }[] =
+      [];
+
+    presignResults.forEach((group) => {
+      if (!Array.isArray(group.uploads)) {
+        throw new Error("پاسخ آپلود نامعتبر است");
+      }
+
+      if (group.uploads.length !== group.indices.length) {
+        throw new Error("تعداد آپلودها با فایل‌ها همخوانی ندارد");
+      }
+
+      group.uploads.forEach((upload, idx) => {
+        uploadsByIndex.push({ index: group.indices[idx], upload });
+      });
+    });
+
+    await Promise.all(
+      uploadsByIndex.map(({ index, upload }) =>
+        uploadPostImageToPresignedUrl(upload, files[index])
+      )
+    );
+
+    const pictureUrls = new Array(files.length);
+    uploadsByIndex.forEach(({ index, upload }) => {
+      pictureUrls[index] = upload.temp_public_url || upload.key;
+    });
+
+    if (pictureUrls.some((url) => !url)) {
+      throw new Error("آدرس تصویر برای ارسال آماده نشد");
+    }
+
+    return pictureUrls as string[];
+  };
+
+  const handleSubmit = async (
+    values: CreatePostFormValues,
+    { setSubmitting, resetForm }: FormikHelpers<CreatePostFormValues>
+  ) => {
+    setSubmitting(true);
+    try {
+      const pictures = await uploadImagesForPost(images);
+      const response: PostResponse = await createPostService({
+        description: values.description,
+        challenge_id: values.challengeID,
+        pictures: pictures.length > 0 ? pictures : undefined,
+      });
+
+      CustomToast("پست با موفقیت ایجاد شد!", "success");
+      imageURLs.forEach((url) => URL.revokeObjectURL(url));
+      setImages([]);
+      setImageURLs([]);
+      resetForm();
+      navigate(`/dashboard/${userId}`);
+      console.log("Post submitted:", response);
+    } catch (error: any) {
+      console.error("Failed to create post:", error);
+      const message =
+        extractBackendMessage(error) || error?.message || "خطا در ساخت پست";
+      CustomToast(message, "error");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -200,7 +295,8 @@ const PostCreation = () => {
               <CustomButton
                 type="submit"
                 className="h-[46.6px] bg-secondary w-full"
-                pageAddress={`/dashboard/${userId}`}
+                disabled={isSubmitting}
+                loading={isSubmitting}
               >
                 <p className="text-center text-base">ساخت</p>
                 <ArrowRight className="!w-[25px] !h-[25px]" />

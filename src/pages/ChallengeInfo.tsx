@@ -17,7 +17,7 @@ import type { ChallengeDataDetails } from "@/types/challengeElementsTypes";
 import { mockChallenges } from "@/data/mockChallenges";
 
 import { OverlappingCards } from "@/components/Custom/OverlappingCards";
-import { cn } from "@/lib/utils";
+import { baseURL } from "@/services/services";
 
 // Use the correct fixed map component
 import LocationMapPicker from "@/components/Custom/LocationMap";
@@ -33,6 +33,11 @@ import {
   getFollowingService,
   getUserById,
 } from "@/services/userService";
+import { getParticipatingChallengesService } from "@/services/postService";
+import { cn } from "@/lib/utils";
+import { set } from "react-hook-form";
+import { getBackendErrorMessage } from "@/services/errorService";
+import { LikeChallengeService, UnlikeChallengeService, UnlikePostService } from "@/services/likeService";
 
 import CustomToast from "@/components/Custom/CustomToast";
 import { DEFAULT_CHALLENGE_IMG } from "@/data/mockImages";
@@ -46,20 +51,71 @@ const ChallengeInfo: React.FC = () => {
   const navigate = useNavigate();
   const { challengeId } = useParams<{ challengeId: string }>();
   const challenge_Id = Number(challengeId);
+  const [isLiked, setIsLiked] = useState(false);
 
-  // Fallback from navigation state
+  // const {
+  //   Img,
+  //   title,
+  //   description,
+  //   dateRange,
+  //   location: challengeLocation,
+  // } = payload;
+
+  // const safeImageUrl = Img && Img.trim() !== "" ? Img : DEFAULT_CHALLENGE_IMG;
   const payload: ChallengeDataDetails =
     (location.state?.challenge as ChallengeDataDetails) ?? defaultChallenge;
+  const [challenge, setChallenge] = useState<ChallengeDataDetails>(
+    payload as ChallengeDataDetails
+  );
+  const [participants, setParticipants] = useState<UserProfile[]>([]);
+  // const [challengeId, setChallengeId] = useState<string | undefined>(
+  //   useParams().challengeId
+  // );
+
+  // const filteredUsers = useMemo(() => {
+  //   if (participants) {
+  //     return participants.filter((u) =>
+  //       u.username.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
+  //   } else return null;
+  // }, [participants, searchTerm]);
+
+  // const handleDelete = (id: string, username: string) => {
+  //   console.log(`${username} (id:${id}) removed`);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [likeCount, setLikeCount] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isParticipated, setIsParticipated] = useState<boolean>(false);
+
+  // const filteredUsers = useMemo(() => {
+  //   if (participants) {
+  //     return participants.filter((u) =>
+  //       u.username.toLowerCase().includes(searchTerm.toLowerCase())
+  //     );
+  //   } else return null;
+  // }, [participants, searchTerm]);
+
+  const handleDelete = (id: string, username: string) => {
+    console.log(`${username} (id:${id}) removed`);};
+
+  // Fallback from navigation state (kept for backward compatibility)
+
+
+  const normalizeUrl = (value?: string | null) => {
+    if (!value) return "";
+    if (/^https?:\/\//i.test(value)) return value;
+    if (value.startsWith("/")) return `${baseURL}${value}`;
+    return `${baseURL}/${value}`;
+  };
 
   const safeImageUrl = payload.Img?.trim()
     ? payload.Img
-    : DEFAULT_CHALLENGE_IMG;
+    : payload.cover_image?.trim()
+      ? normalizeUrl(payload.cover_image)
+      : payload.image_url?.trim()
+        ? normalizeUrl(payload.image_url)
+        : DEFAULT_CHALLENGE_IMG;
 
-  const [challenge, setChallenge] = useState<ChallengeDataDetails | any>(payload);
-  const [participants, setParticipants] = useState<UserProfile[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isParticipated, setIsParticipated] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
 
   const displayCoordinates = useMemo<[number, number] | null>(() => {
@@ -89,11 +145,25 @@ const ChallengeInfo: React.FC = () => {
     });
   };
 
-  const handleLike = () =>
-    setChallenge((prev: any) => ({
-      ...prev,
-      like_count: (prev.like_count || 0) + 1,
-    }));
+  const handleLike = async () =>{
+        if (!challenge) return;
+        try {
+          if (isLiked) {
+            // Unlike
+            await UnlikeChallengeService(Number(challengeId));
+            setIsLiked(false);
+            setLikeCount((prev) => prev - 1);
+          } else {
+            // Like
+            await LikeChallengeService(Number(challengeId));
+            setIsLiked(true);
+            setLikeCount((prev) => prev + 1);
+          }
+        } catch (err) {
+          CustomToast(getBackendErrorMessage(err), "error");
+        }
+      }
+  const handleSave = () => console.log("Challenge saved!");
 
   const nextSlide = () =>
     setCurrentSlide((i) => (i + 1) % mockChallenges.length);
@@ -108,6 +178,8 @@ const ChallengeInfo: React.FC = () => {
       try {
         const fetched = await fetchChallengeById(String(challenge_Id));
         setChallenge(fetched);
+        setLikeCount(fetched.like_count);
+        setIsLiked(fetched.is_user_liked);
       } catch (err) {
         console.error("Failed to fetch challenge:", err);
         CustomToast("خطا در بارگذاری چالش", "error");
@@ -117,7 +189,7 @@ const ChallengeInfo: React.FC = () => {
     };
     fetchChallenge();
   }, [challenge_Id]);
-
+  console.log("like count",likeCount)
   useEffect(() => {
     const fetchUsers = async () => {
       if (!challenge.participants?.length) {
@@ -151,26 +223,37 @@ const ChallengeInfo: React.FC = () => {
   }, [challenge.participants]);
 
   const joinChallengeHandler = async () => {
-    try {
-      if (challenge.visibility === "public") {
-        await joinPublicChallenge(challenge_Id);
-      } else {
-        await joinPrivateChallenge(challenge_Id);
+    if (challenge.visibility == "public") {
+      if (challenge_Id) {
+        try {
+          const data = await joinPublicChallenge(Number(challenge_Id));
+          console.log(data);
+        } catch (e) {
+          // CustomToast(getBackendErrorMessage(e), "error");
+        }
       }
-      setIsParticipated(true);
-      CustomToast("با موفقیت به چالش پیوستید!", "success");
-    } catch (e) {
-      CustomToast("خطا در پیوستن به چالش", "error");
-    }
-  };
+    } else if (challenge.visibility == "private") {
+      if (challenge_Id) {
+        try {
+          const data = await joinPrivateChallenge(Number(challenge_Id));
+          console.log(data);
+          setIsParticipated(true);
+        } catch (e) {
+          CustomToast(getBackendErrorMessage(e), "error");
+        }
+      }
+  }
+};
 
   const leaveChallengeHandler = async () => {
-    try {
-      await leaveChallenge(challenge_Id);
-      setIsParticipated(false);
-      CustomToast("چالش را ترک کردید", "success");
-    } catch (e) {
-      CustomToast("خطا در ترک چالش", "error");
+    if (challenge_Id) {
+      try {
+        const data = await leaveChallenge(Number(challenge_Id));
+        setIsParticipated(false);
+        console.log(data);
+      } catch (e) {
+        CustomToast(getBackendErrorMessage(e), "error");
+      }
     }
   };
 
@@ -190,12 +273,22 @@ const ChallengeInfo: React.FC = () => {
       <div className="flex-1 flex flex-col items-center">
         <BackButtonAndMenu onMenuClick={handleMenu} />
 
-        <ImageAndBadgeContainer imageUrl={challenge.Img ?? challenge.image_url ?? undefined} />
+        <ImageAndBadgeContainer
+          imageUrl={
+            normalizeUrl(challenge.cover_image) ||
+            challenge.Img ||
+            normalizeUrl(challenge.image_url) ||
+            undefined
+          }
+        />
 
         <LikeAndSaveButtons
+          commentCount={challenge.comment_count}
           onLike={handleLike}
-          onSave={() => console.log("Challenge saved!")}
-          likeCount={challenge.like_count || 0}
+          onSave={handleSave}
+          likeCount={likeCount}
+          challengeId={Number(challengeId)}
+          isLiked={isLiked}
         />
 
         <TitleAndDescription
