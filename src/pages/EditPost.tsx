@@ -160,7 +160,7 @@ const EditPost = () => {
   }
 
   return (
-    <>
+    <div>
       {isOwnerViewing && (
         <div className="flex items-center bg-background justify-between mt-5 mr-5 ml-5">
           <button

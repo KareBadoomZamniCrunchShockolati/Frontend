@@ -38,7 +38,7 @@ const CustomButton = ({
       // {...(type ? { type } : {})}
       onClick={handleClick}
       className={cn(
-        "bg-neutral-gray w-40 sm:w-50 md:w-60 sm:text-sm md:text-base cursor-pointer sm:h-10 rounded-xl text-white font-bold active:shadow-none active:translate-y-[3px] shadow-[0_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-25 border-2 border-foreground",
+        "bg-neutral-gray w-40 sm:w-50 md:w-60 sm:text-sm md:text-base cursor-pointer sm:h-10 rounded-xl text-white font-bold active:shadow-none active:translate-y-[3px] shadow-[0_3px_0px_0px_rgba(0,0,0,1)] shadow-foreground transition-all duration-25 border-2 border-foreground",
         className
       )}
       disabled={loading || props.disabled}

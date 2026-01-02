@@ -12,6 +12,7 @@ export default function BottomNav() {
 
   const isHome = location.pathname === "/main";
   const isDashboard = location.pathname.startsWith("/dashboard");
+  const isDarkMode = document.documentElement.classList.contains("dark");
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[100] border-2 border-foreground  border-b-0 bg-foreground shadow-lg rounded-tr-xl rounded-tl-xl ">
@@ -28,7 +29,10 @@ export default function BottomNav() {
             transition-all duration-300 ease-in-out
           `}
         >
-          <img src={Home} alt="خانه" className="h-6 w-6 mb-1" />
+          {isDarkMode && !isHome && <img src={Home} alt="خانه" className="h-6 w-6 mb-1 dark:invert" />}
+          {!isDarkMode && !isHome && <img src={Home} alt="خانه" className="h-6 w-6 mb-1" />}
+          {isDarkMode && isHome && <img src={Home} alt="خانه" className="h-6 w-6 mb-1" />}
+          {!isDarkMode && isHome && <img src={Home} alt="خانه" className="h-6 w-6 mb-1 dark:invert" />}
           <span className="text-xs">خانه</span>
         </button>
 
@@ -47,7 +51,11 @@ export default function BottomNav() {
             transition-all duration-300 ease-in-out
           `}
         >
-          <img src={Profile} alt="پروفایل" className="h-6 w-6 mb-1" />
+          {isDarkMode && !isDashboard && <img src={Profile} alt="پروفایل" className="h-6 w-6 mb-1w dark:invert" />}
+          {isDarkMode && isDashboard && <img src={Profile} alt="پروفایل" className="h-6 w-6 mb-1w" />}
+          {!isDarkMode && !isDashboard && <img src={Profile} alt="پروفایل" className="h-6 w-6 mb-1w" />}
+          {!isDarkMode && isDashboard && <img src={Profile} alt="پروفایل" className="h-6 w-6 mb-1w dark:invert" />}
+          
           <span className="text-xs">پروفایل</span>
         </button>
       </div>

@@ -31,7 +31,7 @@ const LikeAndSaveButtons: React.FC<LikeSaveButtonsProps> = ({
           {convertToPersianDigits(formatFollowBarNumber(commentCount || 0))}
         </span>
         <CustomButton
-          className={`w-min sm:w-min md:w-min bg-white border-primary shadow-primary hover:bg-white rounded-primary-radius p-3 flex items-center space-x-2`}
+          className={`w-min sm:w-min md:w-min bg-background border-primary shadow-primary hover:bg-muted rounded-primary-radius p-3 flex items-center space-x-2`}
           onClick={onLike}
           pageAddress={`/challenge/${challengeId}/comments`}
         >
@@ -39,22 +39,22 @@ const LikeAndSaveButtons: React.FC<LikeSaveButtonsProps> = ({
         </CustomButton>
 
         {/* like */}
-        <span className="text-black text-xl mt-6">
+        <span className="text-foreground text-xl mt-6">
           {convertToPersianDigits(formatFollowBarNumber(likeCount || 0))}
         </span>
         <CustomButton
-          className={`w-min sm:w-min md:w-min bg-white ${colorBorderThumbsup} ${shadowThumbsup} hover:bg-white rounded-primary-radius p-3 flex items-center space-x-2`}
+          className={`w-min sm:w-min md:w-min bg-background ${colorBorderThumbsup} ${shadowThumbsup} hover:bg-muted rounded-primary-radius p-3 flex items-center space-x-2`}
           onClick={onLike}
         >
           <ThumbsUp className={`${colorThumbsup} w-5 h-5`} />
         </CustomButton>
 
-        <CustomButton
+        {/* <CustomButton
           className="w-min sm:w-min md:w-min bg-card border-2 border-primary shadow-[0_4px_0_var(--primary)] hover:bg-card rounded-primary-radius p-3 flex items-center space-x-2 dark:border-primary dark:shadow-[0_4px_0_var(--primary)]"
           onClick={onSave}
         >
           <Bookmark className="text-primary w-5 h-5" />
-        </CustomButton>
+        </CustomButton> */}
       </div>
     </div>
   );

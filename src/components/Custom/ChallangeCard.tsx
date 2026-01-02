@@ -144,7 +144,7 @@ export default function ChallengeCard({
                 )}
               </div>
 
-              <span className="text-xs text-white bg-secondary px-2 py-1 rounded-full whitespace-nowrap">
+              <span className="text-xs text-foreground bg-secondary px-2 py-1 rounded-full whitespace-nowrap">
                 {profiles.length} نفر
               </span>
             </div>
@@ -154,8 +154,8 @@ export default function ChallengeCard({
             <span
               className={`text-xs font-bold px-3 py-1.5 rounded-full border-2 shadow-shadow-strong ${
                 isJoined
-                  ? "bg-success text-white border-success"
-                  : "bg-white text-neutral-gray-bold border-neutral-gray"
+                  ? "bg-success text-foreground border-success"
+                  : "bg-foreground text-neutral-gray-bold border-neutral-gray"
               }`}
             >
               {isJoined ? "عضو شده‌اید ✓" : "عضو نشده‌اید"}
@@ -177,10 +177,10 @@ export default function ChallengeCard({
                 </Avatar>
 
                 <div className="flex flex-col min-w-0">
-                  <span className="font-semibold text-gray-text text-sm truncate">
+                  <span className="font-semibold text-foreground text-sm truncate">
                     {creator?.name || "کاربر ناشناس"}
                   </span>
-                  <span className="text-xs text-gray-text">ایجاد‌کننده</span>
+                  <span className="text-xs text-foreground">ایجاد‌کننده</span>
                 </div>
               </div>
 
@@ -199,14 +199,14 @@ export default function ChallengeCard({
                   className={`p-2 rounded-full transition-all duration-200 border-2 shadow-lg hover:scale-105 ${
                     isSaved
                       ? "bg-save-color text-primary border-primary"
-                      : "bg-white text-neutral-gray-bold border-black"
+                      : "bg-background text-foreground border-foreground"
                   }`}
                 >
                   <Bookmark
                     className={`h-4 w-4 ${
                       isSaved
                         ? "fill-primary stroke-primary"
-                        : "stroke-neutral-gray-bold"
+                        : "stroke-foreground"
                     }`}
                   />
                 </button>
@@ -215,10 +215,10 @@ export default function ChallengeCard({
 
             {/* عنوان و توضیحات */}
             <div className="mb-4">
-              <h2 className="text-lg font-bold text-gray-text mb-2 line-clamp-2">
+              <h2 className="text-lg font-bold text-foreground mb-2 line-clamp-2">
                 {title}
               </h2>
-              <p className="text-gray-text text-sm leading-relaxed line-clamp-3">
+              <p className="text-foreground text-sm leading-relaxed line-clamp-3">
                 {description || "بدون توضیحات"}
               </p>
             </div>
@@ -243,7 +243,7 @@ export default function ChallengeCard({
                 <span className="text-gray-text text-xs font-medium block mb-1">
                   نظرات
                 </span>
-                <div className="flex items-center gap-1.5 text-gray-text font-bold">
+                <div className="flex items-center gap-1.5 text-foreground font-bold">
                   <MessageCircle className="h-4 w-4" />
                   <span>{comments}</span>
                 </div>

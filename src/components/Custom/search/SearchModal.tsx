@@ -27,15 +27,8 @@ const DEFAULT_PAGE_SIZE = 5;
 
 const getChallengeDates = (challenge: SearchChallenge) => ({
   start:
-    challenge.start_time ??
-    challenge.start_date ??
-    challenge.startDate ??
-    "",
-  end:
-    challenge.end_time ??
-    challenge.end_date ??
-    challenge.endDate ??
-    "",
+    challenge.start_time ?? challenge.start_date ?? challenge.startDate ?? "",
+  end: challenge.end_time ?? challenge.end_date ?? challenge.endDate ?? "",
 });
 
 const getLabelBySortKey = (sortBy?: ActiveFilters["sortBy"]) => {
@@ -225,8 +218,7 @@ export function SearchModal({
   const hasAnyVisibleFilter = hasCategory || !!hasSort;
   const hasSearchQuery = !!searchQuery.trim();
   const useDefaultList = !hasSearchQuery && !hasAnyVisibleFilter;
-  const isLoadingResults =
-    isSearching || (useDefaultList && isDefaultLoading);
+  const isLoadingResults = isSearching || (useDefaultList && isDefaultLoading);
 
   const categoryLabel = hasCategory
     ? (categoryTitleById?.[String(activeFilters?.selectedCategory)] ??
@@ -265,7 +257,7 @@ export function SearchModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-white overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
       <div dir="rtl" className="min-h-screen pb-32">
         <SearchTopBar onBack={onClose} onFilter={onFilterClick} />
 
@@ -323,10 +315,10 @@ export function SearchModal({
                     hasSearchQuery &&
                     displayResults.length > 0 && (
                       <div className="mb-4 mt-6 flex items-center justify-between">
-                        <h2 className="text-lg font-bold text-black">
+                        <h2 className="text-lg font-bold text-foreground">
                           نتایج جستجو
                         </h2>
-                        <span className="text-sm text-black/60">
+                        <span className="text-sm text-muted-foreground">
                           {displayResults.length} چالش یافت شد
                         </span>
                       </div>
@@ -354,9 +346,7 @@ export function SearchModal({
                               {...item}
                               startDate={convertToJalali(start)}
                               endDate={convertToJalali(end)}
-                              onClick={() =>
-                                navigate(`/challenge/${item.id}`)
-                              }
+                              onClick={() => navigate(`/challenge/${item.id}`)}
                             />
                           </div>
                         );
@@ -368,7 +358,7 @@ export function SearchModal({
                             onClick={() =>
                               fetchSearchPage(searchQuery, searchPage, true)
                             }
-                            className="rounded-xl border border-white px-5 py-2.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 transition-colors"
+                            className="rounded-xl border border-foreground px-5 py-2.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 transition-colors"
                             disabled={isLoadingMore}
                           >
                             {isLoadingMore
@@ -381,10 +371,8 @@ export function SearchModal({
                         <div className="flex justify-center pt-2">
                           <button
                             type="button"
-                            onClick={() =>
-                              fetchDefaultPage(defaultPage, true)
-                            }
-                            className="rounded-xl border border-white px-5 py-2.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 transition-colors"
+                            onClick={() => fetchDefaultPage(defaultPage, true)}
+                            className="rounded-xl border border-foreground px-5 py-2.5 text-sm font-medium text-primary bg-primary/10 hover:bg-primary/20 transition-colors"
                             disabled={isDefaultLoadingMore}
                           >
                             {isDefaultLoadingMore

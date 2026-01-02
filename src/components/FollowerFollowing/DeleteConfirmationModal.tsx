@@ -3,7 +3,7 @@ import CustomButton from '@/components/Custom/CustomButton';
 
 interface DeleteConfirmationModalProps {
   username: string;
-  listType: 'followers' | 'followings'; // Add the listType prop
+  listType: 'followers' | 'followings';
   onDeleteConfirm: () => void;
   onDeleteCancel: () => void;
 }
@@ -16,34 +16,34 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
 }) => {
   return (
     <>
-      {/* Overlay with onClick to trigger cancel */}
+      {/* Overlay */}
       <div
-        className="fixed top-0 left-0 right-0 bottom-0 bg-black opacity-50 z-50"
-        onClick={onDeleteCancel} // Cancel on overlay click
-      ></div>
+        className="fixed inset-0 bg-black/70 z-50"
+        onClick={onDeleteCancel}
+      />
 
-      {/* Confirmation Modal */}
+      {/* Modal */}
       <div
-        className="fixed bottom-0 left-0 right-0 bg-white shadow-lg rounded-t-lg p-6 z-60 border-2 border-black"
-        onClick={(e) => e.stopPropagation()} // Prevent the modal from closing when clicked
+        className="fixed bottom-0 left-0 right-0 bg-card rounded-t-3xl shadow-2xl p-6 z-50 border-2 border-foreground"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex flex-col items-center text-right" dir="rtl">
-          <p className="font-bold text-lg mb-4">
+          <p className="font-bold text-lg mb-6 text-foreground text-center">
             آیا مطمئن هستید که می‌خواهید{' '}
             <span className="text-primary mx-2" dir="ltr">{username}</span> را از لیست{' '}
             {listType === 'followers' ? 'دنبال‌کنندگان' : 'دنبال‌شوندگان'} حذف کنید؟
           </p>
-        
 
-          <div className="flex flex-col space-y-4">
+          <div className="flex flex-col w-full gap-4">
             <CustomButton
-              className="bg-white text-primary w-full text-xl font-normal px-4 py-2 mb-3 rounded-lg shadow-primary border-primary hover:bg-primary-dark"
+              className="bg-primary text-foreground w-full text-xl font-normal px-4 py-3 rounded-xl shadow-foreground border-foreground hover:bg-destructive/90"
               onClick={onDeleteConfirm}
             >
               حذف
             </CustomButton>
+
             <CustomButton
-              className="bg-white text-secondary w-full text-xl font-normal px-4 py-2 rounded-lg shadow-secondary border-secondary hover:bg-secondary-dark"
+              className="bg-secondary text-foreground w-full text-xl font-normal px-4 py-3 rounded-xl border-foreground hover:bg-muted/80"
               onClick={onDeleteCancel}
             >
               انصراف

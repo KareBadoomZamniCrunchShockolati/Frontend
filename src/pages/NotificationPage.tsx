@@ -3,11 +3,10 @@ import TopBackText from "@/components/Custom/TopBackText";
 import profileImg from "@/assets/Img/Icon/User.svg";
 import convertToPersianDigits from "@/utils/convertToPersianDigits";
 import happy from "@/assets/Img/Icon/emoji-happy.svg";
-import { Navigate, useNavigate } from "react-router-dom";
 import bell from "@/assets/Img/Icon/bell.svg";
 import { useEffect, useState } from "react";
-import "@/data/mockSocket"; // ← just importing starts the server
-import { divIcon } from "leaflet";
+import "@/data/mockSocket";
+import { useNavigate } from "react-router-dom";
 
 const newData = [
   {
@@ -31,6 +30,7 @@ const newData = [
     userId: "1",
   },
 ];
+
 const oldData = [
   {
     type: "inviteChallenge",
@@ -49,6 +49,8 @@ const oldData = [
 
 const NotificationPage = () => {
   const [data, setData] = useState<string[]>([]);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const socket = new window.WebSocket("ws://localhost:8080");
     let new_data;
@@ -63,48 +65,44 @@ const NotificationPage = () => {
   }, []);
 
   return (
-    <div className="p-4">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 p-4">
       <TopBackText text="اعلانات" icon={bell} />
-      <div className="flex flex-col p-4  gap-4 bg-primary border-3 border-black rounded-2xl">
+
+      <div className="flex flex-col p-4 gap-4 bg-primary border-3 border-foreground rounded-2xl">
         <p className="text-right font-extrabold text-2xl text-white">جدید</p>
-        {newData.map((x) => {
-          return x.type == "followed" ? (
-            <NotificationCard type={x.type} username={x.username} />
-          ) : (
-            <NotificationCard
-              type={x.type}
-              username={x.username}
-              challengeName={x.challengeName}
-            />
-          );
-        })}
+        {newData.map((x, index) => (
+          <NotificationCard
+            key={index}
+            type={x.type}
+            username={x.username}
+            challengeName={x.challengeName}
+            userId={x.userId}
+          />
+        ))}
       </div>
-      <div className="flex flex-col p-4 mt-6 gap-4 bg-secondary border-3 border-black rounded-2xl">
+
+      <div className="flex flex-col p-4 mt-6 gap-4 bg-secondary border-3 border-foreground rounded-2xl">
         <div className="flex flex-row-reverse gap-2 font-extrabold text-2xl text-white text-end">
-          <p className=" ">{convertToPersianDigits("30")}</p>
+          <p>{convertToPersianDigits("30")}</p>
           <p>روز گذشته</p>
         </div>
-        {newData.map((x) => {
-          return x.type == "followed" ? (
-            <NotificationCard
-              type={x.type}
-              username={x.username}
-              userId={x.userId}
-            />
-          ) : (
-            <NotificationCard
-              type={x.type}
-              username={x.username}
-              challengeName={x.challengeName}
-            />
-          );
-        })}
+        {oldData.map((x, index) => (
+          <NotificationCard
+            key={index}
+            type={x.type}
+            username={x.username}
+            challengeName={x.challengeName}
+            userId={x.userId}
+          />
+        ))}
         <ProgressCard message=" تونستی 5 روز پشت سر هم به چالش کوه‌نوردی روی دریا پایبند بمونی این خیلی عالیه" />
       </div>
-      {data && data.map((x) => <div>{x}</div>)}
+
+      {data && data.map((x, i) => <div key={i} className="mt-4 text-foreground">{x}</div>)}
     </div>
   );
 };
+
 export default NotificationPage;
 
 const NotificationCard = ({
@@ -119,35 +117,39 @@ const NotificationCard = ({
   userId?: string;
 }) => {
   const navigate = useNavigate();
+
   return (
     <>
-      {type == "inviteChallenge" ? (
-        <div className="flex gap-4 rounded-2xl bg-white justify-between p-4 border-2 border-black">
-          <CustomButton className="bg-primary ">مشاهده</CustomButton>
-          <div className="text-right w-6/7">{`دعوت کرد شما را به ${challengeName} ${username}`}</div>
+      {type === "inviteChallenge" ? (
+        <div className="flex gap-4 rounded-2xl bg-card justify-between p-4 border-2 border-foreground">
+          <CustomButton className="bg-primary text-primary-foreground">مشاهده</CustomButton>
+          <div className="text-right text-foreground flex-1">
+            {username} شما را به چالش {challengeName} دعوت کرد
+          </div>
         </div>
       ) : (
-        <div className="flex gap-4 rounded-2xl bg-white justify-between p-4 border-2 border-black">
-          <CustomButton className="bg-primary  ">دنبال کردن</CustomButton>
-          <div className="flex gap-4 flex-row-reverse w-6/7">
+        <div className="flex gap-4 rounded-2xl bg-card justify-between p-4 border-2 border-foreground">
+          <CustomButton className="bg-primary text-primary-foreground">دنبال کردن</CustomButton>
+          <div className="flex gap-4 flex-row-reverse flex-1 items-center">
             <img
-              onClick={() => navigate(`/dashboard/${userId}`)}
-              className="rounded-full"
+              onClick={() => userId && navigate(`/dashboard/${userId}`)}
+              className="w-12 h-12 rounded-full object-cover cursor-pointer"
               src={profileImg}
-              alt=""
+              alt={username}
             />
-            <p className="w-4/5 text-right">{username} شما را دنبال می‌کند</p>
+            <p className="text-right text-foreground">{username} شما را دنبال می‌کند</p>
           </div>
         </div>
       )}
     </>
   );
 };
+
 const ProgressCard = ({ message }: { message: string }) => {
   return (
-    <div className="flex gap-4 rounded-2xl bg-white justify-between p-4 border-2 border-black">
-      <p className="text-end">{`${message}`}</p>
-      <img src={happy} alt="" />
+    <div className="flex gap-4 rounded-2xl bg-card justify-between p-4 border-2 border-foreground items-center">
+      <p className="text-end text-foreground flex-1">{message}</p>
+      <img src={happy} alt="خوشحال" className="w-12 h-12" />
     </div>
   );
 };

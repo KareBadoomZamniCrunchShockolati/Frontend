@@ -1,25 +1,23 @@
-// src/pages/DarkModePage.tsx
+// src/components/Custom/DarkModeSwitch.tsx  (or wherever you prefer)
 
 import React from 'react';
 import CustomSwitchButton from '@/components/Custom/CustomSwitchButton';
-import { useTheme } from './ThemeContext';
+import { useTheme } from './ThemeContext'; // adjust the path if needed
 
-const DarkModePage: React.FC = () => {
+const DarkModeSwitch: React.FC = () => {
   const { isDark, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background text-foreground transition-colors duration-500">
-      <CustomSwitchButton
-        name="dark-mode"
-        labelText="حالت تاریک"
-        checked={isDark}
-        onCheckedChange={toggleTheme}
-        classNames={{
-          label: "text-lg font-medium select-none",
-        }}
-      />
-    </div>
+    <CustomSwitchButton
+      name="dark-mode"
+      labelText="حالت تاریک"
+      checked={isDark}
+      onCheckedChange={toggleTheme}
+      classNames={{
+        label: "text-lg font-medium select-none",
+      }}
+    />
   );
 };
 
-export default DarkModePage;
+export default DarkModeSwitch;

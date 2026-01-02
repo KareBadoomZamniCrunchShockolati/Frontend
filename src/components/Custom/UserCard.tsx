@@ -41,7 +41,7 @@ const UserCard: React.FC<UserCardProps> = ({
       className={`flex items-center justify-between mb-2 p-2 w-full sm:w-100 md:w-110 h-24 border border-foreground rounded-[7px] cursor-pointer ${className} `}
       onClick={handleCardClick} // Trigger navigation on card click
     >
-      <div className="flex items-center space-x-4">
+      <div className="flex text-foreground items-center space-x-4">
         <img
           className="w-16 h-16 rounded-full border-1 border-foreground"
           src={imagePath}

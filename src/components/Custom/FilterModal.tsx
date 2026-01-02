@@ -175,7 +175,7 @@ export function FilterModal({
 
       {/* Modal */}
       <div
-        className={`fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-[32px] shadow-2xl transform transition-all duration-300 ease-out ${
+        className={`fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-[32px] shadow-2xl transform transition-all duration-300 ease-out ${
           isModalVisible
             ? "translate-y-0 opacity-100"
             : "translate-y-full opacity-0"
@@ -183,17 +183,17 @@ export function FilterModal({
       >
         {/* Header */}
         <div
-          className="sticky top-0 bg-white flex items-center justify-between px-4 pt-6 pb-4 border-b border-white rounded-t-[32px] z-10"
+          className="sticky top-0 bg-card flex items-center justify-between px-4 pt-6 pb-4 border-b border-border rounded-t-[32px] z-10"
           dir="rtl"
         >
-          <h2 className="text-xl font-bold text-slate-900">فیلتر</h2>
+          <h2 className="text-xl font-bold text-foreground">فیلتر</h2>
           <button
             onClick={handleClose}
-            className="grid h-10 w-10 place-items-center rounded-xl hover:bg-slate-100 transition-all duration-200 active:scale-95"
+            className="grid h-10 w-10 place-items-center rounded-xl hover:bg-muted transition-all duration-200 active:scale-95"
             aria-label="بستن"
             disabled={isLoading}
           >
-            <X className="h-6 w-6 text-slate-600" />
+            <X className="h-6 w-6 text-foreground" />
           </button>
         </div>
 
@@ -231,7 +231,7 @@ export function FilterModal({
                         : "translateY(10px)",
                     }}
                   >
-                    <h3 className="text-base font-bold text-black mb-4">
+                    <h3 className="text-base font-bold text-foreground mb-4">
                       دسته‌بندی
                     </h3>
 
@@ -239,14 +239,14 @@ export function FilterModal({
                     <button
                       type="button"
                       onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                      className="w-full mb-10 px-4 py-4 rounded-2xl border-2 border-white bg-white text-black font-medium text-sm flex items-center justify-between hover:border-primary transition-all duration-200 active:scale-[0.98]"
+                      className="w-full mb-10 px-4 py-4 rounded-2xl border-2 border-border bg-card text-foreground font-medium text-sm flex items-center justify-between hover:border-primary transition-all duration-200 active:scale-[0.98]"
                       disabled={isLoading}
                     >
-                      <span className="text-black">
+                      <span className="text-foreground">
                         {selectedCategoryTitle ?? "همه دسته‌بندی‌ها"}
                       </span>
                       <ChevronDown
-                        className={`h-5 w-5 text-slate-500 transition-transform duration-300 ${
+                        className={`h-5 w-5 text-muted-foreground transition-transform duration-300 ${
                           isCategoryOpen ? "rotate-180" : ""
                         }`}
                       />
@@ -260,7 +260,7 @@ export function FilterModal({
                           : "mt-0 max-h-0 opacity-0"
                       }`}
                     >
-                      <div className="rounded-2xl border-2 border-white overflow-hidden">
+                      <div className="rounded-2xl border-2 border-border overflow-hidden">
                         <div className="max-h-48 overflow-y-auto">
                           <button
                             type="button"
@@ -268,10 +268,10 @@ export function FilterModal({
                               setFieldValue("selectedCategory", null);
                               setIsCategoryOpen(false);
                             }}
-                            className={`w-full px-4 py-3.5 text-right text-sm font-medium border-b border-white transition-colors duration-200 ${
+                            className={`w-full px-4 py-3.5 text-right text-sm font-medium border-b border-border transition-colors duration-200 ${
                               !values.selectedCategory
                                 ? "bg-primary/20 text-primary"
-                                : "bg-white text-black hover:bg-slate-50"
+                                : "bg-card text-foreground hover:bg-muted"
                             }`}
                             disabled={isLoading}
                           >
@@ -286,10 +286,10 @@ export function FilterModal({
                                 setFieldValue("selectedCategory", cat.id);
                                 setIsCategoryOpen(false);
                               }}
-                              className={`w-full px-4 py-3.5 text-right text-sm font-medium border-b border-white last:border-b-0 transition-colors duration-200 ${
+                              className={`w-full px-4 py-3.5 text-right text-sm font-medium border-b border-border last:border-b-0 transition-colors duration-200 ${
                                 values.selectedCategory === cat.id
                                   ? "bg-primary/20 text-primary"
-                                  : "bg-white text-black hover:bg-slate-50"
+                                  : "bg-card text-foreground hover:bg-muted"
                               }`}
                               style={{
                                 transitionDelay: isCategoryOpen
@@ -310,7 +310,7 @@ export function FilterModal({
                   {isLoading && (
                     <div className="text-center py-4">
                       <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-                      <p className="text-sm text-slate-600 mt-2">
+                      <p className="text-sm text-muted-foreground mt-2">
                         در حال دریافت داده‌ها...
                       </p>
                     </div>
@@ -319,8 +319,7 @@ export function FilterModal({
 
                 {/* Buttons */}
                 <div
-                  className="sticky bottom-0 bg-white px-4 py-4 border-t border-white flex justify-between transition-all duration-300 delay-300
-                  mb-20"
+                  className="sticky bottom-0 bg-card px-4 py-4 border-t border-border flex justify-between transition-all duration-300 delay-300 mb-20"
                 >
                   <CustomBtn
                     type="button"
@@ -328,7 +327,7 @@ export function FilterModal({
                       resetForm();
                       setIsCategoryOpen(false);
                     }}
-                    className="bg-secondary"
+                    className="bg-secondary text-secondary-foreground"
                     disabled={isLoading}
                   >
                     پاک کردن
@@ -336,7 +335,7 @@ export function FilterModal({
 
                   <CustomBtn
                     type="submit"
-                    className="!bg-primary !text-white"
+                    className="bg-primary text-primary-foreground"
                     disabled={isLoading}
                   >
                     {isLoading ? "در حال اعمال..." : "اعمال فیلتر"}

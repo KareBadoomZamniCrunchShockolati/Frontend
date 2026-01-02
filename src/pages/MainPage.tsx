@@ -41,6 +41,8 @@ function CategoryGrid({
 }) {
   const navigate = useNavigate();
 
+  const isDark = document.documentElement.classList.contains("dark");
+
   return (
     <div className="px-4 pt-4">
       <div className="mb-3 mt-5 text-base font-bold text-foreground">
@@ -55,14 +57,27 @@ function CategoryGrid({
             onClick={() => navigate(`/category/${c.id}`)}
             className="flex flex-col cursor-pointer items-center gap-2 rounded-2xl border-2 border-foreground bg-card py-3 shadow-shadow-light active:scale-[0.98]"
           >
-            <div>
-              <img
-                src={c.icon}
-                alt={c.title}
-                className="h-6 w-6"
-                loading="lazy"
-              />
-            </div>
+            {isDark && (
+              <div>
+                <img
+                  src={c.icon}
+                  alt={c.title}
+                  className="h-6 w-6 dark:invert"
+                  loading="lazy"
+                />
+              </div>
+            )}
+
+            {!isDark && (
+              <div>
+                <img
+                  src={c.icon}
+                  alt={c.title}
+                  className="h-6 w-6"
+                  loading="lazy"
+                />
+              </div>
+            )}
 
             <span className="text-xs font-medium text-foreground">
               {c.title}
@@ -73,7 +88,6 @@ function CategoryGrid({
     </div>
   );
 }
-
 
 export default function HomeScreen() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -95,7 +109,9 @@ export default function HomeScreen() {
     topCreators: true,
   });
 
-  const [activeFilters, setActiveFilters] = useState<ActiveFilters | null>(null);
+  const [activeFilters, setActiveFilters] = useState<ActiveFilters | null>(
+    null
+  );
 
   const navigate = useNavigate();
 
@@ -132,7 +148,7 @@ export default function HomeScreen() {
 
       setTopCreators(formattedCreators);
     } catch (error) {
-      CustomToast(getBackendErrorMessage(error), "error");
+      console.error("Error fetching top creators:", error);
       // داده‌های نمونه در صورت خطا
       setTopCreators([
         { id: 1, username: "mahditd", avatar: "/images/mahditd.jpg", rank: 1 },
@@ -282,7 +298,10 @@ export default function HomeScreen() {
 
   return (
     <>
-      <div dir="rtl" className="min-h-screen pb-20 bg-background text-foreground transition-colors duration-300">
+      <div
+        dir="rtl"
+        className="min-h-screen pb-20 bg-background text-foreground transition-colors duration-300"
+      >
         <div className="mx-auto pb-6">
           <Formik initialValues={{ q: "" }} onSubmit={() => {}}>
             {({ values, setFieldValue }) => {
@@ -421,17 +440,17 @@ export default function HomeScreen() {
             }}
           </Formik>
           <BottomNav />
-                <div
-        className="w-full mt-[var(--top-page)] p-4"
-        onClick={() => {
-          setTimeout(() => {
-            navigate(`/following/posts`);
-          }, 200);
-        }}
-      >
-        <div
-        dir="ltr"
-          className="
+          <div
+            className="w-full mt-[var(--top-page)] p-4"
+            onClick={() => {
+              setTimeout(() => {
+                navigate(`/following/posts`);
+              }, 200);
+            }}
+          >
+            <div
+              dir="ltr"
+              className="
                 relative
                 flex
                 items-center
@@ -447,23 +466,26 @@ export default function HomeScreen() {
                 active:translate-x-[3px]
                 transition-all duration-25
               "
-          style={{
-            background: "linear-gradient(135deg, var(--secondary), var(--secondary-hover) 80%)",
-          }}
-        >
-          <div className="text-white text-right">
-            <h2 className="text-2xl font-bold mb-2">پست‌های افراد دنبال‌شده</h2>
+              style={{
+                background:
+                  "linear-gradient(135deg, var(--secondary), var(--secondary-hover) 80%)",
+              }}
+            >
+              <div className="text-white text-right">
+                <h2 className="text-2xl font-bold mb-2">
+                  پست‌های افراد دنبال‌شده
+                </h2>
 
-            <p className="text-sm opacity-90">
-دیدن پست‌های افرادی که دنبال می‌کنید
-            </p>
-          </div>
+                <p className="text-sm opacity-90">
+                  دیدن پست‌های افرادی که دنبال می‌کنید
+                </p>
+              </div>
 
-          <div className="relative">
-            <OverlappingCards hasProfiles={true}/>
+              <div className="relative">
+                <OverlappingCards hasProfiles={true} />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
         </div>
       </div>
 
