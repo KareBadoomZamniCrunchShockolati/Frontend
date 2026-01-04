@@ -89,7 +89,7 @@ export default function CustomTextArea({
                 onChange={handleChange}
                 dir={"rtl" }
                 className={`
-                  border !border-[var(--borderDefault)]
+                  border !border-[var(--foreground)]
                   shadow-[0px_1px_0px_var(--borderDefault)]
                   focus:!border-[var(--borderFoucus)]
                   focus:!shadow-[0px_1px_0px_var(--borderFoucusShadow)]
@@ -112,7 +112,7 @@ export default function CustomTextArea({
               {icon && (
                 <div
                   className={`
-                    absolute top-4 text-gray-500 cursor-pointer
+                    absolute top-4 text-gray-text cursor-pointer
                     ${isRTL ? "left-4" : "right-4"}
                   `}
                   onClick={onIconClick}
@@ -127,8 +127,8 @@ export default function CustomTextArea({
                   ${ "right-4" }
                   ${
                     isFloating
-                      ? "top-[-10px] text-xs bg-white px-1 text-black"
-                      : "top-3 text-sm text-gray-500"
+                      ? "top-[-10px] text-xs bg-background px-1 text-foreground"
+                      : "top-3 text-sm text-gray-text"
                   }
                 `}
               >
@@ -149,7 +149,7 @@ export default function CustomTextArea({
 
             {/* شمارنده کاراکتر باقی مانده */}
             <div
-              className={`mt-1 text-xs text-gray-400 ${
+              className={`mt-1 text-xs text-foreground ${
                 "pr-4 text-right"
               }`}
             >

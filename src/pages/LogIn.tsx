@@ -64,14 +64,14 @@ export default function Login() {
 
   return (
     <div
-      className={`w-screen h-screen flex justify-center items-center px-2 bg-cover bg-white ${
+      className={`w-screen h-screen flex justify-center items-center px-2 bg-cover bg-background ${
         !useMobile() && "bg-[url(@/assets/Img/Desktop-background-2.png)]"
       }`}
     >
       <div
         className={`p-5 flex md:flex-row rounded-3xl ${
           useMobile() && "w-9/10"
-        } bg-white`}
+        } bg-background`}
       >
         <div className="hidden md:opacity-100 md:flex items-end justify-center  h-[410px]">
           <img
@@ -100,7 +100,7 @@ export default function Login() {
             {({ isSubmitting }) => (
               <Form>
                 <div className="space-y-8  mx-auto">
-                  <p className="text-right">
+                  <p className="text-right text-gray-text">
                     لطفا ایمیل و رمز عبور خود را وارد کنید
                   </p>
                   <CustomInput name="email" label="ایمیل" />
@@ -128,7 +128,7 @@ export default function Login() {
             <Link to="/signup" className="text-secondary mr-1">
               ثبت نام
             </Link>
-            <p>حساب کاربری ندارید؟</p>
+            <p className="text-gray-text">حساب کاربری ندارید؟</p>
           </div>
         </div>
       </div>

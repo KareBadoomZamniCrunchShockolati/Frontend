@@ -4,8 +4,10 @@ import React from "react";
 import { Calendar, MapPin } from "lucide-react";
 import type { DateAndLocationProps } from "@/types/challengeElementsTypes";
 
-
-const DateAndLocation: React.FC<DateAndLocationProps> = ({ dateRange, location }) => {
+const DateAndLocation: React.FC<DateAndLocationProps> = ({
+  dateRange,
+  location,
+}) => {
   return (
     <div className="space-y-4 mt-6 mb-4 text-right w-full max-w-xl">
       <div className="flex items-center text-sm text-gray-text justify-end w-full">

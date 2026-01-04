@@ -38,7 +38,7 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
           <div className="w-full flex justify-end">
             <label className="flex items-center cursor-pointer">
               <span
-                className={`text-lg text-black mr-2 
+                className={`text-lg text-foreground mr-2 
                           ${
                             textTransparentOnChecked &&
                             isChecked &&

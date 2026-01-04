@@ -8,7 +8,7 @@ const TitleAndDescription: React.FC<ChallengeDescriptionProps> = ({
 }) => {
   return (
     <div className="text-right mb-6 mt-6 max-w-2xl w-full" dir="rtl">
-      <h1 className="text-2xl font-semibold text-black mb-4">{title}</h1>
+      <h1 className="text-2xl font-semibold text-foreground mb-4">{title}</h1>
       <p className="text-md text-gray-text text-justify">{description}</p>
     </div>
   );

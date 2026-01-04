@@ -42,10 +42,10 @@ const OwnerButton = () => {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent
           side="bottom"
-          className="animate-slideIn shadow-xl bg-white [&>button]:hidden rounded-t-2xl w-full sm:w-1/2 md:w-1/2 mx-auto"
+          className="animate-slideIn shadow-xl bg-background border-foreground [&>button]:hidden rounded-t-2xl w-full sm:w-1/2 md:w-1/2 mx-auto"
         >
           <SheetClose asChild>
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1.5 bg-gray-400 rounded-full cursor-pointer hover:bg-gray-500"></div>
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1.5 bg-foreground rounded-full cursor-pointer hover:bg-background"></div>
           </SheetClose>
           <SheetHeader className="flex flex-col items-center justify-center">
             <SheetTitle>کدوم؟</SheetTitle>

@@ -1,7 +1,6 @@
 // src/components/ChallengeManagement/create/LocationMapPicker.tsx
 import React from "react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { LocationMapPickerProps } from "@/types/challengeCreateTypes";
 import orangeMarkerIcon from "./orangeMarkerIcon";
@@ -35,8 +34,10 @@ const LocationMapPicker: React.FC<LocationMapPickerProps> = ({
 
   const mapCenter: [number, number] = position ?? defaultCenter;
 
+  const isDark = document.documentElement.classList.contains("dark");
+
   return (
-    <div className={`${height} w-full rounded-primary-radius overflow-hidden border-2 border-black`}>
+    <div className={`${height} w-full rounded-primary-radius overflow-hidden border-2 border-foreground`}>
       <MapContainer
         center={mapCenter}
         zoom={13}
@@ -46,12 +47,11 @@ const LocationMapPicker: React.FC<LocationMapPickerProps> = ({
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          className={isDark ? "brightness-75 invert hue-rotate-180 contrast-125 saturate-50" : ""}
         />
 
-        {/* Click handler only in editable mode */}
         {!readOnly && <MapClickHandler onClick={handleClick} />}
 
-        {/* Show marker if position is set */}
         {position && <Marker position={position} icon={orangeMarkerIcon} />}
       </MapContainer>
     </div>

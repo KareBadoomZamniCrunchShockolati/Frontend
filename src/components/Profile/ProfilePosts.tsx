@@ -44,9 +44,9 @@ const ProfilePosts = () => {
       <div className="columns-2 sm:columns-3 md:columns-4 gap-3 p-3">
         {postSkeleton.map((post) => (
           <div key={post.id} className="break-inside-avoid mb-3">
-            <Card className="overflow-hidden rounded-[12.5px] shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] border-2 border-black hover:shadow-2xl hover:opacity-90 transition cursor-pointer">
+            <Card className="overflow-hidden rounded-secondary-radius shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] border-2 border-black hover:shadow-2xl hover:opacity-90 transition cursor-pointer">
               <AspectRatio ratio={post.ratio}>
-                <Skeleton className="h-full w-full rounded-[12.5px] rounded-b-none" />
+                <Skeleton className="h-full w-full rounded-secondary-radius rounded-b-none" />
               </AspectRatio>
               <CardFooter className="p-4 py-2 justify-end">
                 <Skeleton className="h-4 w-4/5" />

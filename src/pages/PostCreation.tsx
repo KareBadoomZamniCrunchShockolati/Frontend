@@ -37,10 +37,11 @@ import type {
 const PostCreation = () => {
   const { token, userId } = useUserStore.getState();
   const [imageURLs, setImageURLs] = useState<string[]>([]);
+
   if (!token) {
     CustomToast("باید اول به اکانت خود وارد شوید", "error");
     return (
-      <div className="text-center text-primary mt-8 text-lg font-medium">
+      <div className="min-h-screen bg-background text-center text-foreground mt-8 text-lg font-medium">
         باید اول به اکانت خود وارد شوید
       </div>
     );
@@ -58,8 +59,9 @@ const PostCreation = () => {
       setImageURLs((prev) => [...prev, ...newURLs]);
     }
   };
+
   const handleDelete = (index: number) => {
-    URL.revokeObjectURL(imageURLs[index]); // free memory
+    URL.revokeObjectURL(imageURLs[index]);
     setImages((prev) => prev.filter((_, i) => i !== index));
     setImageURLs((prev) => prev.filter((_, i) => i !== index));
   };
@@ -85,7 +87,6 @@ const PostCreation = () => {
     };
 
     fetchChallenges();
-    // console.log("challenges state:", challenges);
   }, []);
 
   const extractBackendMessage = (error: any) => {
@@ -186,19 +187,12 @@ const PostCreation = () => {
       setSubmitting(false);
     }
   };
-  // const challengess = [
-  //   { id: 1, name: "چالش روزی 8 لیوان آب خوردن" },
-  //   { id: 2, name: "چالش پیاده‌روی هفتگی" },
-  //   { id: 3, name: "چالش سلام دادن با افراد غریبه" },
-  //   { id: 4, name: "چالش شنا کردن" },
-  //   { id: 5, name: "چالش میو میو کردن" },
-  // ];
 
   return (
-    <>
-      <div className="flex items-center justify-between mt-[20px] mr-[24px] ml-[24px]">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 flex flex-col">
+      <div className="flex items-center justify-between mt-4 mr-[24px] ml-[24px]">
         <button
-          className="p-2 border-2 border-primary rounded-xl hover:bg-primary-hover transition-colors"
+          className="p-2 border-2 border-foreground rounded-xl hover:bg-muted transition-colors"
           onClick={() => navigate(`/dashboard/${userId}`)}
         >
           <ArrowLeft className="w-8 h-8 text-primary" />
@@ -209,7 +203,6 @@ const PostCreation = () => {
         </p>
       </div>
 
-      {/* FORM */}
       <Formik
         initialValues={{
           description: "",
@@ -218,10 +211,9 @@ const PostCreation = () => {
         onSubmit={handleSubmit}
       >
         {({ values, setFieldValue, isSubmitting }) => (
-          <Form>
-            {/* Image preview + Upload */}
+          <Form className="flex-1 flex flex-col">
             <div className="flex flex-col items-center gap-2 mr-[24px] ml-[24px] mt-[20px]">
-              <label className="w-full h-64 border-2 border-neutral-gray rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden">
+              <label className="w-full h-64 border-2 border-foreground rounded-xl flex items-center justify-center cursor-pointer relative overflow-hidden bg-card">
                 {images.length > 0 ? (
                   <Carousel className="w-full h-full relative">
                     <CarouselContent className="h-full">
@@ -243,18 +235,17 @@ const PostCreation = () => {
                       ))}
                     </CarouselContent>
 
-                    {/* Absolute buttons on the edges of the label */}
                     <CarouselPrevious
                       type="button"
-                      className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20"
+                      className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-card rounded-full p-1 shadow-md z-20"
                     />
                     <CarouselNext
                       type="button"
-                      className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20"
+                      className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-card rounded-full p-1 shadow-md z-20"
                     />
                   </Carousel>
                 ) : (
-                  <span className="text-neutral-gray font-bold text-center">
+                  <span className="text-muted-foreground font-bold text-center">
                     پیش‌نمایه
                   </span>
                 )}
@@ -273,9 +264,7 @@ const PostCreation = () => {
               </CustomButton>
             </div>
 
-            {/* Description */}
-            <div className="mr-[24px] ml-[24px] mt-[22.5px]">
-              {/* <p className="text-right text-xl font-bold mb-2">توضیحات</p> */}
+            <div className="mr-[24px] ml-[24px] mt-[22.5px] flex-1">
               <CustomInput
                 name="description"
                 label="توضیحات"
@@ -284,7 +273,7 @@ const PostCreation = () => {
                 as="textarea"
               />
             </div>
-            {/* challenge selector */}
+
             <div className="mr-[24px] ml-[24px] mt-[12.5px]">
               <p className="text-right text-xl font-bold mb-2">
                 چالش مربوطه (اختیاری)
@@ -297,14 +286,12 @@ const PostCreation = () => {
                 }
                 onChange={(item) => {
                   setFieldValue("challengeID", item.id);
-                  console.log("Selected challenge ID:", values.challengeID);
                 }}
                 placeHolder="انتخاب چالش"
               />
             </div>
 
-            {/* Submit Button */}
-            <div className="mt-10 mr-[24px] ml-[24px]">
+            <div className="mt-10 mr-[24px] ml-[24px] pb-6">
               <CustomButton
                 type="submit"
                 className="h-[46.6px] bg-secondary w-full"
@@ -318,7 +305,7 @@ const PostCreation = () => {
           </Form>
         )}
       </Formik>
-    </>
+    </div>
   );
 };
 

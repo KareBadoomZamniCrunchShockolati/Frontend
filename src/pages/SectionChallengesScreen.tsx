@@ -241,9 +241,9 @@ export default function SectionChallengesScreen() {
   }, []);
 
   return (
-    <div dir="rtl" className="min-h-screen bg-white">
+    <div dir="rtl" className="min-h-screen bg-background">
       {/* Header (Back button + Title) */}
-      <div className="sticky top-0 z-10 bg-white px-4 pt-4 pb-3 shadow-sm">
+      <div className="sticky top-0 z-10 bg-background px-4 pt-4 pb-3 shadow-sm">
         <div className="flex items-center justify-between" dir="ltr">
           <button
             type="button"

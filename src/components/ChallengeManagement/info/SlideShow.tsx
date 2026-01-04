@@ -27,13 +27,13 @@ const ChallengeSlideshow: React.FC<ChallengeSlideshowProps> = ({
       {/* Slideshow Navigation Buttons */}
       <div className="absolute top-1/2 left-0 w-full flex justify-between transform -translate-y-1/2">
         <CustomButton
-          className="bg-white text-secondary shadow-none hover:bg-blue-400 p-2 w-7 sm:w-8 md:w-8 rounded-[8px]"
+          className="bg-white text-secondary shadow-none hover:bg-blue-400 p-2 w-7 sm:w-8 md:w-8 rounded-primary-radius"
           onClick={prevSlide}
         >
           &#8249;
         </CustomButton>
         <CustomButton
-          className="bg-white text-secondary shadow-none hover:bg-blue-400 p-2 w-7 sm:w-8 md:w-8 rounded-[8px]"
+          className="bg-white text-secondary shadow-none hover:bg-blue-400 p-2 w-7 sm:w-8 md:w-8 rounded-primary-radius"
           onClick={nextSlide}
         >
           &#8250;

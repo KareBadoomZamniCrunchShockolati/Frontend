@@ -30,7 +30,7 @@ const CommentCard = ({
   const entityId = Number(id);
   const [openReplySection, setOpenReplySection] = useState(false);
   const replyColor = openReplySection ? "text-neutral-gray" : "text-primary";
-  const pasokhColor = openReplySection ? "text-neutral-gray" : "text-black";
+  const pasokhColor = openReplySection ? "text-neutral-gray" : "text-foreground";
   const [isLiked, setIsLiked] = useState(comment.is_liked);
   const [likeCount, setLikeCount] = useState(comment.like_count);
   const isFirstLevel = comment.parent_id ? false : true;
@@ -196,7 +196,7 @@ const CommentCard = ({
                 className={`w-5 h-5 ${thumsupColor} scale-x-[-1]`}
                 onClick={handleLikeToggle}
               />
-              <p className="text-black font-semibold text-xs">
+              <p className="text-foreground font-semibold text-xs">
                 {convertToPersianDigits(formatFollowBarNumber(likeCount))}
               </p>
             </div>

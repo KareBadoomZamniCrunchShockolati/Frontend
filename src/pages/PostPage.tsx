@@ -119,7 +119,7 @@ const PostPage = () => {
     //skeleton loading
     if (loading) {
       return (
-        <div className="w-full flex justify-center p-4">
+        <div className="w-full flex justify-center p-4 bg-background">
           <div className="w-full max-w-md relative">
             {/* Top User Info */}
             <div className="w-full flex items-center gap-3 mb-[10px]" dir="rtl">
@@ -203,7 +203,7 @@ const PostPage = () => {
       );
     }
     return (
-      <div className="w-full flex justify-center p-4">
+      <div className="w-full flex justify-center bg-background p-4">
         <div className="w-full max-w-md relative">
           <div className="w-full flex items-center gap-3 mb-[10px]" dir="rtl">
             <Avatar
@@ -222,12 +222,12 @@ const PostPage = () => {
               </AvatarFallback>
             </Avatar>
             <div dir="rtl" className="flex flex-col gap-2 translate-y-[2px]">
-              <p className="text-sm sm:text-base font-semibold text-black" onClick={() => navigate(`/dashboard/${postData?.user_id}`)}>
+              <p className="text-sm sm:text-base font-semibold text-foreground" onClick={() => navigate(`/dashboard/${postData?.user_id}`)}>
                 {postData?.username}
               </p>
               <p
                 dir="rtl"
-                className="text-xs text-neutral-gray-bold font-semibold"
+                className="text-xs text-gray-text font-semibold"
               >
                 {convertToPersianDigits(timeAgo(postData?.created_at || ""))}
               </p>
@@ -235,7 +235,7 @@ const PostPage = () => {
             <div className="ms-auto">
               <TertiaryCustomButton
                 onClick={() => navigate(`/editpost/${postId}`)}
-                className="text-primary"
+                className="text-primary bg-background hover:bg-muted"
               >
                 ویرایش پست
                 <Pencil />
@@ -270,13 +270,13 @@ const PostPage = () => {
                 {postmock.imageUrl.length > 1 && (
                   <CarouselPrevious
                     type="button"
-                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20"
+                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-background rounded-full p-1 shadow-md z-20"
                   />
                 )}
                 {postmock.imageUrl.length > 1 && (
                   <CarouselNext
                     type="button"
-                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white rounded-full p-1 shadow-md z-20"
+                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-background rounded-full p-1 shadow-md z-20"
                   />
                 )}
               </Carousel>
@@ -305,6 +305,7 @@ const PostPage = () => {
               <div className="flex items-center gap-[16px] mb-[25px]" dir="rtl">
                 <div className="gap-[4px] flex items-center" dir="rtl">
                   <TertiaryCustomButton
+                  className="bg-background hover:bg-muted"
                     isGray={isLiked}
                     onClick={handleLikeToggle}
                   >
@@ -324,7 +325,8 @@ const PostPage = () => {
                   </p>
                 </div>
                 <div className="gap-[4px] flex items-center" dir="rtl">
-                  <TertiaryCustomButton pageAddress={`/post/${postData?.id}/comments`}>
+                  <TertiaryCustomButton className="bg-background hover:bg-muted" pageAddress={`/post/${postData?.id}/comments`}>
+                  
                     <span dir="rtl" className="text-primary">
                       نظر
                     </span>
@@ -404,7 +406,7 @@ const PostPage = () => {
     );
   }
   return (
-    <div className="w-full flex justify-center p-4">
+    <div className="w-full flex justify-center bg-background p-4">
       <div className="w-full max-w-md relative">
         <div className="w-full flex items-center gap-3 mb-[10px]" dir="rtl">
           <Avatar

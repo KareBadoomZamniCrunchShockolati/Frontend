@@ -1,16 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { mockComments } from "@/data/mockComments";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { CommentRequest, CommentResponse } from "@/types/commentTypes";
-import { Form, Formik, type FormikHelpers } from "formik";
-import CustomInput from "@/components/Custom/CustomInput";
 import CustomButton from "@/components/Custom/CustomButton";
-import { ArrowLeft, MessageCircle } from "lucide-react";
 import CustomToast from "@/components/Custom/CustomToast";
-import { Card, CardContent } from "@/components/ui/card";
-import { ThumbsUp } from "lucide-react";
-import TertiaryCustomButton from "@/components/Custom/TertiaryCustomButton";
+import LoadingPage from "@/components/Custom/LoadingPage";
+import useUserStore from "@/store/userStore/userStore";
+import { ArrowLeft, MessageCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import CustomInput from "@/components/Custom/CustomInput";
+import { Form, Formik, type FormikHelpers } from "formik";
 import CommentCard from "@/components/Custom/CommentCard";
 import {
   CommentChallengeService,
@@ -23,6 +19,7 @@ import { getBackendErrorMessage } from "@/services/errorService";
 interface props {
   entityType: "challenge" | "post";
 }
+
 const Comments = ({ entityType }: props) => {
   const { id } = useParams();
   const entityId = Number(id);
@@ -30,11 +27,6 @@ const Comments = ({ entityType }: props) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   setComments(mockComments);
-  //   setLoading(false);
-  // }, []);
 
   const fetchComments = async () => {
     try {
@@ -45,41 +37,34 @@ const Comments = ({ entityType }: props) => {
         const res = await GetCommentsPostService(entityId);
         setComments(Array.isArray(res) ? res : []);
       }
-      // console.log(comments);
     } catch (err) {
       CustomToast(getBackendErrorMessage(err), "error");
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchComments();
-    console.log("comments:", comments);
   }, [entityId]);
-
-  if (loading) return <div>Loading comments...</div>; //need to make skeleton for this instead ------------------------------------
-  if (error) return <div>{error}</div>;
 
   const handleSubmitComment = async (
     values: { commentText: string },
     { resetForm }: FormikHelpers<{ commentText: string }>
   ) => {
     try {
-      console.log("Submitting comment with values:", values);
       if (entityType === "challenge") {
-        const response: CommentResponse = await CommentChallengeService({
+        await CommentChallengeService({
           entity_type: entityType,
           entity_id: entityId,
           content: values.commentText,
         });
-        console.log("Comment submitted:", response);
       } else {
-        const response: CommentResponse = await CommentPostService({
+        await CommentPostService({
           entity_type: entityType,
           entity_id: entityId,
           content: values.commentText,
         });
-        console.log("Comment submitted:", response);
       }
       CustomToast("نظر با موفقیت ایجاد شد!", "success");
       fetchComments();
@@ -88,12 +73,17 @@ const Comments = ({ entityType }: props) => {
       CustomToast(getBackendErrorMessage(error), "error");
     }
   };
+
+  if (loading) return <LoadingPage />;
+
+  if (error) return <div className="text-center text-destructive mt-10">{error}</div>;
+
   return (
-    <>
-      <div className="px-[var(--side-page)] mt-[var(--top-page)]">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 flex flex-col">
+      <div className="px-[var(--side-page)] pt-[var(--top-page)] pb-4">
+        <div className="flex items-center justify-between mb-6">
           <button
-            className="p-2 border-2 border-primary rounded-xl hover:bg-primary-hover transition-colors"
+            className="p-2 border-2 border-foreground rounded-xl hover:bg-muted transition-colors"
             onClick={() => navigate(`/${entityType}/${entityId}`)}
           >
             <ArrowLeft className="w-8 h-8 text-primary" />
@@ -104,46 +94,48 @@ const Comments = ({ entityType }: props) => {
           </p>
         </div>
 
-        <div className="flex items-center mt-[var(--top-page)]" dir="rtl">
-          <Formik
-            initialValues={{ commentText: "" }}
-            onSubmit={handleSubmitComment}
-          >
-            {({ handleSubmit }) => (
-              <Form onSubmit={handleSubmit} className="w-full">
-                <div className="w-full flex items-center gap-1">
-                  <CustomInput width="w-full" name="commentText" label="نظر" />
-                  <CustomButton
-                    type="submit"
-                    className="bg-secondary hover:bg-secondary-hover"
-                  >
-                    ارسال نظر
-                  </CustomButton>
-                </div>
-              </Form>
-            )}
-          </Formik>
-        </div>
+        <Formik
+          initialValues={{ commentText: "" }}
+          onSubmit={handleSubmitComment}
+        >
+          {({ handleSubmit }) => (
+            <Form onSubmit={handleSubmit} className="w-full">
+              <div className="flex items-center gap-2">
+                <CustomInput
+                  width="w-full"
+                  name="commentText"
+                  label="نظر"
+                  className="bg-card"
+                />
+                <CustomButton
+                  type="submit"
+                  className="bg-secondary hover:bg-secondary-hover whitespace-nowrap"
+                >
+                  ارسال نظر
+                </CustomButton>
+              </div>
+            </Form>
+          )}
+        </Formik>
       </div>
 
-      <div className="flex flex-col gap-[var(--comment-gap)] my-[var(--top-page)] mx-[var(--side-page)]">
-        {comments.length === 0 && (
-          <p className="text-center text-primary font-medium">
-            ! هنوز نظری ثبت نشده است
+      <div className="flex-1 flex flex-col gap-[var(--comment-gap)] px-[var(--side-page)] pb-[var(--top-page)]">
+        {comments.length === 0 ? (
+          <p className="text-center text-muted-foreground font-medium mt-10">
+            هنوز نظری ثبت نشده است!
           </p>
+        ) : (
+          comments.map((comment) => (
+            <CommentCard
+              key={comment.id}
+              comment={comment}
+              refreshComments={fetchComments}
+              entityType={entityType}
+            />
+          ))
         )}
-        {comments.map((comment) => (
-          <CommentCard
-            key={comment.id}
-            comment={comment}
-            refreshComments={fetchComments}
-            entityType={entityType}
-          />
-        ))}
-        {/* <CommentCard isFirstLevel={true} id={1} />
-        <CommentCard isFirstLevel={false} id={2} /> */}
       </div>
-    </>
+    </div>
   );
 };
 

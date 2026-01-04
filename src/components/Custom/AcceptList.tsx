@@ -10,7 +10,6 @@ import {
   showRequestingUsers,
 } from "@/services/challengeService";
 import type { User } from "@/types/acceptUser";
-import styles from "./AcceptList.module.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { getBackendErrorMessage } from "@/services/errorService";
 import CustomToast from "./CustomToast";
@@ -20,6 +19,7 @@ const AcceptList = () => {
   const [users, setUsers] = useState<User[]>([]);
   const navigate = useNavigate();
   const { challengeId } = useParams<{ challengeId: string }>();
+
   const searchedUsers = users.filter((user) =>
     user.user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -62,44 +62,58 @@ const AcceptList = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <TopBackText text="درخواست‌ های پیوستن" />
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+      <TopBackText text="درخواست‌های پیوستن" />
       <SearchBar searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
       <div
-        className={styles.scrollContainer}
+        className="flex-1 overflow-y-auto px-[var(--side-page)] pb-20"
         style={
           {
             "--thumb-image": `url('${thumb}')`,
           } as React.CSSProperties
         }
       >
-        <div className={styles.usersList}>
-          {searchedUsers.map((user) => (
-            <div
-              onClick={() => console.log(user)}
-              key={user.requestId}
-              className={styles.userCard}
-            >
-              <div className={styles.userInfo}>
-                <img className={styles.profileImage} src={""} alt="profile" />
-                <p className={styles.username}>{user.user.username}</p>
+        <div className="space-y-4 py-4">
+          {searchedUsers.length === 0 ? (
+            <p className="text-center text-muted-foreground py-8">
+              درخواستی برای پیوستن وجود ندارد
+            </p>
+          ) : (
+            searchedUsers.map((user) => (
+              <div
+                key={user.requestId}
+                className="flex items-center justify-between p-4 rounded-xl bg-card border border-foreground/20 shadow-sm"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                    <img
+                      className="w-full h-full object-cover"
+                      src={user.user.profile_picture || ""}
+                      alt={user.user.username}
+                    />
+                  </div>
+                  <p className="font-medium text-foreground">
+                    {user.user.username}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    className="p-2 rounded-lg bg-destructive/10 hover:bg-destructive/20 transition-colors"
+                    onClick={() => handleDelete(user.requestId)}
+                  >
+                    <img src={cross} alt="رد کردن" className="w-6 h-6" />
+                  </button>
+                  <button
+                    className="p-2 rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors"
+                    onClick={() => handleAccept(user.requestId)}
+                  >
+                    <img src={tick} alt="پذیرش" className="w-6 h-6" />
+                  </button>
+                </div>
               </div>
-              <div className={styles.actionButtons}>
-                <button
-                  className={styles.actionButton}
-                  onClick={() => handleDelete(user.requestId)}
-                >
-                  <img src={cross} alt="" />
-                </button>
-                <button
-                  className={styles.actionButton}
-                  onClick={() => handleAccept(user.requestId)}
-                >
-                  <img src={tick} alt="" />
-                </button>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>
