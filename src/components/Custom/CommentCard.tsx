@@ -196,7 +196,7 @@ const CommentCard = ({
                 className={`w-5 h-5 ${thumsupColor} scale-x-[-1]`}
                 onClick={handleLikeToggle}
               />
-              <p className="text-black font-semibold text-xs">
+              <p className="text-foreground font-semibold text-xs">
                 {convertToPersianDigits(formatFollowBarNumber(likeCount))}
               </p>
             </div>
